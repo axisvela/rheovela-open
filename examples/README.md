@@ -132,6 +132,10 @@ compensate <activity-id> with <activity-id>        // 通过另一个活动补�
 > `WorkflowDefinition` JSON schema（`contracts.Stage` / `contracts.Transition`
 > 尚无对应字段）；它们由 core 的 effect ledger / compensation 计划器消费。
 
+> 所有示例 `WorkflowDefinition` JSON 均符合 `api/workflow.schema.json`
+> （draft-07），可用任意 JSON Schema 校验器或 `go test ./api/ -v` 的
+> `TestWorkflowSchemaValidatesSample` 验证。
+
 ### 2. 定义并运行
 
 以 `PurchaseApproval` 为例（Windows PowerShell / 类 Unix shell 均可）：
