@@ -22,6 +22,10 @@ func TestMigratedInCatalog(t *testing.T) {
 	assert.Contains(t, contracts.KnownEventTypes, "Migrated")
 }
 
+func TestCompensationExecutedInCatalog(t *testing.T) {
+	assert.Contains(t, contracts.KnownEventTypes, "CompensationExecuted")
+}
+
 func TestEventRoundTrip(t *testing.T) {
 	ev := contracts.Event{
 		ID:            "e1",
