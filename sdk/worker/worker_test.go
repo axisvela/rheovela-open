@@ -20,6 +20,8 @@ type fakeStore struct {
 	failed   map[string]string
 	claims   int
 	claimErr error
+	hbCalls  int  // total Heartbeat calls
+	hbFailAt int  // 1-based: fail the Nth Heartbeat call; 0 = never fail
 }
 
 func newFakeStore(items ...WorkItem) *fakeStore {
@@ -64,6 +66,10 @@ func (s *fakeStore) Claim(id string, lease time.Duration) (string, error) {
 func (s *fakeStore) Heartbeat(id, token string, lease time.Duration) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
+	s.hbCalls++
+	if s.hbFailAt > 0 && s.hbCalls == s.hbFailAt {
+		return errors.New("lease expired")
+	}
 	if !s.leased[id] {
 		return errors.New("not leased")
 	}
@@ -149,4 +155,61 @@ func TestProcessOnceStopsOnCancellation(t *testing.T) {
 	n, err := w.ProcessOnce(ctx)
 	assert.Equal(t, 0, n)
 	assert.ErrorIs(t, err, context.Canceled)
+}
+
+func TestProcessOnceHeartbeatsDuringWork(t *testing.T) {
+	store := newFakeStore(WorkItem{ID: "hb1", InstanceID: "i1", ActivityID: "a1", State: "ready"})
+	w := New(store, func(ctx context.Context, item WorkItem) WorkResult {
+		select {
+		case <-ctx.Done():
+			return WorkResult{Status: "failure", Error: "canceled"}
+		case <-time.After(150 * time.Millisecond):
+		}
+		return WorkResult{Status: "success", Outcome: "slow ok"}
+	}, time.Second, WithHeartbeatInterval(50*time.Millisecond))
+
+	n, err := w.ProcessOnce(context.Background())
+	require.NoError(t, err)
+	assert.Equal(t, 1, n)
+	assert.Equal(t, []string{"hb1"}, store.done)
+	store.mu.Lock()
+	defer store.mu.Unlock()
+	assert.GreaterOrEqual(t, store.hbCalls, 1, "heartbeat should fire during long-running fn")
+}
+
+func TestHeartbeatFailureCancelsWork(t *testing.T) {
+	store := newFakeStore(WorkItem{ID: "hb2", InstanceID: "i2", ActivityID: "a2", State: "ready"})
+	store.hbFailAt = 1
+	var canceled bool
+	w := New(store, func(ctx context.Context, item WorkItem) WorkResult {
+		select {
+		case <-ctx.Done():
+			canceled = true
+			return WorkResult{Status: "success", Outcome: "ctx canceled"}
+		case <-time.After(5 * time.Second):
+			return WorkResult{Status: "success", Outcome: "timeout"}
+		}
+	}, time.Second, WithHeartbeatInterval(50*time.Millisecond))
+
+	n, err := w.ProcessOnce(context.Background())
+	require.NoError(t, err)
+	assert.Equal(t, 1, n)
+	assert.True(t, canceled, "fn context should be canceled on heartbeat failure")
+	assert.Empty(t, store.done)
+	store.mu.Lock()
+	defer store.mu.Unlock()
+	assert.Equal(t, map[string]string{"hb2": "lease lost"}, store.failed)
+}
+
+func TestNoHeartbeatForFastTask(t *testing.T) {
+	store := newFakeStore(WorkItem{ID: "fast", InstanceID: "i1", ActivityID: "a1", State: "ready"})
+	w := New(store, func(ctx context.Context, item WorkItem) WorkResult {
+		return WorkResult{Status: "success", Outcome: "ok"}
+	}, time.Second)
+
+	n, err := w.ProcessOnce(context.Background())
+	require.NoError(t, err)
+	assert.Equal(t, 1, n)
+	assert.Equal(t, []string{"fast"}, store.done)
+	assert.Empty(t, store.failed)
 }

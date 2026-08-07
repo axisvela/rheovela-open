@@ -3,6 +3,7 @@ package worker
 
 import (
 	"context"
+	"sync/atomic"
 	"time"
 )
 
@@ -31,10 +32,11 @@ type WorkStore interface {
 }
 
 type Worker struct {
-	store WorkStore
-	lease time.Duration
-	fn    WorkFn
-	logf  func(format string, args ...any)
+	store             WorkStore
+	lease             time.Duration
+	fn                WorkFn
+	logf              func(format string, args ...any)
+	heartbeatInterval time.Duration
 }
 
 type Option func(*Worker)
@@ -43,8 +45,21 @@ func WithLogger(logf func(format string, args ...any)) Option {
 	return func(w *Worker) { w.logf = logf }
 }
 
+func WithHeartbeatInterval(d time.Duration) Option {
+	return func(w *Worker) { w.heartbeatInterval = d }
+}
+
 func New(store WorkStore, fn WorkFn, lease time.Duration, opts ...Option) *Worker {
-	w := &Worker{store: store, fn: fn, lease: lease, logf: func(string, ...any) {}}
+	w := &Worker{
+		store:             store,
+		fn:                fn,
+		lease:             lease,
+		logf:              func(string, ...any) {},
+		heartbeatInterval: lease / 2,
+	}
+	if w.heartbeatInterval < time.Second {
+		w.heartbeatInterval = time.Second
+	}
 	for _, o := range opts {
 		o(w)
 	}
@@ -68,7 +83,7 @@ func (w *Worker) ProcessOnce(ctx context.Context) (int, error) {
 			continue
 		}
 		w.logf("claim %s token=%s", it.ID, token)
-		res := w.fn(ctx, it)
+		res := w.runWithHeartbeat(ctx, it, token)
 		if res.Status == "success" {
 			if err := w.store.Complete(it.ID, token); err != nil {
 				w.logf("complete %s: %v", it.ID, err)
@@ -83,4 +98,39 @@ func (w *Worker) ProcessOnce(ctx context.Context) (int, error) {
 		processed++
 	}
 	return processed, nil
+}
+
+// runWithHeartbeat 运行 fn，并在后台按 heartbeatInterval 定期发送心跳以续租。
+// 若心跳失败（租约过期/stale token），则取消 fn 的上下文并返回 "lease lost" 失败结果。
+// 心跳 goroutine 在 fn 返回后通过 stop 通道停止，不会泄漏。
+func (w *Worker) runWithHeartbeat(ctx context.Context, item WorkItem, token string) WorkResult {
+	hctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
+	stop := make(chan struct{})
+	var leaseLost atomic.Bool
+	go func() {
+		t := time.NewTicker(w.heartbeatInterval)
+		defer t.Stop()
+		for {
+			select {
+			case <-stop:
+				return
+			case <-t.C:
+				if err := w.store.Heartbeat(item.ID, token, w.lease); err != nil {
+					w.logf("heartbeat %s: %v", item.ID, err)
+					leaseLost.Store(true)
+					cancel()
+					return
+				}
+			}
+		}
+	}()
+
+	res := w.fn(hctx, item)
+	close(stop)
+	if leaseLost.Load() {
+		return WorkResult{Status: "failure", Error: "lease lost"}
+	}
+	return res
 }
