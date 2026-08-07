@@ -18,6 +18,10 @@ func TestStageAssignedInCatalog(t *testing.T) {
 	assert.Contains(t, contracts.KnownEventTypes, "StageAssigned")
 }
 
+func TestMigratedInCatalog(t *testing.T) {
+	assert.Contains(t, contracts.KnownEventTypes, "Migrated")
+}
+
 func TestEventRoundTrip(t *testing.T) {
 	ev := contracts.Event{
 		ID:            "e1",
