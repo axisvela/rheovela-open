@@ -1,0 +1,9 @@
+// PurchaseApproval — 采购审批（RHEO IR 示例，schema 兼容 core 的 internal/rheoir DSL）。
+process PurchaseApproval v1 {
+  activity validate : AgentTask capability "invoice.validate"
+  activity approve  : HumanTask role "cost-center-owner"
+  activity post     : ServiceTask capability "erp.invoice.post" effect_key "invoice/${id}"
+  compensate post with capability "erp.invoice.reverse"
+  transition validate -> approve when amount >= 1000
+  transition validate -> post when amount < 1000
+}

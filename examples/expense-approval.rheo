@@ -1,0 +1,12 @@
+// ExpenseApproval — 费用报销（4 阶段：validate → approve → financeCheck → pay，
+// 带条件分支与补偿，RHEO IR 示例）。
+process ExpenseApproval v1 {
+  activity validate     : AgentTask capability "expense.validate"
+  activity approve      : HumanTask role "manager"
+  activity financeCheck : HumanTask role "finance-team"
+  activity pay          : ServiceTask capability "payroll.pay" effect_key "payment/${id}"
+  compensate pay with capability "payroll.reverse"
+  transition validate -> approve
+  transition approve -> financeCheck when amount >= 1000
+  transition financeCheck -> pay
+}
