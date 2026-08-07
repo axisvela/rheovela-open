@@ -208,5 +208,6 @@ false`；有签名则按 `Verify` 结果判定。**404**：实例不存在。
 ## 完整 JSON schema
 
 契约型（`WorkflowDefinition` / `Event` / `ProcessInstance`）定义见
-`contracts/types.go`（`schema_version=1`）。CLI 完整命令与 Go API 见 core
-`docs/api.md`。
+`contracts/types.go`（`schema_version=1`）。JSON Schema（draft-07）见
+`workflow.schema.json` 与 `event.schema.json`，可用任意 JSON Schema 校验器
+或 `go test ./api/ -v` 验证。CLI 完整命令与 Go API 见 core `docs/api.md`。

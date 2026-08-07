@@ -164,6 +164,78 @@ func TestWorkflowSchemaValidatesSample(t *testing.T) {
 	}
 }
 
+func TestEventSchema(t *testing.T) {
+	path := filepath.Join("..", "api", "event.schema.json")
+	if _, err := os.Stat(path); err != nil {
+		t.Fatalf("schema file not found: %v", err)
+	}
+	raw, err := os.ReadFile(path)
+	if err != nil {
+		t.Fatalf("read schema: %v", err)
+	}
+	var root map[string]any
+	if err := json.Unmarshal(raw, &root); err != nil {
+		t.Fatalf("schema is not valid JSON: %v", err)
+	}
+
+	if got := root["$schema"]; got != "http://json-schema.org/draft-07/schema#" {
+		t.Errorf("$schema = %v, want draft-07 URI", got)
+	}
+	if root["$id"] == nil || root["$id"] == "" {
+		t.Errorf("$id must be present")
+	}
+	if root["type"] != "object" {
+		t.Errorf("type = %v, want object", root["type"])
+	}
+
+	required := requiredStrings(root)
+	for _, wantKey := range []string{"id", "stream_id", "actor_id", "type", "payload", "wall_time"} {
+		if !contains(required, wantKey) {
+			t.Errorf("required array is missing %q", wantKey)
+		}
+	}
+
+	properties, ok := root["properties"].(map[string]any)
+	if !ok {
+		t.Fatalf("properties is not an object schema")
+	}
+	typeSchema, ok := properties["type"].(map[string]any)
+	if !ok {
+		t.Fatalf("properties.type is not an object schema")
+	}
+	typeEnum, ok := typeSchema["enum"].([]any)
+	if !ok || len(typeEnum) == 0 {
+		t.Fatalf("properties.type must declare a non-empty enum")
+	}
+	for _, wantType := range []string{"RunOpened", "ProcessSuspended"} {
+		if !containsAny(typeEnum, wantType) {
+			t.Errorf("type enum is missing %q", wantType)
+		}
+	}
+
+	payload, ok := properties["payload"].(map[string]any)
+	if !ok {
+		t.Fatalf("properties.payload is not an object schema")
+	}
+	if payload["type"] != "object" {
+		t.Errorf("properties.payload.type = %v, want object", payload["type"])
+	}
+
+	sv, ok := properties["schema_version"].(map[string]any)
+	if !ok {
+		t.Fatalf("properties.schema_version is not an object schema")
+	}
+	if sv["default"] != "1" {
+		t.Errorf("properties.schema_version.default = %v, want \"1\"", sv["default"])
+	}
+
+	if sig, ok := properties["signature"].(map[string]any); ok {
+		if sig["type"] != "string" {
+			t.Errorf("properties.signature.type = %v, want string", sig["type"])
+		}
+	}
+}
+
 func contains(xs []string, want string) bool {
 	for _, x := range xs {
 		if x == want {

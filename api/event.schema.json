@@ -1,0 +1,59 @@
+{
+  "$id": "https://github.com/axisrobo/rheovela-open/blob/wave21-open/api/event.schema.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Event",
+  "description": "RHEOVELA Event contract (schema_version=1). Event-sourced run ledger record consumed by the engine/validator and the audit evidence chain.",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["id", "stream_id", "actor_id", "type", "payload", "wall_time"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "stream_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "actor_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "RunOpened",
+        "StepEntered",
+        "StepCompleted",
+        "StepFailed",
+        "StepSkipped",
+        "RunClosed",
+        "StageAssigned",
+        "TimerFired",
+        "Migrated",
+        "SubprocessStarted",
+        "CompensationExecuted",
+        "ProcessSuspended",
+        "ProcessResumed"
+      ]
+    },
+    "payload": {
+      "type": "object"
+    },
+    "lamport_clock": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "wall_time": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "schema_version": {
+      "type": "string",
+      "default": "1"
+    },
+    "signature": {
+      "type": "string"
+    }
+  }
+}
