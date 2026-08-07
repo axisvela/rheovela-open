@@ -26,6 +26,10 @@ func TestCompensationExecutedInCatalog(t *testing.T) {
 	assert.Contains(t, contracts.KnownEventTypes, "CompensationExecuted")
 }
 
+func TestSubprocessStartedInCatalog(t *testing.T) {
+	assert.Contains(t, contracts.KnownEventTypes, "SubprocessStarted")
+}
+
 func TestEventRoundTrip(t *testing.T) {
 	ev := contracts.Event{
 		ID:            "e1",

@@ -12,6 +12,7 @@ const SchemaVersion = "1"
 var KnownEventTypes = []string{
 	"RunOpened", "StepEntered", "StepCompleted", "StepFailed", "StepSkipped",
 	"RunClosed", "StageAssigned", "TimerFired", "Migrated", "CompensationExecuted",
+	"SubprocessStarted",
 }
 
 type ActorType string
