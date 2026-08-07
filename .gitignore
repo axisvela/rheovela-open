@@ -1,5 +1,7 @@
 *.exe
 *.test
+__pycache__/
+*.pyc
 .idea/
 .vscode/
 .DS_Store
