@@ -224,3 +224,63 @@ go test ./examples/go-worker/ -v   # TestExampleWorkerFlow
 实现了 `WorkStore`，将 `PollReady` / `Claim` / `Heartbeat` / `Complete` / `Fail`
 映射到 core 的 Worker HTTP API（`rheo serve`）。接入时只需把 `worker.New`
 的第一个参数从 `fakeStore` 替换为 `runtime.WorkerBridge` 实例即可，其余处理逻辑不变。
+
+## Python Worker 示例（SDK 端到端）
+
+`python-worker/main.py` 是一个可运行的 Python worker 示例，演示 `sdk/python/worker.py`
+的完整处理循环：poll → claim → complete/fail。它启动一个本地 fake Worker-API 服务器
+（stdlib `http.server`，内存 dict 存储），进程结束后自动关闭。仅依赖 Python 标准库。
+
+示例复用 `sdk/python/worker.py` 的 `Client` / `Worker`（通过 `sys.path` 引入），
+`task-1` 返回 `success` → `done`；`task-2` 返回 `failure` → `failed`。
+
+### 运行
+
+```sh
+python examples/python-worker/main.py
+```
+
+预期输出：
+
+```
+processed=2
+  task-1: done
+  task-2: failed
+```
+
+### 对接真实 core
+
+示例中的 `FakeWorkerServer` 实现了 Worker HTTP API（`GET /api/v1/work-items`、
+`POST .../claim` / `complete` / `fail`）。生产环境中该 API 由 core 的 `rheo serve`
+提供，把 `Client(srv.base_url)` 换成 `Client("http://localhost:8080")` 即可。
+
+## TypeScript Worker 示例（SDK 端到端）
+
+`typescript-worker/worker-example.mjs` 是一个可运行的 ESM 脚本（Node 18+），演示
+`Worker.processOnce()` 的完整处理循环：poll → claim → complete/fail。它 mock
+`globalThis.fetch` 指向一个内存中的 Worker-API 响应，无需任何运行时依赖。
+
+> Node 无法直接 `import` `.ts` 文件（需 transform），因此脚本内联了一份与
+> `sdk/typescript/worker.ts` 对应的 `Client` / `Worker` 最小实现，并注明镜像自 SDK。
+
+`task-1` 返回 `success` → `done`；`task-2` 返回 `failure` → `failed`。
+
+### 运行
+
+```sh
+node examples/typescript-worker/worker-example.mjs
+```
+
+预期输出：
+
+```
+processed=2
+  task-1: done
+  task-2: failed
+```
+
+### 对接真实 core
+
+示例中 mock 的 `fetch` 返回 Worker HTTP API 的响应。生产环境中把
+`new Client("http://fake")` 换成 `new Client("http://localhost:8080")` 并移除
+`globalThis.fetch` 的 mock 即可对接 core 的 `rheo serve`。
