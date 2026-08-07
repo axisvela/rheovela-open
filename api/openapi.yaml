@@ -1,0 +1,700 @@
+openapi: 3.0.3
+info:
+  title: Rheovela Ops + Worker HTTP API
+  description: >
+    Single-node HTTP API exposed by `rheo serve` (`internal/server`). All
+    routes under `/api/v1` return `application/json`. This is a local
+    ops/integration surface — no TLS/auth shim. Multi-tenant auth lives in
+    `rheovela-ee` (X-Tenant-ID middleware). The `/mcp` route is a JSON-RPC
+    2.0 MCP gateway (protocol version 2024-11-05).
+  version: v1.9-core
+  license:
+    name: Apache-2.0
+
+servers:
+  - url: http://127.0.0.1:8080
+
+tags:
+  - name: Instances
+    description: Process instance lifecycle (open, list, get, steps, compensate).
+  - name: Audit
+    description: Evidence chain with optional signature verification.
+  - name: Worker
+    description: Work-item queue consumed by workers (claim/heartbeat/complete/fail).
+  - name: MCP
+    description: Model Context Protocol gateway (JSON-RPC 2.0).
+
+paths:
+  /api/v1/instances:
+    get:
+      tags: [Instances]
+      summary: List process instances
+      description: Optional `project` filter; empty returns all instances ordered by started_at descending.
+      operationId: listInstances
+      parameters:
+        - name: project
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Project ID to filter by.
+      responses:
+        "200":
+          description: List of process instances.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ProcessInstance"
+        "500":
+          $ref: "#/components/responses/ServerError"
+    post:
+      tags: [Instances]
+      summary: Open a run
+      description: >
+        Opens a process run. Retrying with the same `idempotency_key` returns
+        the existing instance without emitting duplicate events. A missing key
+        is auto-generated.
+      operationId: openRun
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OpenRunRequest"
+      responses:
+        "201":
+          description: Created instance.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProcessInstance"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /api/v1/instances/{id}:
+    get:
+      tags: [Instances]
+      summary: Get a single instance
+      operationId: getInstance
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Instance ID (stream ID, e.g. `R-<uuid>`).
+      responses:
+        "200":
+          description: The instance.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProcessInstance"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /api/v1/instances/{id}/steps:
+    post:
+      tags: [Instances]
+      summary: Perform a step action
+      description: >
+        Applies a step action to the instance: `enter | complete | fail |
+        skip | assign`. Shares the same `application.Service` as the CLI, so
+        projections stay atomic and are protected by `idempotency_key`.
+      operationId: step
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StepRequest"
+      responses:
+        "200":
+          description: Action applied.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                    example: ok
+                required: [status]
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /api/v1/instances/{id}/compensate:
+    post:
+      tags: [Instances]
+      summary: Compensate an instance
+      description: Runs compensation for a failed/compensatable instance. Idempotent per instance.
+      operationId: compensate
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                actor:
+                  type: string
+                  description: Actor requesting compensation.
+              required: [actor]
+      responses:
+        "200":
+          description: Compensation plan.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /api/v1/audit/{id}:
+    get:
+      tags: [Audit]
+      summary: Get the evidence chain for an instance
+      description: >
+        Returns plan -> events -> assignment -> execution plus effect records.
+        When the server runs with `--verify-key`, each event signature is
+        verified; `signature_valid` reflects the verification result.
+      operationId: getAudit
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Evidence chain.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuditChain"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /api/v1/work-items:
+    get:
+      tags: [Worker]
+      summary: List ready work items
+      description: Optional `instance` filter; empty returns all ready work items.
+      operationId: listWorkItems
+      parameters:
+        - name: instance
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Instance ID to filter by.
+      responses:
+        "200":
+          description: List of work items.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/WorkItem"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
+  /api/v1/work-items/{id}/claim:
+    post:
+      tags: [Worker]
+      summary: Claim a work item
+      description: >
+        Atomically claims a ready work item (or one whose lease has expired)
+        and returns a fencing token. The token identifies this worker; stale
+        workers or expired leases cannot act on the item. A claimed item
+        returns 409.
+      operationId: claimWorkItem
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LeaseRequest"
+      responses:
+        "200":
+          description: Claimed; fencing token and lease details.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+
+  /api/v1/work-items/{id}/heartbeat:
+    post:
+      tags: [Worker]
+      summary: Renew a work-item lease
+      description: Extends the lease, succeeding only for the current fencing-token holder.
+      operationId: heartbeatWorkItem
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WorkItemTokenRequest"
+      responses:
+        "200":
+          description: Lease renewed.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OkResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+
+  /api/v1/work-items/{id}/complete:
+    post:
+      tags: [Worker]
+      summary: Complete a work item
+      description: Marks the item done, succeeding only for the current token holder while the lease is valid.
+      operationId: completeWorkItem
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [token]
+              properties:
+                token:
+                  type: string
+                  description: Fencing token returned by claim.
+      responses:
+        "200":
+          description: Completed.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OkResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+
+  /api/v1/work-items/{id}/fail:
+    post:
+      tags: [Worker]
+      summary: Fail a work item
+      description: Marks the item failed with an error message, succeeding only for the current token holder while the lease is valid.
+      operationId: failWorkItem
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [token]
+              properties:
+                token:
+                  type: string
+                  description: Fencing token returned by claim.
+                error:
+                  type: string
+                  description: Failure reason.
+      responses:
+        "200":
+          description: Failed.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OkResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+
+  /mcp:
+    post:
+      tags: [MCP]
+      summary: MCP gateway
+      description: >
+        Model Context Protocol gateway (JSON-RPC 2.0 envelope, protocol version
+        2024-11-05). Supports `initialize`, `tools/list` and `tools/call`
+        (runtime tools: open_run, enter_step, complete_step, fail_step,
+        skip_step, close_run, list_instances, get_evidence). Request `id` is
+        echoed back verbatim.
+      operationId: mcp
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/JsonRpcRequest"
+      responses:
+        "200":
+          description: JSON-RPC result or error object.
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/JsonRpcSuccess"
+                  - $ref: "#/components/schemas/JsonRpcError"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
+components:
+  schemas:
+    ProcessInstance:
+      type: object
+      required: [instance_id, project_id, definition_id, definition_version, status, opened_by, variables, depth, started_at]
+      properties:
+        instance_id:
+          type: string
+          description: Instance ID (stream ID), e.g. `R-<uuid>`.
+        project_id:
+          type: string
+        definition_id:
+          type: string
+          description: Workflow definition ID.
+        definition_version:
+          type: integer
+          description: Definition version fixed at open.
+        status:
+          type: string
+          enum: [active, done, failed, cancelled]
+        opened_by:
+          type: string
+          description: Actor that opened the run.
+        variables:
+          type: object
+          additionalProperties:
+            type: string
+          description: Condition variables (`--var`).
+        parent_instance_id:
+          type: string
+          nullable: true
+          description: Parent instance for subprocesses.
+        depth:
+          type: integer
+          description: Subprocess depth (parent = 0).
+        partition_id:
+          type: string
+        started_at:
+          type: string
+          format: date-time
+        closed_at:
+          type: string
+          format: date-time
+          nullable: true
+
+    OpenRunRequest:
+      type: object
+      required: [workflow]
+      properties:
+        workflow:
+          type: string
+          description: Workflow definition ID (missing -> 400).
+        project:
+          type: string
+        actor:
+          type: string
+          description: Actor ID (written to the event's actor_id).
+        variables:
+          type: object
+          additionalProperties:
+            type: string
+        idempotency_key:
+          type: string
+          description: Idempotency key; auto-generated when omitted.
+
+    StepRequest:
+      type: object
+      required: [action, stage]
+      properties:
+        action:
+          type: string
+          enum: [enter, complete, fail, skip, assign]
+        stage:
+          type: string
+          description: Stage ID.
+        actor:
+          type: string
+        assigned_to:
+          type: string
+          description: Only used by `assign`.
+        error:
+          type: string
+          description: Only used by `fail`.
+        idempotency_key:
+          type: string
+
+    AuditChain:
+      type: object
+      required: [instance_id, definition_id, definition_version, status]
+      properties:
+        instance_id:
+          type: string
+        definition_id:
+          type: string
+        definition_version:
+          type: integer
+        status:
+          type: string
+        events:
+          type: array
+          items:
+            $ref: "#/components/schemas/AuditEvent"
+        effects:
+          type: array
+          items:
+            type: object
+            properties:
+              idempotency_key:
+                type: string
+              target:
+                type: string
+              state:
+                type: string
+              evidence:
+                type: string
+        stage_executions:
+          type: array
+          items:
+            type: object
+            properties:
+              stage_id:
+                type: string
+              assigned_to:
+                type: string
+              assigned_by:
+                type: string
+              executed_by:
+                type: array
+                items:
+                  type: string
+              completed_by:
+                type: string
+              status:
+                type: string
+
+    AuditEvent:
+      type: object
+      properties:
+        seq:
+          type: integer
+        type:
+          type: string
+          example: RunOpened
+        actor_id:
+          type: string
+        wall_time:
+          type: string
+          format: date-time
+        signature:
+          type: string
+        signature_valid:
+          type: boolean
+        payload:
+          type: object
+          additionalProperties: true
+
+    WorkItem:
+      type: object
+      required: [id, instance_id, activity_id, state]
+      properties:
+        id:
+          type: string
+        instance_id:
+          type: string
+        activity_id:
+          type: string
+        state:
+          type: string
+          enum: [ready, claimed, done, failed]
+
+    LeaseRequest:
+      type: object
+      properties:
+        lease:
+          type: string
+          description: Lease duration (Go duration), default `30s`.
+          example: 30s
+
+    ClaimResponse:
+      type: object
+      required: [token, lease, lease_until]
+      properties:
+        token:
+          type: string
+          description: Fencing token identifying the claiming worker.
+        lease:
+          type: string
+          description: Applied lease duration.
+        lease_until:
+          type: string
+          format: date-time
+
+    WorkItemTokenRequest:
+      type: object
+      required: [token]
+      properties:
+        token:
+          type: string
+          description: Fencing token returned by claim.
+        lease:
+          type: string
+          description: Lease duration to renew (Go duration), default `30s`.
+
+    OkResponse:
+      type: object
+      required: [ok]
+      properties:
+        ok:
+          type: boolean
+          const: true
+
+    Error:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: string
+          description: Human-readable error message.
+
+    JsonRpcRequest:
+      type: object
+      required: [jsonrpc, method]
+      properties:
+        jsonrpc:
+          type: string
+          const: "2.0"
+        id:
+          oneOf:
+            - type: string
+            - type: integer
+            - type: "null"
+          description: Echoed back verbatim; may be null.
+        method:
+          type: string
+          enum: [initialize, tools/list, tools/call]
+        params:
+          type: object
+          additionalProperties: true
+
+    JsonRpcSuccess:
+      type: object
+      properties:
+        jsonrpc:
+          type: string
+          const: "2.0"
+        id:
+          oneOf:
+            - type: string
+            - type: integer
+            - type: "null"
+        result:
+          type: object
+          additionalProperties: true
+
+    JsonRpcError:
+      type: object
+      properties:
+        jsonrpc:
+          type: string
+          const: "2.0"
+        id:
+          oneOf:
+            - type: string
+            - type: integer
+            - type: "null"
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code:
+              type: integer
+            message:
+              type: string
+            data:
+              type: object
+              additionalProperties: true
+
+  responses:
+    BadRequest:
+      description: Invalid body / action / state transition.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    NotFound:
+      description: Resource not found.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    Conflict:
+      description: Not claimable / stale token / lease expired.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    ServerError:
+      description: Internal server error.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
