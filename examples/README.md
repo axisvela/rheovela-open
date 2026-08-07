@@ -188,3 +188,39 @@ rheo run close --outcome done
 | `rheo serve` | 启动 HTTP Ops API |
 
 详细 CLI 文档见 core 仓库 `docs/api.md`。
+
+## Go Worker 示例（SDK 端到端）
+
+`go-worker/` 是一个可运行的 Go worker 示例，演示 worker SDK
+（`sdk/worker`）的完整处理循环：poll → claim → run → complete/fail。它使用一个
+内存中的 `fakeStore`（实现 `worker.WorkStore`），不依赖 core。
+
+### 运行
+
+```sh
+go run ./examples/go-worker/
+```
+
+预期输出：
+
+```
+processed=2
+  task-1: done
+  task-2: failed
+```
+
+`task-1` 的工作函数返回 `success` → `done`；`task-2` 返回 `failure` → `failed`。
+
+### 测试
+
+```sh
+go test ./examples/go-worker/ -v   # TestExampleWorkerFlow
+```
+
+### 对接真实 core
+
+示例中的 `fakeStore` 是 `sdk/worker.WorkStore` 端口的一个最小实现。生产环境中
+该端口由 rheovela core（AGPL 内核）的 `runtime` 包提供：`runtime.WorkerBridge`
+实现了 `WorkStore`，将 `PollReady` / `Claim` / `Heartbeat` / `Complete` / `Fail`
+映射到 core 的 Worker HTTP API（`rheo serve`）。接入时只需把 `worker.New`
+的第一个参数从 `fakeStore` 替换为 `runtime.WorkerBridge` 实例即可，其余处理逻辑不变。
