@@ -8,6 +8,12 @@ import (
 
 const SchemaVersion = "1"
 
+// KnownEventTypes 是 engine/validator 已知的事件类型目录。
+var KnownEventTypes = []string{
+	"RunOpened", "StepEntered", "StepCompleted", "StepFailed", "StepSkipped",
+	"RunClosed", "StageAssigned", "TimerFired",
+}
+
 type ActorType string
 
 const (

@@ -14,6 +14,10 @@ func TestSchemaVersionConstant(t *testing.T) {
 	assert.Equal(t, "1", contracts.SchemaVersion)
 }
 
+func TestStageAssignedInCatalog(t *testing.T) {
+	assert.Contains(t, contracts.KnownEventTypes, "StageAssigned")
+}
+
 func TestEventRoundTrip(t *testing.T) {
 	ev := contracts.Event{
 		ID:            "e1",
