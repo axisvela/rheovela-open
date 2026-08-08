@@ -1,3 +1,5 @@
+> [English](README.en.md) · 中文
+
 # HTTP Ops API — Reference
 
 RHEOVELA core 的单节点 HTTP Ops API 由 `rheo serve` 暴露（`internal/server`，

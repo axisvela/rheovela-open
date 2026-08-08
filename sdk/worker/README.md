@@ -1,3 +1,5 @@
+> [English](README.en.md) · 中文
+
 # Go Worker SDK — `sdk/worker`
 
 面向 worker 的 Go SDK（Apache-2.0）：**领取 → 心跳 → 完成/失败** 的持久化任务
