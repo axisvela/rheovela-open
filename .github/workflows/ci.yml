@@ -26,3 +26,12 @@ jobs:
           java-version: '21'
       - run: javac -d out sdk/java/worker/Worker.java sdk/java/example/Example.java
       - run: java -cp out example.Example
+  rust:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - run: cargo build --offline
+        working-directory: sdk/rust
+      - run: cargo run --offline
+        working-directory: sdk/rust
