@@ -16,7 +16,7 @@ RHEOVELA 是一个 **Dynamic Process & Durable Workflow Platform（动态流程�
 
 ## 这个仓库是什么
 
-**rheovela-open** 是 RHEOVELA 的**对外发布层（Apache-2.0，当前 **v0.9.0-beta**）**：版本化 contracts、5 语言 Worker SDK、HTTP Worker API、OpenAPI 与示例流程。完整功能见 [docs/FEATURES.md](docs/FEATURES.md)。
+**rheovela-open** 是 RHEOVELA 的**对外发布层**（Apache-2.0，当前 `v0.9.0-beta`）：版本化 contracts、5 语言 Worker SDK、HTTP Worker API、OpenAPI 与示例流程。完整功能见 [docs/FEATURES.md](docs/FEATURES.md)。
 
 - 内核（AGPL-3.0）：https://github.com/axisrobo/rheovela
 - 企业版（Enterprise）：https://github.com/axisrobo/rheovela-ee
@@ -73,7 +73,7 @@ RHEOVELA is a **Dynamic Process & Durable Workflow Platform**.
 
 ## What this repository is
 
-**rheovela-open** is the **public release layer of RHEOVELA (Apache-2.0, current **v0.9.0-beta**)**: versioned contracts, 5-language Worker SDKs, the HTTP Worker API, OpenAPI spec and example workflows. Full feature list in [docs/FEATURES.en.md](docs/FEATURES.en.md).
+**rheovela-open** is the **public release layer of RHEOVELA** (Apache-2.0, current `v0.9.0-beta`): versioned contracts, 5-language Worker SDKs, the HTTP Worker API, OpenAPI spec and example workflows. Full feature list in [docs/FEATURES.en.md](docs/FEATURES.en.md).
 
 - Core (AGPL-3.0): https://github.com/axisrobo/rheovela
 - Enterprise: https://github.com/axisrobo/rheovela-ee
