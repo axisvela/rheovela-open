@@ -14,7 +14,7 @@ RHEOVELA 对外发布层（Apache-2.0，当前 **v0.9.0-beta**）：产品介绍
 | `sdk/` | worker SDK（5 种语言）— [Go](sdk/worker/) · [Python](sdk/python/) · [TypeScript](sdk/typescript/) · [Java](sdk/java/) · [Rust](sdk/rust/) |
 | `api/` | HTTP API reference — [README（Ops API）](api/README.md) · [OpenAPI 3.0 规范](api/openapi.yaml) · [workflow.schema.json](api/workflow.schema.json) · [event.schema.json](api/event.schema.json) |
 | `examples/` | 示例流程（RHEO IR DSL）— [README](examples/README.md) |
-| `docs/` | 产品介绍与教程 — [product.md](docs/product.md) |
+| `docs/` | **功能与特性** — [FEATURES.md](docs/FEATURES.md)（[English](docs/FEATURES.en.md)）· 产品介绍 — [product.md](docs/product.md) |
 
 ## 快速开始（Worker SDK）
 
@@ -57,7 +57,7 @@ contracts, SDKs (Go/Python/TypeScript/Java/Rust), API reference and examples.
 | `sdk/` | Worker SDKs (5 languages) — [Go](sdk/worker/) · [Python](sdk/python/) · [TypeScript](sdk/typescript/) · [Java](sdk/java/) · [Rust](sdk/rust/) |
 | `api/` | HTTP API reference — [README (Ops API)](api/README.md) · [OpenAPI 3.0 spec](api/openapi.yaml) · [workflow.schema.json](api/workflow.schema.json) · [event.schema.json](api/event.schema.json) |
 | `examples/` | Example workflows (RHEO IR DSL) — [README](examples/README.md) |
-| `docs/` | Product intro & tutorials — [product.md](docs/product.md) |
+| `docs/` | **Features** — [FEATURES.md](docs/FEATURES.md) ([中文](docs/FEATURES.md) / [English](docs/FEATURES.en.md)) · Product intro — [product.md](docs/product.md) |
 
 ## Quick start (Worker SDK)
 
