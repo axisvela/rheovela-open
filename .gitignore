@@ -1,6 +1,7 @@
 *.exe
 *.test
 __pycache__/
+out/
 *.pyc
 .idea/
 .vscode/
