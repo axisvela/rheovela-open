@@ -1,6 +1,6 @@
 # Rheovela-open
 
-RHEOVELA 对外发布层（Apache-2.0）：产品介绍、版本化 contracts、SDK（Go/Python/TS）、API reference 与 examples。
+RHEOVELA 对外发布层（Apache-2.0，当前 **v0.9.0-beta**）：产品介绍、版本化 contracts、SDK（5 种语言：Go/Python/TypeScript/Java/Rust）、API reference 与 examples。
 
 - 仓库：https://github.com/axisrobo/rheovela-open
 - 内核（AGPL）：https://github.com/axisrobo/rheovela
@@ -11,8 +11,8 @@ RHEOVELA 对外发布层（Apache-2.0）：产品介绍、版本化 contracts、
 | 目录 | 内容 |
 |------|------|
 | `contracts/` | 版本化 event/command/process schemas（权威契约，`schema_version=1`） |
-| `sdk/` | worker SDK — [Go](sdk/worker/) · [Python](sdk/python/) · [TypeScript](sdk/typescript/) |
-| `api/` | HTTP API reference — [README（Ops API）](api/README.md) · [OpenAPI 3.0 规范](api/openapi.yaml) |
+| `sdk/` | worker SDK（5 种语言）— [Go](sdk/worker/) · [Python](sdk/python/) · [TypeScript](sdk/typescript/) · [Java](sdk/java/) · [Rust](sdk/rust/) |
+| `api/` | HTTP API reference — [README（Ops API）](api/README.md) · [OpenAPI 3.0 规范](api/openapi.yaml) · [workflow.schema.json](api/workflow.schema.json) · [event.schema.json](api/event.schema.json) |
 | `examples/` | 示例流程（RHEO IR DSL）— [README](examples/README.md) |
 | `docs/` | 产品介绍与教程 — [product.md](docs/product.md) |
 
@@ -24,6 +24,8 @@ RHEOVELA 对外发布层（Apache-2.0）：产品介绍、版本化 contracts、
 - Go：`sdk/worker/`（`WorkStore` 端口 + `Worker` 循环）
 - Python：`sdk/python/`（stdlib-only，`worker.Client` / `worker.Worker`）
 - TypeScript：`sdk/typescript/`（零依赖，Node 18+ `fetch`，`Client` / `Worker`）
+- Java：`sdk/java/`（JDK 21，零依赖 `java.net.http.HttpClient`，`Worker`）
+- Rust：`sdk/rust/`（std-only，零外部 crate，`Client` / `Worker`）
 
 ```ts
 // sdk/typescript 用法
@@ -41,7 +43,7 @@ await w.processOnce(); // poll → claim → fn → complete/fail
 # Rheovela-open
 
 The public release layer of RHEOVELA (Apache-2.0): product intro, versioned
-contracts, SDKs (Go/Python/TS), API reference and examples.
+contracts, SDKs (Go/Python/TypeScript/Java/Rust), API reference and examples.
 
 - Repo: https://github.com/axisrobo/rheovela-open
 - Core (AGPL): https://github.com/axisrobo/rheovela
@@ -52,8 +54,8 @@ contracts, SDKs (Go/Python/TS), API reference and examples.
 | Path | Content |
 |------|---------|
 | `contracts/` | Versioned event/command/process schemas (authoritative contract, `schema_version=1`) |
-| `sdk/` | Worker SDKs — [Go](sdk/worker/) · [Python](sdk/python/) · [TypeScript](sdk/typescript/) |
-| `api/` | HTTP API reference — [README (Ops API)](api/README.md) · [OpenAPI 3.0 spec](api/openapi.yaml) |
+| `sdk/` | Worker SDKs (5 languages) — [Go](sdk/worker/) · [Python](sdk/python/) · [TypeScript](sdk/typescript/) · [Java](sdk/java/) · [Rust](sdk/rust/) |
+| `api/` | HTTP API reference — [README (Ops API)](api/README.md) · [OpenAPI 3.0 spec](api/openapi.yaml) · [workflow.schema.json](api/workflow.schema.json) · [event.schema.json](api/event.schema.json) |
 | `examples/` | Example workflows (RHEO IR DSL) — [README](examples/README.md) |
 | `docs/` | Product intro & tutorials — [product.md](docs/product.md) |
 
@@ -66,6 +68,8 @@ any language SDK:
 - Go: `sdk/worker/` (`WorkStore` port + `Worker` loop)
 - Python: `sdk/python/` (stdlib-only, `worker.Client` / `worker.Worker`)
 - TypeScript: `sdk/typescript/` (zero-dependency, Node 18+ `fetch`, `Client` / `Worker`)
+- Java: `sdk/java/` (JDK 21, zero deps `java.net.http.HttpClient`, `Worker`)
+- Rust: `sdk/rust/` (std-only, zero external crates, `Client` / `Worker`)
 
 ```ts
 import { Client, Worker } from "./sdk/typescript/worker.ts";
@@ -82,5 +86,11 @@ await w.processOnce(); // poll → claim → fn → complete/fail
 ```sh
 go test ./...                      # Go SDK tests
 python -m unittest discover -s sdk/python -v   # Python SDK tests
-node --test sdk/typescript/        # TypeScript SDK tests
+node --experimental-transform-types --test sdk/typescript/worker.test.ts   # TypeScript SDK tests
+javac -d out sdk/java/worker/Worker.java sdk/java/example/Example.java && java -cp out example.Example   # Java SDK
+(cd sdk/rust && cargo build --offline && cargo run --offline)             # Rust SDK
 ```
+
+CI (`.github/workflows/ci.yml`) runs 4 jobs: **go** / **python** / **java** / **rust**.
+
+CI（`.github/workflows/ci.yml`）跑 4 个 job：**go** / **python** / **java** / **rust**。

@@ -2,6 +2,7 @@
 
 > RHEOVELA：**Dynamic Process & Durable Workflow Platform**。
 > 将治理后的 **Capability Plan** 物化为可持久、可恢复、可审计的 **Process Instance**。
+> 当前状态：**v0.9.0-beta**（对外发布层，Apache-2.0）。
 
 ## 定位
 
@@ -22,7 +23,7 @@ RHEOVELA 是一个面向「动态流程 + 持久工作流」的运行时平台�
 
 | 仓库 | License | 定位 |
 |------|---------|------|
-| [`rheovela-open`](https://github.com/axisrobo/rheovela-open)（本仓库） | Apache-2.0 | 对外发布层：版本化 `contracts/`（`schema_version=1`）、`sdk/`（worker SDK）、`api/`（HTTP API reference）、`examples/`、`docs/` |
+| [`rheovela-open`](https://github.com/axisrobo/rheovela-open)（本仓库） | Apache-2.0 | 对外发布层（**v0.9.0-beta**）：版本化 `contracts/`（`schema_version=1`）、`sdk/`（worker SDK，**5 种语言**：Go / Python / TypeScript / Java / Rust）、`api/`（HTTP API reference）、`examples/`、`docs/` |
 | [`rheovela`](https://github.com/axisrobo/rheovela) | AGPL-3.0 | 内核：store / kernel / engine / application / scheduler / broker / effects / compensation / migration / server / CLI（`cmd/rheo`），并暴露公共 `runtime` 包 |
 | `rheovela-ee` | Enterprise | 企业层：多租户、HA、audit/evidence explorer、migration console、企业 IdP（AEGIVELA） |
 
@@ -35,9 +36,11 @@ SDK 不受 AGPL 传染。
 ### 事件溯源与确定性内核
 
 - 事件追加写（`events` 表），每流服务端分配聚合序号 `seq`，防止重复/乱序。
-- `internal/engine` 以纯函数折叠事件（`RunOpened`、`StepEntered`、
-  `StepCompleted`、`StepFailed`、`StepSkipped`、`RunClosed`、`StageAssigned`、
-  `TimerFired`、`Migrated`、`CompensationExecuted` 等），重建运行状态。
+- `internal/engine` 以纯函数折叠事件（`KnownEventTypes` 共 **13 种**：
+  `RunOpened`、`StepEntered`、`StepCompleted`、`StepFailed`、`StepSkipped`、
+  `RunClosed`、`StageAssigned`、`TimerFired`、`Migrated`、
+  `CompensationExecuted`、`SubprocessStarted`、`ProcessSuspended`、
+  `ProcessResumed`），重建运行状态。
 - 投影（`run_contexts` / `process_instances`）与事件流同事务写入，可随时
   `RebuildProjection`。
 
