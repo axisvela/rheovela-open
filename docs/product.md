@@ -4,7 +4,7 @@
 
 > RHEOVELA：**Dynamic Process & Durable Workflow Platform**。
 > 将治理后的 **Capability Plan** 物化为可持久、可恢复、可审计的 **Process Instance**。
-> 当前状态：**v0.9.0-beta**（对外发布层，Apache-2.0）。
+> 当前状态：**v1.0.0-rc.1**（对外发布层，Apache-2.0）。
 
 ## 定位
 
@@ -25,7 +25,7 @@ RHEOVELA 是一个面向「动态流程 + 持久工作流」的运行时平台�
 
 | 仓库 | License | 定位 |
 |------|---------|------|
-| [`rheovela-open`](https://github.com/axisrobo/rheovela-open)（本仓库） | Apache-2.0 | 对外发布层（**v0.9.0-beta**）：版本化 `contracts/`（`schema_version=1`）、`sdk/`（worker SDK，**5 种语言**：Go / Python / TypeScript / Java / Rust）、`api/`（HTTP API reference）、`examples/`、`docs/` |
+| [`rheovela-open`](https://github.com/axisrobo/rheovela-open)（本仓库） | Apache-2.0 | 对外发布层（**v1.0.0-rc.1**）：版本化 `contracts/`（`schema_version=1`）、`sdk/`（worker SDK，**5 种语言**：Go / Python / TypeScript / Java / Rust）、`api/`（HTTP API reference）、`examples/`、`docs/` |
 | [`rheovela`](https://github.com/axisrobo/rheovela) | AGPL-3.0 | 内核：store / kernel / engine / application / scheduler / broker / effects / compensation / migration / server / CLI（`cmd/rheo`），并暴露公共 `runtime` 包 |
 | `rheovela-ee` | Enterprise | 企业层：多租户、HA、audit/evidence explorer、migration console、企业 IdP（AEGIVELA） |
 

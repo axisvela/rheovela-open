@@ -5,7 +5,7 @@
 > RHEOVELA: **Dynamic Process & Durable Workflow Platform**.
 > Materializes a governed **Capability Plan** into a durable, resumable,
 > auditable **Process Instance**.
-> Current state: **v0.9.0-beta** (public release layer, Apache-2.0).
+> Current state: **v1.0.0-rc.1** (public release layer, Apache-2.0).
 
 ## Positioning
 
@@ -30,7 +30,7 @@ RHEOVELA is a runtime platform for "dynamic process + durable workflow". Core id
 
 | Repo | License | Role |
 |------|---------|------|
-| [`rheovela-open`](https://github.com/axisrobo/rheovela-open) (this repo) | Apache-2.0 | Public release layer (**v0.9.0-beta**): versioned `contracts/` (`schema_version=1`), `sdk/` (worker SDKs, **5 languages**: Go / Python / TypeScript / Java / Rust), `api/` (HTTP API reference), `examples/`, `docs/` |
+| [`rheovela-open`](https://github.com/axisrobo/rheovela-open) (this repo) | Apache-2.0 | Public release layer (**v1.0.0-rc.1**): versioned `contracts/` (`schema_version=1`), `sdk/` (worker SDKs, **5 languages**: Go / Python / TypeScript / Java / Rust), `api/` (HTTP API reference), `examples/`, `docs/` |
 | [`rheovela`](https://github.com/axisrobo/rheovela) | AGPL-3.0 | Core: store / kernel / engine / application / scheduler / broker / effects / compensation / migration / server / CLI (`cmd/rheo`), and exposes the public `runtime` package |
 | `rheovela-ee` | Enterprise | Enterprise layer: multi-tenancy, HA, audit/evidence explorer, migration console, enterprise IdP (AEGIVELA) |
 
