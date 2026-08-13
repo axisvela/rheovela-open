@@ -66,6 +66,19 @@ State lives in a single SQLite file. Default location is
 and with `RHEO_DB` on other commands if supported. Back this file up — see
 [Backup & DR](#backup--dr).
 
+### 1.4 Postgres backend (opt-in, ee)
+
+`rheo-ee serve` can use PostgreSQL instead of SQLite:
+
+```sh
+rheo-ee serve --store postgres --db-url "postgres://user:pass@host:5432/rheo?sslmode=disable" --addr :8081
+```
+
+- All engine state lives in Postgres tables (same schema as SQLite, `TIMESTAMPTZ`).
+- **Backup/DR**: Postgres uses `pg_dump` / `pg_restore`; the file-based `rheo dr`
+  commands are SQLite-only.
+- The core `rheo` CLI still targets SQLite; Postgres is an ee/server option.
+
 ---
 
 ## 2. First run: define, open, step, close

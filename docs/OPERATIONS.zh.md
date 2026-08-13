@@ -62,6 +62,19 @@ rheo --version   # → rheo v1.0.0-rc.1（发布时注入）
 `serve` 可用 `--db <path>` 覆盖；其他命令视支持情况可用 `RHEO_DB`。务必备份
 该文件——见 [备份与灾备](#7-备份与灾备)。
 
+### 1.4 Postgres 后端（可选，ee）
+
+`rheo-ee serve` 可以用 PostgreSQL 替代 SQLite：
+
+```sh
+rheo-ee serve --store postgres --db-url "postgres://user:pass@host:5432/rheo?sslmode=disable" --addr :8081
+```
+
+- 全部引擎状态存放在 Postgres 表中（与 SQLite 同构，`TIMESTAMPTZ`）。
+- **备份 / 灾备**：Postgres 使用 `pg_dump` / `pg_restore`；基于文件的 `rheo dr`
+  命令仅限 SQLite。
+- core `rheo` CLI 仍面向 SQLite；Postgres 是 ee / server 的选项。
+
 ---
 
 ## 2. 首次运行：定义 / 打开 / 推进 / 关闭
