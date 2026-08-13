@@ -1,27 +1,56 @@
 > English · [中文](README.zh.md)
 
-# Rheovela-open
+# RHEOVELA — Dynamic Process & Durable Workflow Platform
 
 ## What is RHEOVELA
 
-RHEOVELA is a **Dynamic Process & Durable Workflow Platform**.
+RHEOVELA is a **Dynamic Process & Durable Workflow Platform** that materializes
+governed Capability Plans into **persistent, recoverable, approvable, migratable
+and auditable Process Instances**.
 
-**The problem**: More and more long-running work in an enterprise is carried forward by agents, humans and robots together, spanning minutes, hours, days or months. Yet agent sessions and individual workers are ephemeral — a model process exiting, a network outage, a worker crash, a shift change or a system upgrade can all lose, duplicate or render unexplainable the work "in progress". Traditional BPM modeling is too static to absorb dynamic agent plans, while a bare agent loop has no notion of long-lived responsibility, recovery or audit.
+**The problem it solves**: More and more long-running work in an enterprise is
+carried forward by agents, humans and robots together, spanning minutes, hours,
+days or months. Yet agent sessions and individual workers are ephemeral — a model
+process exiting, a network outage, a worker crash, a shift change or a system
+upgrade can all lose, duplicate or render unexplainable the work "in progress".
+Traditional BPM modeling is too static to absorb dynamic agent plans, while a bare
+agent loop has no notion of long-lived responsibility, recovery or audit.
 
-**The answer**: RHEOVELA materializes governed Capability Plans into **persistent, recoverable, approvable, migratable and auditable Process Instances** — it owns "how long-running work reliably flows", not open-ended planning, and not a single agent's inference loop.
+**The answer**: RHEOVELA owns "how long-running work reliably flows" — not
+open-ended planning, and not a single agent's inference loop.
 
-- **Event sourcing + deterministic kernel**: consistent state is recovered from the event stream after any crash
-- **Atomic idempotent command pipeline**: restarts, duplicates and reordering never cause duplicate business effects
-- **Work Items unify humans / agents / services / robots**: claim / lease / fencing prevents double execution
-- **Evidence chain + signatures**: who was assigned, who executed, under what grant, what effects — fully auditable
-- **Compensation / migration / subprocess / suspend-resume / edge sync / checkpoint / legal hold**
+### Key features
 
-## What this repository is
+- **Event sourcing + deterministic kernel**: consistent state is recovered from
+  the event stream after any crash; the same event stream always folds to the
+  same result
+- **Atomic idempotent command pipeline**: restarts, duplicates and reordering
+  never cause duplicate business effects
+- **Work Items unify humans / agents / services / robots**: claim / lease /
+  fencing prevents double execution
+- **Evidence chain + signatures**: who was assigned, who executed, under what
+  grant, what effects — fully auditable
+- **Compensation / migration / replan / subprocess / suspend-resume / edge sync
+  / checkpoint / legal hold / HA lease-lock**
 
-**rheovela-open** is the **public release layer of RHEOVELA** (Apache-2.0, current `v1.0.0-rc.1`): versioned contracts, 5-language Worker SDKs, the HTTP Worker API, OpenAPI spec and example workflows. Full feature list in [docs/FEATURES.en.md](docs/FEATURES.en.md).
+### Multi-target interfaces
 
-- Core (AGPL-3.0): https://github.com/axisrobo/rheovela
-- Enterprise: https://github.com/axisrobo/rheovela-ee
+- **CLI** (25+ commands): `workflow define|validate|diff|import-bpmn|export-bpmn`,
+  `run open|step|close|suspend|resume|list`, `checkpoint`, `migrate`, `replan`,
+  `audit`, `history`, `serve`, `watch`, `sync`, `partition`, `bench`, `dr`
+- **HTTP Ops API** (40+ endpoints): instances / steps / workflows / work-items /
+  audit / sync / events (SSE) / health / status / metrics
+- **MCP gateway**: `POST /mcp` — JSON-RPC 2.0 tools for agents
+- **Worker HTTP API**: claim / heartbeat / complete / fail
+
+## This repository — rheovela-open
+
+**rheovela-open** is the **public release layer of RHEOVELA** (Apache-2.0,
+current `v1.0.0-rc.1`): versioned contracts, 5-language Worker SDKs, the HTTP
+Worker API, OpenAPI spec and example workflows. The core engine (AGPL-3.0) lives
+in [rheovela](https://github.com/axisrobo/rheovela); enterprise capabilities live
+in [rheovela-ee](https://github.com/axisrobo/rheovela-ee). Full feature list in
+[docs/FEATURES.en.md](docs/FEATURES.en.md).
 
 ## Layout
 
