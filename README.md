@@ -60,7 +60,7 @@ in [rheovela-ee](https://github.com/axisrobo/rheovela-ee). Full feature list in
 | `sdk/` | Worker SDKs (5 languages) — [Go](sdk/worker/) · [Python](sdk/python/) · [TypeScript](sdk/typescript/) · [Java](sdk/java/) · [Rust](sdk/rust/) |
 | `api/` | HTTP API reference — [README (Ops API)](api/README.md) · [OpenAPI 3.0 spec](api/openapi.yaml) · [workflow.schema.json](api/workflow.schema.json) · [event.schema.json](api/event.schema.json) |
 | `examples/` | Example workflows (RHEO IR DSL) — [README](examples/README.md) |
-| `docs/` | **Features** — [FEATURES.en.md](docs/FEATURES.en.md) ([中文](docs/FEATURES.md)) · Product intro — [product.en.md](docs/product.en.md) ([中文](docs/product.md)) |
+| `docs/` | **Features** — [FEATURES.en.md](docs/FEATURES.en.md) ([中文](docs/FEATURES.md)) · Product intro — [product.en.md](docs/product.en.md) ([中文](docs/product.md)) · **Operations** — [OPERATIONS.md](docs/OPERATIONS.md) ([中文](docs/OPERATIONS.zh.md)) · **Development** — [DEVELOPMENT.md](docs/DEVELOPMENT.md) ([中文](docs/DEVELOPMENT.zh.md)) |
 
 ## Quick start (Worker SDK)
 

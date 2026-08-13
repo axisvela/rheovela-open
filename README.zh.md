@@ -37,7 +37,7 @@ RHEOVELA 是一个 **Dynamic Process & Durable Workflow Platform（动态流程�
 | `sdk/` | worker SDK（5 种语言）— [Go](sdk/worker/) · [Python](sdk/python/) · [TypeScript](sdk/typescript/) · [Java](sdk/java/) · [Rust](sdk/rust/) |
 | `api/` | HTTP API reference — [README（Ops API）](api/README.md) · [OpenAPI 3.0 规范](api/openapi.yaml) · [workflow.schema.json](api/workflow.schema.json) · [event.schema.json](api/event.schema.json) |
 | `examples/` | 示例流程（RHEO IR DSL）— [README](examples/README.md) |
-| `docs/` | **功能与特性** — [FEATURES.md](docs/FEATURES.md)（[English](docs/FEATURES.en.md)）· 产品介绍 — [product.md](docs/product.md)（[English](docs/product.en.md)） |
+| `docs/` | **功能与特性** — [FEATURES.md](docs/FEATURES.md)（[English](docs/FEATURES.en.md)）· 产品介绍 — [product.md](docs/product.md)（[English](docs/product.en.md)）· **运维手册** — [OPERATIONS.zh.md](docs/OPERATIONS.zh.md)（[English](docs/OPERATIONS.md)）· **开发手册** — [DEVELOPMENT.zh.md](docs/DEVELOPMENT.zh.md)（[English](docs/DEVELOPMENT.md)） |
 
 ## 快速开始（Worker SDK）
 
