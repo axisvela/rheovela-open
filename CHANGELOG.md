@@ -1,6 +1,13 @@
 # Changelog
 
-RHEOVELA open（`github.com/axisrobo/rheovela-open`，Apache-2.0）发布记录：对外发布层（版本化 contracts、SDK、examples、CI、OpenAPI）。格式：最新在前；每个版本对应一个 git tag。
+RHEOVELA open（`github.com/axisrobo/rheovela-open`，Apache-2.0）发布记录：对外发布层（版本化 contracts、SDK、examples、CI、OpenAPI）。格式：最新在前；每个版本对应一个 git tag（三仓库统一语义版本 tag）。
+
+## [v1.1.0] - 2026-08-13
+
+随 core `v1.1.0`（Postgres 支持）同步发布：文档补齐**运维手册**
+（`docs/OPERATIONS.md`，含 Postgres 后端小节）与**开发手册**
+（`docs/DEVELOPMENT.md`）；README 改为英文为主 + 中文链接
+（`README.zh.md`）。
 
 ## [v0.9.0-beta] - 2026-08-08
 
