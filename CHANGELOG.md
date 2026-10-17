@@ -2,6 +2,13 @@
 
 RHEOVELA open（`github.com/axisrobo/rheovela-open`，Apache-2.0）发布记录：对外发布层（版本化 contracts、SDK、examples、CI、OpenAPI）。格式：最新在前；每个版本对应一个 git tag（三仓库统一语义版本 tag）。
 
+## Unreleased (core progress)
+
+- Core adds the work-item retry policy (attempts / max_attempts): a failed
+  item re-queues while attempts remain and becomes terminal at the bound.
+- Core adds cancel (POST /api/v1/work-items/{id}/cancel); the Go SDK exposes
+  CancelWorkItem.
+
 ## [v1.1.0] - 2026-08-13
 
 随 core `v1.1.0`（Postgres 支持）同步发布：文档补齐**运维手册**

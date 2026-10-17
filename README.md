@@ -95,3 +95,11 @@ javac -d out sdk/java/worker/Worker.java sdk/java/example/Example.java && java -
 ```
 
 CI (`.github/workflows/ci.yml`) runs 4 jobs: **go** / **python** / **java** / **rust**.
+
+## Core status (recorded here; no external links)
+
+The RHEOVELA core runtime now enforces a work-item retry policy: a failed item
+re-queues while attempts remain and becomes terminal at max_attempts; a cancel
+operation terminates a ready / claimed / failed item. The Go SDK exposes claim,
+heartbeat, complete, fail and cancel. Deployed fault injection proved
+fail -> ready -> reclaim -> complete and cancellation end-to-end.
