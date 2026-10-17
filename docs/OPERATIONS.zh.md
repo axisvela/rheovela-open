@@ -2,7 +2,7 @@
 
 > [English](OPERATIONS.md) · 中文
 
-本手册覆盖基于内核（`rheo`，`github.com/axisrobo/rheovela`）部署的 RHEOVELA
+本手册覆盖基于内核（`rheo`，`github.com/axisvela/rheovela`）部署的 RHEOVELA
 单节点运维。`rheovela-open` 仓库提供集成所需的 contracts、Worker SDK 与 API
 参考；运行时本体是 `rheo` 二进制。
 
@@ -295,7 +295,7 @@ rheo dr backup backups/daily.db.bak && rheo dr verify backups/daily.db.bak
 | 校验定义 | `rheo workflow validate <file>` |
 | 导入 / 导出 BPMN | `rheo workflow import-bpmn <file>` / `rheo workflow export-bpmn <file>` |
 
-完整 CLI 参考：core 仓库 `docs/api.md`（在 `github.com/axisrobo/rheovela`）。
+完整 CLI 参考：core 仓库 `docs/api.md`（在 `github.com/axisvela/rheovela`）。
 
 ---
 

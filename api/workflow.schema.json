@@ -1,5 +1,5 @@
 {
-  "$id": "https://github.com/axisrobo/rheovela-open/blob/wave20-open/api/workflow.schema.json",
+  "$id": "https://github.com/axisvela/rheovela-open/blob/wave20-open/api/workflow.schema.json",
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "WorkflowDefinition",
   "description": "RHEOVELA WorkflowDefinition contract (schema_version=1). Compile target of the RHEO IR DSL and input to `rheo workflow define`.",

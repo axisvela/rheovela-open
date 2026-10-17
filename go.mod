@@ -1,4 +1,4 @@
-module github.com/axisrobo/rheovela-open
+module github.com/axisvela/rheovela-open
 
 go 1.25.0
 

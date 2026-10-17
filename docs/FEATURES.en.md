@@ -4,7 +4,7 @@
 
 RHEOVELA is a **Dynamic Process & Durable Workflow Platform**: it materializes governed capability plans into persistent, recoverable, approvable, migratable and auditable Process Instances. It is responsible for "how long-running work reliably flows" across humans, agents, robots and enterprise systems.
 
-This repository (`rheovela-open`) is the Apache-2.0 public layer: versioned contracts, SDKs and APIs. The core runtime lives in [rheovela](https://github.com/axisrobo/rheovela) (AGPL-3.0); enterprise capabilities live in [rheovela-ee](https://github.com/axisrobo/rheovela-ee) (Enterprise).
+This repository (`rheovela-open`) is the Apache-2.0 public layer: versioned contracts, SDKs and APIs. The core runtime lives in [rheovela](https://github.com/axisvela/rheovela) (AGPL-3.0); enterprise capabilities live in [rheovela-ee](https://github.com/axisvela/rheovela-ee) (Enterprise).
 
 ---
 
@@ -91,4 +91,4 @@ rheo run close --outcome done
 rheo serve --addr :8080
 ```
 
-See [docs/product.en.md](docs/product.en.md) and the Beta manual ([docs/BETA.md](https://github.com/axisrobo/rheovela/blob/master/docs/BETA.md)) for the release criteria.
+See [docs/product.en.md](docs/product.en.md) and the Beta manual ([docs/BETA.md](https://github.com/axisvela/rheovela/blob/master/docs/BETA.md)) for the release criteria.

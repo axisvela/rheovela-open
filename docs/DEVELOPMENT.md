@@ -7,9 +7,9 @@ extending the contracts, building against the Worker SDKs, authoring example
 workflows, and wiring the 5-language SDKs to a running core node.
 
 > **The kernel is elsewhere.** The engine, storage, CLI (`rheo`) and HTTP server
-> live in `github.com/axisrobo/rheovela` (AGPL-3.0). `rheovela-open`
+> live in `github.com/axisvela/rheovela` (AGPL-3.0). `rheovela-open`
 > (Apache-2.0) is the public layer: contracts, SDKs, API references, examples
-> and CI. Enterprise capabilities live in `github.com/axisrobo/rheovela-ee`.
+> and CI. Enterprise capabilities live in `github.com/axisvela/rheovela-ee`.
 > This guide covers the open layer; pointers to core docs are marked `core:`.
 
 ---
@@ -277,4 +277,4 @@ See also:
 - **Operations guide**: [OPERATIONS.md](OPERATIONS.md) (English) · [中文](OPERATIONS.zh.md)
 - **Features**: [FEATURES.en.md](FEATURES.en.md) · [中文](FEATURES.md)
 - **HTTP API reference**: [api/README.en.md](../api/README.en.md) · [中文](../api/README.md)
-- **Core CLI/Go API** (in `github.com/axisrobo/rheovela`): `docs/api.md`
+- **Core CLI/Go API** (in `github.com/axisvela/rheovela`): `docs/api.md`

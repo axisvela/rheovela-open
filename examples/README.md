@@ -85,7 +85,7 @@ compensate <activity-id> with <activity-id>        // 通过另一个活动补�
 
 ## 如何运行
 
-前置：安装 core CLI（`github.com/axisrobo/rheovela`，`cmd/rheo` → `rheo`/`rheo.exe`）。
+前置：安装 core CLI（`github.com/axisvela/rheovela`，`cmd/rheo` → `rheo`/`rheo.exe`）。
 
 ### 1. 编译 IR → JSON
 

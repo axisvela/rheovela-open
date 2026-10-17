@@ -6,9 +6,9 @@
 Worker SDK 构建、编写示例流程，并把 5 种语言 SDK 接入运行中的 core 节点。
 
 > **内核在别处。** 引擎、存储、CLI（`rheo`）与 HTTP 服务位于
-> `github.com/axisrobo/rheovela`（AGPL-3.0）。`rheovela-open`（Apache-2.0）
+> `github.com/axisvela/rheovela`（AGPL-3.0）。`rheovela-open`（Apache-2.0）
 > 是公共层：contracts、SDK、API 参考、示例与 CI。企业能力位于
-> `github.com/axisrobo/rheovela-ee`。本手册覆盖开放层；core 文档以
+> `github.com/axisvela/rheovela-ee`。本手册覆盖开放层；core 文档以
 > `core:` 标注。
 
 ---
@@ -265,4 +265,4 @@ tag（`v1.x-core`）**不**产生 GitHub Release。
 - **运维手册**：[OPERATIONS.md](OPERATIONS.md)（English）· [中文](OPERATIONS.zh.md)
 - **功能特性**：[FEATURES.md](FEATURES.md)（[English](FEATURES.en.md)）
 - **HTTP API 参考**：[api/README.md](../api/README.md)（[English](../api/README.en.md)）
-- **core CLI/Go API**（在 `github.com/axisrobo/rheovela`）：`docs/api.md`
+- **core CLI/Go API**（在 `github.com/axisvela/rheovela`）：`docs/api.md`

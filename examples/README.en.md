@@ -90,7 +90,7 @@ compensate <activity-id> with <activity-id>        // compensate via another act
 ## How to run
 
 Prerequisite: install the core CLI
-(`github.com/axisrobo/rheovela`, `cmd/rheo` → `rheo`/`rheo.exe`).
+(`github.com/axisvela/rheovela`, `cmd/rheo` → `rheo`/`rheo.exe`).
 
 ### 1. Compile IR → JSON
 

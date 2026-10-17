@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/axisrobo/rheovela-open/contracts"
+	"github.com/axisvela/rheovela-open/contracts"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

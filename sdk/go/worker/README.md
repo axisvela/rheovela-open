@@ -50,8 +50,8 @@ core（AGPL）在公共 `runtime` 包中提供了 `WorkerBridge`，它通过 cor
 
 ```go
 import (
-    "github.com/axisrobo/rheovela/runtime"   // core 公共 API
-    worker "github.com/axisrobo/rheovela-open/sdk/worker"
+    "github.com/axisvela/rheovela/runtime"   // core 公共 API
+    worker "github.com/axisvela/rheovela-open/sdk/worker"
 )
 ```
 
@@ -98,8 +98,8 @@ import (
     "fmt"
     "time"
 
-    "github.com/axisrobo/rheovela/runtime"
-    worker "github.com/axisrobo/rheovela-open/sdk/worker"
+    "github.com/axisvela/rheovela/runtime"
+    worker "github.com/axisvela/rheovela-open/sdk/worker"
 )
 
 func main() {

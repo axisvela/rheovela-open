@@ -4,7 +4,7 @@
 
 RHEOVELA 是一个 **Dynamic Process & Durable Workflow Platform（动态流程与持久化工作流平台）**：把治理后的 Capability Plan 物化为可持久、可恢复、可审批、可迁移、可审计的 Process Instance。它负责"长期工作如何可靠流转"，跨越人、Agent、机器人与企业系统。
 
-本仓库（rheovela-open）是 Apache-2.0 对外发布层：版本化契约、SDK 与 API。内核实现位于 [rheovela](https://github.com/axisrobo/rheovela)（AGPL-3.0），企业能力位于 [rheovela-ee](https://github.com/axisrobo/rheovela-ee)（Enterprise）。
+本仓库（rheovela-open）是 Apache-2.0 对外发布层：版本化契约、SDK 与 API。内核实现位于 [rheovela](https://github.com/axisvela/rheovela)（AGPL-3.0），企业能力位于 [rheovela-ee](https://github.com/axisvela/rheovela-ee)（Enterprise）。
 
 ---
 

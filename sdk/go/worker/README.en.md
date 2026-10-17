@@ -53,8 +53,8 @@ semantics):
 
 ```go
 import (
-    "github.com/axisrobo/rheovela/runtime"   // core public API
-    worker "github.com/axisrobo/rheovela-open/sdk/worker"
+    "github.com/axisvela/rheovela/runtime"   // core public API
+    worker "github.com/axisvela/rheovela-open/sdk/worker"
 )
 ```
 
@@ -105,8 +105,8 @@ import (
     "fmt"
     "time"
 
-    "github.com/axisrobo/rheovela/runtime"
-    worker "github.com/axisrobo/rheovela-open/sdk/worker"
+    "github.com/axisvela/rheovela/runtime"
+    worker "github.com/axisvela/rheovela-open/sdk/worker"
 )
 
 func main() {

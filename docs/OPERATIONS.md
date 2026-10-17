@@ -3,7 +3,7 @@
 > English · [中文](OPERATIONS.zh.md)
 
 This guide covers operating a RHEOVELA node built on the core engine
-(`rheo`, `github.com/axisrobo/rheovela`). The `rheovela-open` repository
+(`rheo`, `github.com/axisvela/rheovela`). The `rheovela-open` repository
 provides the contracts, Worker SDKs and API references you need to integrate;
 the runtime itself is the `rheo` binary.
 
@@ -306,7 +306,7 @@ does not print `OK: true`, do not run the node against that file.
 | Validate a definition | `rheo workflow validate <file>` |
 | Import / export BPMN | `rheo workflow import-bpmn <file>` / `rheo workflow export-bpmn <file>` |
 
-Full CLI reference: core `docs/api.md` (in `github.com/axisrobo/rheovela`).
+Full CLI reference: core `docs/api.md` (in `github.com/axisvela/rheovela`).
 
 ---
 
