@@ -1,4 +1,4 @@
-module github.com/axisvela/rheovela-open/sdk/go
+module github.com/axisvela/rheovela-open/sdk/go/v3
 
 go 1.25.0
 

@@ -10,7 +10,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/axisvela/rheovela-open/sdk/go/worker"
+	"github.com/axisvela/rheovela-open/sdk/go/v3/worker"
 )
 
 // fakeStore implements worker.WorkStore in memory. In production the durable

@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/axisvela/rheovela-open/sdk/go/worker"
+	"github.com/axisvela/rheovela-open/sdk/go/v3/worker"
 )
 
 // HTTPWorkStore adapts the Rheovela client to the worker SDK's WorkStore port,
