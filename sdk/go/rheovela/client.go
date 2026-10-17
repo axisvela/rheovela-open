@@ -234,6 +234,11 @@ func (c *Client) FailWorkItem(ctx context.Context, id, token, reason string) err
 	return c.doJSON(ctx, http.MethodPost, "/api/v1/work-items/"+url.PathEscape(id)+"/fail", map[string]string{"token": token, "error": reason}, nil)
 }
 
+// CancelWorkItem terminates a work item (ready/claimed/failed).
+func (c *Client) CancelWorkItem(ctx context.Context, id string) error {
+	return c.doJSON(ctx, http.MethodPost, "/api/v1/work-items/"+url.PathEscape(id)+"/cancel", map[string]string{}, nil)
+}
+
 // Health checks the service is reachable.
 func (c *Client) Health(ctx context.Context) error {
 	return c.doJSON(ctx, http.MethodGet, "/api/v1/health", nil, nil)
