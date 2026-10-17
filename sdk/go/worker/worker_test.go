@@ -22,6 +22,9 @@ type fakeStore struct {
 	claimErr error
 	hbCalls  int  // total Heartbeat calls
 	hbFailAt int  // 1-based: fail the Nth Heartbeat call; 0 = never fail
+	// requeueOnFail models the durable runtime's retry behavior: a failed
+	// work item returns to the ready queue and can be claimed again.
+	requeueOnFail bool
 }
 
 func newFakeStore(items ...WorkItem) *fakeStore {
@@ -89,6 +92,9 @@ func (s *fakeStore) Fail(id, token, errMsg string) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	s.failed[id] = errMsg
+	if s.requeueOnFail {
+		delete(s.leased, id)
+	}
 	return nil
 }
 
@@ -212,4 +218,67 @@ func TestNoHeartbeatForFastTask(t *testing.T) {
 	assert.Equal(t, 1, n)
 	assert.Equal(t, []string{"fast"}, store.done)
 	assert.Empty(t, store.failed)
+}
+
+// TestProcessOnceRetriesAfterFailureThenCompletes closes the R6 work-item
+// loop: a transient failure returns the item to the queue (durable-runtime
+// retry), and the next ProcessOnce reclaims and completes it — one effect,
+// one completion.
+func TestProcessOnceRetriesAfterFailureThenCompletes(t *testing.T) {
+	store := newFakeStore(WorkItem{ID: "retry1", InstanceID: "i1", ActivityID: "a1", State: "ready"})
+	store.requeueOnFail = true
+	var calls int
+	w := New(store, func(ctx context.Context, item WorkItem) WorkResult {
+		calls++
+		if calls == 1 {
+			return WorkResult{Status: "failure", Error: "transient"}
+		}
+		return WorkResult{Status: "success", Outcome: "recovered"}
+	}, time.Minute)
+
+	n, err := w.ProcessOnce(context.Background())
+	require.NoError(t, err)
+	assert.Equal(t, 1, n)
+	assert.Empty(t, store.done)
+	assert.Equal(t, map[string]string{"retry1": "transient"}, store.failed)
+
+	n, err = w.ProcessOnce(context.Background())
+	require.NoError(t, err)
+	assert.Equal(t, 1, n)
+	assert.Equal(t, []string{"retry1"}, store.done)
+	assert.Equal(t, 2, calls, "work fn should run once per attempt")
+}
+
+// TestCancellationDuringWorkRequeuesWithoutDuplicateCompletion cancels the work
+// in flight: the attempt fails (does not complete), the item is requeued, and a
+// later run with a fresh context completes it exactly once — no duplicate
+// completion/effect.
+func TestCancellationDuringWorkRequeuesWithoutDuplicateCompletion(t *testing.T) {
+	store := newFakeStore(WorkItem{ID: "cancel1", InstanceID: "i1", ActivityID: "a1", State: "ready"})
+	store.requeueOnFail = true
+	started := make(chan struct{})
+	var attempts int
+	w := New(store, func(ctx context.Context, item WorkItem) WorkResult {
+		attempts++
+		if attempts == 1 {
+			close(started)
+			<-ctx.Done()
+			return WorkResult{Status: "failure", Error: "canceled"}
+		}
+		return WorkResult{Status: "success", Outcome: "done"}
+	}, time.Minute)
+
+	ctx, cancel := context.WithCancel(context.Background())
+	go func() { <-started; cancel() }()
+
+	_, err := w.ProcessOnce(ctx)
+	require.NoError(t, err)
+	assert.Empty(t, store.done, "a cancelled attempt must not complete")
+	assert.Equal(t, map[string]string{"cancel1": "canceled"}, store.failed)
+
+	n, err := w.ProcessOnce(context.Background())
+	require.NoError(t, err)
+	assert.Equal(t, 1, n)
+	assert.Equal(t, []string{"cancel1"}, store.done, "exactly one completion after reclaim")
+	assert.Equal(t, 2, attempts)
 }
