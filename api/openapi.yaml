@@ -198,8 +198,12 @@ paths:
   /api/v1/work-items:
     get:
       tags: [Worker]
-      summary: List ready work items
-      description: Optional `instance` filter; empty returns all ready work items.
+      summary: List work items
+      description: >
+        With `instance`, lists that instance's work items and optionally filters
+        by `state`. Without `instance`, lists claimable items globally: `ready`
+        items plus `claimed` items whose lease has expired, ready to be claimed
+        by another worker.
       operationId: listWorkItems
       parameters:
         - name: instance
@@ -208,6 +212,13 @@ paths:
           schema:
             type: string
           description: Instance ID to filter by.
+        - name: state
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [ready, claimed, awaiting_approval, done, failed, cancelled]
+          description: Work-item state filter.
       responses:
         "200":
           description: List of work items.
@@ -217,6 +228,32 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/WorkItem"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
+  /api/v1/work-items/{id}:
+    get:
+      tags: [Worker]
+      summary: Get a work item
+      description: >
+        Fetch one work item, including its typed result, checkpoint/effect
+        references, attempt counters, and approval record.
+      operationId: getWorkItem
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Work item.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WorkItem"
+        "404":
+          $ref: "#/components/responses/NotFound"
         "500":
           $ref: "#/components/responses/ServerError"
 
@@ -292,7 +329,11 @@ paths:
     post:
       tags: [Worker]
       summary: Complete a work item
-      description: Marks the item done, succeeding only for the current token holder while the lease is valid.
+      description: >
+        Atomically appends `StepCompleted`, marks the item done, and opens the
+        next stage's item. Succeeds only for the current token holder while the
+        lease is valid. `result`, `checkpoint_ref`, `effect_cursor`, and `actor`
+        are optional; a token-only body remains compatible.
       operationId: completeWorkItem
       parameters:
         - name: id
@@ -311,15 +352,182 @@ paths:
                 token:
                   type: string
                   description: Fencing token returned by claim.
+                actor:
+                  type: string
+                  description: Actor recorded on the completion event.
+                result:
+                  type: object
+                  additionalProperties: true
+                  description: Opaque typed step result.
+                checkpoint_ref:
+                  type: string
+                  description: Reference to the worker's durable checkpoint.
+                effect_cursor:
+                  type: string
+                  description: Reference to the worker's effect-ledger cursor.
       responses:
         "200":
-          description: Completed.
+          description: Completed; response includes the updated work item.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WorkItemResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+
+  /api/v1/work-items/{id}/request-approval:
+    post:
+      tags: [Worker]
+      summary: Request human approval
+      description: >
+        Moves a claimed work item into `awaiting_approval`, persisting the
+        reason, optional final arguments, and checkpoint/effect references. The
+        item is requeued to `ready` after approval.
+      operationId: requestWorkItemApproval
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApprovalRequest"
+      responses:
+        "200":
+          description: Approval requested; response includes the updated work item.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WorkItemResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+
+  /api/v1/work-items/{id}/approve:
+    post:
+      tags: [Worker]
+      summary: Approve a work item
+      description: >
+        Records the approval decision and requeues the item to `ready` so a
+        successor worker can resume from the persisted checkpoint.
+      operationId: approveWorkItem
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [actor]
+              properties:
+                actor:
+                  type: string
+                comment:
+                  type: string
+                final_args:
+                  type: object
+                  additionalProperties: true
+      responses:
+        "200":
+          description: Approved; response includes the updated work item.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WorkItemResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+
+  /api/v1/work-items/{id}/reject:
+    post:
+      tags: [Worker]
+      summary: Reject a work item
+      description: >
+        Records the rejection and marks the item `failed` with `last_error` set
+        to the reason. Completion stays blocked until the item is remediated.
+      operationId: rejectWorkItem
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [actor, reason]
+              properties:
+                actor:
+                  type: string
+                reason:
+                  type: string
+      responses:
+        "200":
+          description: Rejected; response includes the updated work item.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WorkItemResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+
+  /api/v1/work-items/{id}/cancel:
+    post:
+      tags: [Worker]
+      summary: Cancel a work item
+      description: >
+        Marks the item cancelled and releases any lease. Items carrying an
+        approval record (pending or rejected) cannot be cancelled; they must be
+        approved or rejected instead. Rejection requires remediation by
+        closing, replanning, or migrating the run.
+      operationId: cancelWorkItem
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Cancelled.
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/OkResponse"
-        "400":
-          $ref: "#/components/responses/BadRequest"
         "404":
           $ref: "#/components/responses/NotFound"
         "409":
@@ -564,7 +772,93 @@ components:
           type: string
         state:
           type: string
-          enum: [ready, claimed, done, failed]
+          enum: [ready, claimed, awaiting_approval, done, failed, cancelled]
+        assignee:
+          type: string
+        lease_until:
+          type: string
+          format: date-time
+        fencing_token:
+          type: string
+        attempts:
+          type: integer
+        max_attempts:
+          type: integer
+        last_error:
+          type: string
+        result:
+          type: object
+          additionalProperties: true
+          description: Opaque typed step result.
+        checkpoint_ref:
+          type: string
+        effect_cursor:
+          type: string
+        approval:
+          $ref: "#/components/schemas/WorkItemApproval"
+        created_at:
+          type: string
+          format: date-time
+
+    WorkItemApproval:
+      type: object
+      required: [state]
+      properties:
+        state:
+          type: string
+          enum: [pending, approved, rejected]
+        pending_stage:
+          type: string
+        final_args:
+          type: object
+          additionalProperties: true
+        checkpoint_ref:
+          type: string
+        effect_cursor:
+          type: string
+        reason:
+          type: string
+        requested_by:
+          type: string
+        requested_at:
+          type: string
+          format: date-time
+        decided_by:
+          type: string
+        decided_at:
+          type: string
+          format: date-time
+        comment:
+          type: string
+
+    ApprovalRequest:
+      type: object
+      required: [token, reason]
+      properties:
+        token:
+          type: string
+          description: Fencing token returned by claim.
+        actor:
+          type: string
+        reason:
+          type: string
+        final_args:
+          type: object
+          additionalProperties: true
+        checkpoint_ref:
+          type: string
+        effect_cursor:
+          type: string
+
+    WorkItemResponse:
+      type: object
+      required: [ok, work_item]
+      properties:
+        ok:
+          type: boolean
+          const: true
+        work_item:
+          $ref: "#/components/schemas/WorkItem"
 
     LeaseRequest:
       type: object
@@ -587,6 +881,8 @@ components:
         lease_until:
           type: string
           format: date-time
+        work_item:
+          $ref: "#/components/schemas/WorkItem"
 
     WorkItemTokenRequest:
       type: object
@@ -681,13 +977,21 @@ components:
           schema:
             $ref: "#/components/schemas/Error"
     NotFound:
-      description: Resource not found.
+      description: Resource not found (unknown work item or missing instance).
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    Forbidden:
+      description: Unknown or denied actor.
       content:
         application/json:
           schema:
             $ref: "#/components/schemas/Error"
     Conflict:
-      description: Not claimable / stale token / lease expired.
+      description: >
+        Not claimable / stale token / lease expired / approval pending /
+        approval rejected / suspended run.
       content:
         application/json:
           schema:

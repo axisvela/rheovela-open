@@ -38,11 +38,12 @@ SDK 不受 AGPL 传染。
 ### 事件溯源与确定性内核
 
 - 事件追加写（`events` 表），每流服务端分配聚合序号 `seq`，防止重复/乱序。
-- `internal/engine` 以纯函数折叠事件（`KnownEventTypes` 共 **13 种**：
+- `internal/engine` 以纯函数折叠事件（`KnownEventTypes` 共 **16 种**：
   `RunOpened`、`StepEntered`、`StepCompleted`、`StepFailed`、`StepSkipped`、
   `RunClosed`、`StageAssigned`、`TimerFired`、`Migrated`、
   `CompensationExecuted`、`SubprocessStarted`、`ProcessSuspended`、
-  `ProcessResumed`），重建运行状态。
+  `ProcessResumed`、`WorkItemApprovalRequested`、`WorkItemApproved`、
+  `WorkItemRejected`），重建运行状态。
 - 投影（`run_contexts` / `process_instances`）与事件流同事务写入，可随时
   `RebuildProjection`。
 
