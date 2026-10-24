@@ -2,6 +2,7 @@ package worker
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"sync"
 	"testing"
@@ -20,8 +21,8 @@ type fakeStore struct {
 	failed   map[string]string
 	claims   int
 	claimErr error
-	hbCalls  int  // total Heartbeat calls
-	hbFailAt int  // 1-based: fail the Nth Heartbeat call; 0 = never fail
+	hbCalls  int // total Heartbeat calls
+	hbFailAt int // 1-based: fail the Nth Heartbeat call; 0 = never fail
 	// requeueOnFail models the durable runtime's retry behavior: a failed
 	// work item returns to the ready queue and can be claimed again.
 	requeueOnFail bool
@@ -281,4 +282,140 @@ func TestCancellationDuringWorkRequeuesWithoutDuplicateCompletion(t *testing.T) 
 	assert.Equal(t, 1, n)
 	assert.Equal(t, []string{"cancel1"}, store.done, "exactly one completion after reclaim")
 	assert.Equal(t, 2, attempts)
+}
+
+type resultStore struct {
+	*fakeStore
+	completed []WorkResult
+}
+
+func (s *resultStore) CompleteWithResult(id, token string, res WorkResult) error {
+	s.completed = append(s.completed, res)
+	return s.fakeStore.Complete(id, token)
+}
+
+func TestProcessOnceUsesResultStore(t *testing.T) {
+	base := newFakeStore(WorkItem{ID: "w1", State: "ready"})
+	store := &resultStore{fakeStore: base}
+	w := New(store, func(ctx context.Context, item WorkItem) WorkResult {
+		return WorkResult{Status: "success", Result: json.RawMessage(`{"ok":true}`), CheckpointRef: "ckpt-1"}
+	}, time.Minute)
+
+	_, err := w.ProcessOnce(context.Background())
+	require.NoError(t, err)
+	require.Len(t, store.completed, 1)
+	assert.Equal(t, "ckpt-1", store.completed[0].CheckpointRef)
+}
+
+type approvalStore struct {
+	*fakeStore
+	requests []ApprovalRequest
+	err      error
+}
+
+func (s *approvalStore) RequestApproval(id, token string, req ApprovalRequest) error {
+	if s.err != nil {
+		return s.err
+	}
+	s.requests = append(s.requests, req)
+	return nil
+}
+
+func TestProcessOnceRequestsApproval(t *testing.T) {
+	base := newFakeStore(WorkItem{ID: "w1", State: "ready"})
+	store := &approvalStore{fakeStore: base}
+	w := New(store, func(ctx context.Context, item WorkItem) WorkResult {
+		return WorkResult{Status: "approval", Approval: &ApprovalRequest{Reason: "over limit"}}
+	}, time.Minute)
+
+	_, err := w.ProcessOnce(context.Background())
+	require.NoError(t, err)
+	require.Len(t, store.requests, 1)
+	assert.Equal(t, "over limit", store.requests[0].Reason)
+	assert.Empty(t, base.failed)
+}
+
+func TestProcessOnceApprovalUnsupportedFails(t *testing.T) {
+	store := newFakeStore(WorkItem{ID: "w1", State: "ready"})
+	w := New(store, func(ctx context.Context, item WorkItem) WorkResult {
+		return WorkResult{Status: "approval", Approval: &ApprovalRequest{Reason: "over limit"}}
+	}, time.Minute)
+
+	n, err := w.ProcessOnce(context.Background())
+	require.NoError(t, err)
+	assert.Equal(t, 1, n)
+	assert.Contains(t, store.failed["w1"], "does not support approval")
+}
+
+func TestProcessOnceApprovalNilFails(t *testing.T) {
+	base := newFakeStore(WorkItem{ID: "w1", State: "ready"})
+	store := &approvalStore{fakeStore: base}
+	w := New(store, func(ctx context.Context, item WorkItem) WorkResult {
+		return WorkResult{Status: "approval"}
+	}, time.Minute)
+
+	n, err := w.ProcessOnce(context.Background())
+	require.NoError(t, err)
+	assert.Equal(t, 1, n)
+	assert.Contains(t, base.failed["w1"], "missing approval request")
+}
+
+func TestProcessOnceApprovalErrorFails(t *testing.T) {
+	base := newFakeStore(WorkItem{ID: "w1", State: "ready"})
+	store := &approvalStore{fakeStore: base, err: errors.New("approval backend down")}
+	w := New(store, func(ctx context.Context, item WorkItem) WorkResult {
+		return WorkResult{Status: "approval", Approval: &ApprovalRequest{Reason: "over limit"}}
+	}, time.Minute)
+
+	n, err := w.ProcessOnce(context.Background())
+	require.NoError(t, err)
+	assert.Equal(t, 1, n)
+	assert.Equal(t, "approval backend down", base.failed["w1"])
+	assert.Empty(t, store.requests)
+}
+
+func TestProcessOnceApprovalCounts(t *testing.T) {
+	base := newFakeStore(WorkItem{ID: "w1", State: "ready"})
+	store := &approvalStore{fakeStore: base}
+	w := New(store, func(ctx context.Context, item WorkItem) WorkResult {
+		return WorkResult{Status: "approval", Approval: &ApprovalRequest{Reason: "ok"}}
+	}, time.Minute)
+
+	n, err := w.ProcessOnce(context.Background())
+	require.NoError(t, err)
+	assert.Equal(t, 1, n)
+	assert.Empty(t, base.failed)
+	assert.Len(t, store.requests, 1)
+}
+
+func TestProcessOnceLegacyCompleteFallback(t *testing.T) {
+	store := newFakeStore(WorkItem{ID: "w1", State: "ready"})
+	w := New(store, func(ctx context.Context, item WorkItem) WorkResult {
+		return WorkResult{Status: "success", Outcome: "ok"}
+	}, time.Minute)
+
+	n, err := w.ProcessOnce(context.Background())
+	require.NoError(t, err)
+	assert.Equal(t, 1, n)
+	assert.Equal(t, []string{"w1"}, store.done)
+}
+
+func TestProcessOnceApprovalMergesRefs(t *testing.T) {
+	base := newFakeStore(WorkItem{ID: "w1", State: "ready"})
+	store := &approvalStore{fakeStore: base}
+	w := New(store, func(ctx context.Context, item WorkItem) WorkResult {
+		return WorkResult{
+			Status:        "approval",
+			CheckpointRef: "ckpt-top",
+			EffectCursor:  "cur-top",
+			Approval:      &ApprovalRequest{Reason: "over limit"},
+		}
+	}, time.Minute)
+
+	n, err := w.ProcessOnce(context.Background())
+	require.NoError(t, err)
+	assert.Equal(t, 1, n)
+	require.Len(t, store.requests, 1)
+	assert.Equal(t, "ckpt-top", store.requests[0].CheckpointRef)
+	assert.Equal(t, "cur-top", store.requests[0].EffectCursor)
 }
