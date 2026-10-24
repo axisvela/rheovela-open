@@ -2,6 +2,14 @@
 
 RHEOVELA open（`github.com/axisvela/rheovela-open`，Apache-2.0）发布记录：对外发布层（版本化 contracts、SDK、examples、CI、OpenAPI）。格式：最新在前；每个版本对应一个 git tag（三仓库统一语义版本 tag）。
 
+## [v1.4.1] - 2026-10-24
+
+### Documentation
+
+- Added `docs/STATUS.md` and `docs/ROADMAP.md`.
+- Aligned README/product/operations/development version references with
+  `v1.4.0` and documented the v1.4.0 SDK feature matrix.
+
 ## [v1.4.0] - 2026-10-24
 
 - Core adds the work-item retry policy (attempts / max_attempts): a failed
