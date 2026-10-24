@@ -79,6 +79,12 @@ func TestRunContextJSONRoundTrip(t *testing.T) {
 	assert.Equal(t, "review", decoded.CurrentStage)
 }
 
+func TestKnownEventTypesIncludesWorkItemApproval(t *testing.T) {
+	for _, typ := range []string{"WorkItemApprovalRequested", "WorkItemApproved", "WorkItemRejected"} {
+		assert.Contains(t, contracts.KnownEventTypes, typ)
+	}
+}
+
 func TestWorkflowDefinitionJSONRoundTrip(t *testing.T) {
 	wf := contracts.WorkflowDefinition{
 		WorkflowID: "paper-submission",

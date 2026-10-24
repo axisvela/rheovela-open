@@ -3,24 +3,67 @@ package worker
 
 import (
 	"context"
+	"encoding/json"
 	"sync/atomic"
 	"time"
 )
 
+type Approval struct {
+	State         string          `json:"state"`
+	PendingStage  string          `json:"pending_stage,omitempty"`
+	FinalArgs     json.RawMessage `json:"final_args,omitempty"`
+	Reason        string          `json:"reason,omitempty"`
+	RequestedBy   string          `json:"requested_by,omitempty"`
+	RequestedAt   time.Time       `json:"requested_at,omitempty"`
+	DecidedBy     string          `json:"decided_by,omitempty"`
+	DecidedAt     *time.Time      `json:"decided_at,omitempty"`
+	Comment       string          `json:"comment,omitempty"`
+	CheckpointRef string          `json:"checkpoint_ref,omitempty"`
+	EffectCursor  string          `json:"effect_cursor,omitempty"`
+}
+
+type ApprovalRequest struct {
+	Actor         string
+	Reason        string
+	FinalArgs     json.RawMessage
+	CheckpointRef string
+	EffectCursor  string
+}
+
 type WorkItem struct {
-	ID         string
-	InstanceID string
-	ActivityID string
-	State      string
+	ID            string
+	InstanceID    string
+	ActivityID    string
+	State         string
+	Result        json.RawMessage
+	CheckpointRef string
+	EffectCursor  string
+	Approval      *Approval
 }
 
 type WorkResult struct {
-	Status  string // "success" | "failure"
-	Error   string
-	Outcome string
+	Status        string // "success" | "failure" | "approval"
+	Error         string
+	Outcome       string
+	Result        json.RawMessage
+	CheckpointRef string
+	EffectCursor  string
+	Approval      *ApprovalRequest
 }
 
 type WorkFn func(ctx context.Context, item WorkItem) WorkResult
+
+// ResultStore is an optional WorkStore extension: when implemented, successful
+// results are committed together with their result payload and cursors.
+type ResultStore interface {
+	CompleteWithResult(id, token string, res WorkResult) error
+}
+
+// ApprovalStore is an optional WorkStore extension: when implemented, a worker
+// can request human approval instead of completing or failing.
+type ApprovalStore interface {
+	RequestApproval(id, token string, req ApprovalRequest) error
+}
 
 // WorkStore 是 durable runtime（rheovela core）必须实现的端口。
 type WorkStore interface {
@@ -84,12 +127,54 @@ func (w *Worker) ProcessOnce(ctx context.Context) (int, error) {
 		}
 		w.logf("claim %s token=%s", it.ID, token)
 		res := w.runWithHeartbeat(ctx, it, token)
-		if res.Status == "success" {
-			if err := w.store.Complete(it.ID, token); err != nil {
+		switch res.Status {
+		case "success":
+			var err error
+			if rs, ok := w.store.(ResultStore); ok {
+				err = rs.CompleteWithResult(it.ID, token, res)
+			} else {
+				err = w.store.Complete(it.ID, token)
+			}
+			if err != nil {
 				w.logf("complete %s: %v", it.ID, err)
 				continue
 			}
-		} else {
+		case "approval":
+			as, ok := w.store.(ApprovalStore)
+			if !ok {
+				w.logf("request approval %s: store does not implement ApprovalStore", it.ID)
+				if err := w.store.Fail(it.ID, token, "worker store does not support approval"); err != nil {
+					w.logf("fail %s: %v", it.ID, err)
+					continue
+				}
+				processed++
+				continue
+			}
+			if res.Approval == nil {
+				if err := w.store.Fail(it.ID, token, "approval result is missing approval request"); err != nil {
+					w.logf("fail %s: %v", it.ID, err)
+					continue
+				}
+				processed++
+				continue
+			}
+			req := *res.Approval
+			if req.CheckpointRef == "" {
+				req.CheckpointRef = res.CheckpointRef
+			}
+			if req.EffectCursor == "" {
+				req.EffectCursor = res.EffectCursor
+			}
+			if err := as.RequestApproval(it.ID, token, req); err != nil {
+				w.logf("request approval %s: %v", it.ID, err)
+				if ferr := w.store.Fail(it.ID, token, err.Error()); ferr != nil {
+					w.logf("fail %s: %v", it.ID, ferr)
+					continue
+				}
+				processed++
+				continue
+			}
+		default:
 			if err := w.store.Fail(it.ID, token, res.Error); err != nil {
 				w.logf("fail %s: %v", it.ID, err)
 				continue
@@ -108,8 +193,10 @@ func (w *Worker) runWithHeartbeat(ctx context.Context, item WorkItem, token stri
 	defer cancel()
 
 	stop := make(chan struct{})
+	done := make(chan struct{})
 	var leaseLost atomic.Bool
 	go func() {
+		defer close(done)
 		t := time.NewTicker(w.heartbeatInterval)
 		defer t.Stop()
 		for {
@@ -129,6 +216,7 @@ func (w *Worker) runWithHeartbeat(ctx context.Context, item WorkItem, token stri
 
 	res := w.fn(hctx, item)
 	close(stop)
+	<-done
 	if leaseLost.Load() {
 		return WorkResult{Status: "failure", Error: "lease lost"}
 	}

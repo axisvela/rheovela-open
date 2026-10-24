@@ -13,7 +13,7 @@
 
 ```go
 type WorkStore interface {
-    PollReady() ([]WorkItem, error)                                   // 取回所有 ready 工作项
+    PollReady() ([]WorkItem, error)                                   // 取回所有可领取工作项（ready + 租约过期的 claimed）
     Claim(id string, lease time.Duration) (token string, err error)   // 领取，返回 fencing token
     Heartbeat(id, token string, lease time.Duration) error            // 续租
     Complete(id, token string) error                                  // 幂等完成
@@ -28,16 +28,24 @@ type WorkStore interface {
 
 ```go
 type WorkItem struct {
-    ID         string
-    InstanceID string
-    ActivityID string
-    State      string
+    ID            string
+    InstanceID    string
+    ActivityID    string
+    State         string
+    Result        json.RawMessage
+    CheckpointRef string
+    EffectCursor  string
+    Approval      *Approval
 }
 
 type WorkResult struct {
-    Status  string // "success" | "failure"
-    Error   string
-    Outcome string
+    Status        string // "success" | "failure" | "approval"
+    Error         string
+    Outcome       string
+    Result        json.RawMessage
+    CheckpointRef string
+    EffectCursor  string
+    Approval      *ApprovalRequest
 }
 ```
 
@@ -45,26 +53,41 @@ type WorkResult struct {
 
 ### 方式 A：嵌入 core 的 `runtime.WorkerBridge`（推荐，本地/edge）
 
-core（AGPL）在公共 `runtime` 包中提供了 `WorkerBridge`，它通过 core 的 broker
-（`work_items` 表 + claim/lease/fencing 语义）实现 `WorkStore`：
+core（AGPL）在公共 `runtime` 包中提供了两个 bridge：
+
+- **`LegacyWorkerBridge`**（构造器 `runtime.NewWorkerBridge`）：只实现
+  `WorkStore`，`Complete` 走 broker，**不持久化 result/checkpoint/effect_cursor**，
+  也不支持审批。为兼容旧代码保留。
+- **`WorkerBridge`**（构造器 `runtime.NewWorkerBridgeWithService`）：实现
+  `WorkStore` 以及可选端口 `ResultStore` 与 `ApprovalStore`。`Complete` /
+  `CompleteWithResult` 经 `Service.CompleteWorkItem` 提交，原子推进阶段、持久化
+  result，并创建下一阶段工作项；`RequestApproval` 把工作项转入
+  `awaiting_approval`。生产环境应使用这个 bridge。
 
 ```go
 import (
     "github.com/axisvela/rheovela/runtime"   // core 公共 API
     worker "github.com/axisvela/rheovela-open/sdk/worker"
 )
-```
 
-构造 `WorkerBridge` 需要 core 的 `Store`：
-
-```go
 db, err := runtime.OpenDB(dbPath)      // 打开 SQLite
 st := runtime.NewStore(db)
-bridge := runtime.NewWorkerBridge(st)  // implements worker.WorkStore
+svc := runtime.NewService(st)
+bridge := runtime.NewWorkerBridgeWithService(st, svc,
+    runtime.WithWorkerActor("worker-1"), // 记录为 StepCompleted 的 actor
+)
 ```
 
-依赖方向：`worker` SDK（Apache）本身零依赖 core；`WorkerBridge` 位于 core 侧，把
-core 的 broker 语义桥接到 SDK 的 `WorkStore` 端口。
+- **`WithWorkerActor(actor)`**：设置 Service 命令中记录的 worker actor。若
+  Service 配置了 Identity，该 actor 必须被授予 execute scope（审批场景还需
+  approve scope）。
+- **`ResultStore`**：`CompleteWithResult(id, token, WorkResult)` 与 result 一起
+  持久化 `checkpoint_ref` / `effect_cursor`。
+- **`ApprovalStore`**：`RequestApproval(id, token, ApprovalRequest)` 请求人工审批；
+  没有 Service 时 fail closed。
+
+依赖方向：`worker` SDK（Apache）本身零依赖 core；两个 bridge 位于 core 侧，把
+core 的 broker/service 语义桥接到 SDK 的端口。
 
 ### 方式 B：自行实现 `WorkStore`
 
@@ -109,7 +132,9 @@ func main() {
     }
     defer db.Close()
     st := runtime.NewStore(db)
-    bridge := runtime.NewWorkerBridge(st)
+    svc := runtime.NewService(st)
+    bridge := runtime.NewWorkerBridgeWithService(st, svc,
+        runtime.WithWorkerActor("worker-1"))
 
     // fn：接到工作项就执行，返回 success/failure
     fn := func(ctx context.Context, item worker.WorkItem) worker.WorkResult {

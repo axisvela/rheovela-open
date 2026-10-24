@@ -64,7 +64,7 @@ Key types:
 ### JSON Schemas + OpenAPI
 
 - `api/workflow.schema.json` — `WorkflowDefinition` (draft-07)
-- `api/event.schema.json` — `Event` (covers all 13 event types)
+- `api/event.schema.json` — `Event` (covers all 16 event types, including `WorkItemApprovalRequested`, `WorkItemApproved`, and `WorkItemRejected`)
 - `api/openapi.yaml` — HTTP Ops API + Worker API routes
 - `api/schema_test.go` — keeps the schemas consistent with `contracts` and
   validates the bundled example definitions
@@ -93,10 +93,15 @@ The Worker HTTP API each SDK talks to:
 
 | Method | Path | Purpose |
 |--------|------|---------|
-| `GET` | `/api/v1/work-items?instance=<id>` | list ready work items |
+| `GET` | `/api/v1/work-items` | list claimable work items globally (`ready` + expired `claimed`) |
+| `GET` | `/api/v1/work-items?instance=<id>` | list an instance's work items (optional `state` filter) |
+| `GET` | `/api/v1/work-items/{id}` | get one work item with its result, refs, and approval |
 | `POST` | `/api/v1/work-items/{id}/claim` | claim → `{token, lease, lease_until}` |
 | `POST` | `/api/v1/work-items/{id}/heartbeat` | renew lease `{token, lease}` |
-| `POST` | `/api/v1/work-items/{id}/complete` | complete `{token}` |
+| `POST` | `/api/v1/work-items/{id}/complete` | complete `{token}`; accepts `result`, `checkpoint_ref`, `effect_cursor` |
+| `POST` | `/api/v1/work-items/{id}/request-approval` | pause the item for a human decision |
+| `POST` | `/api/v1/work-items/{id}/approve` | approve the decision and requeue to `ready` |
+| `POST` | `/api/v1/work-items/{id}/reject` | reject the decision (requires close/replan/migration) |
 | `POST` | `/api/v1/work-items/{id}/fail` | fail `{token, error}` |
 
 A worker is a **loop**: poll ready items → claim (fencing token) → run your
@@ -105,14 +110,27 @@ protocol; you provide the work function.
 
 ### Go (embedded, local/edge)
 
-The Go SDK defines the `WorkStore` port. In production the core provides
-`runtime.WorkerBridge` (implements `WorkStore` on the local broker); you can
-also implement the 5 methods against any backend.
+The Go SDK defines the `WorkStore` port plus the optional `ResultStore` and
+`ApprovalStore` ports. Core ships two bridges:
+
+- `runtime.NewWorkerBridge(st)` → `LegacyWorkerBridge`: `WorkStore` only.
+  `Complete` uses the broker and **does not persist results**, and approvals are
+  unsupported. This is the legacy, non-result-persisting bridge.
+- `runtime.NewWorkerBridgeWithService(st, svc, opts...)` → `WorkerBridge`:
+  `WorkStore` + `ResultStore` + `ApprovalStore`. `Complete` and
+  `CompleteWithResult` delegate to `Service.CompleteWorkItem`, so the stage
+  advances atomically, the result/refs are persisted, and the next stage item is
+  created. `RequestApproval` pauses the item for a human decision.
+
+Use the service-backed bridge in production:
 
 ```go
 db, _ := runtime.OpenDB("~/.proc/proc.db")
 st := runtime.NewStore(db)
-bridge := runtime.NewWorkerBridge(st)
+svc := runtime.NewService(st)
+bridge := runtime.NewWorkerBridgeWithService(st, svc,
+    runtime.WithWorkerActor("worker-1"),
+)
 
 fn := func(ctx context.Context, item worker.WorkItem) worker.WorkResult {
     // do the work...
@@ -125,6 +143,10 @@ for {
     if n == 0 { time.Sleep(2 * time.Second) }
 }
 ```
+
+`WithWorkerActor` sets the actor recorded on `StepCompleted`; with an Identity
+provider it must hold the execute scope (and the approve scope for approval
+requests). You can also implement the 5 `WorkStore` methods against any backend.
 
 ### Python / TypeScript / Java / Rust (HTTP)
 

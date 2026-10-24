@@ -14,14 +14,27 @@ type HTTPWorkStore struct {
 	ctx context.Context
 }
 
-var _ worker.WorkStore = (*HTTPWorkStore)(nil)
+var (
+	_ worker.WorkStore     = (*HTTPWorkStore)(nil)
+	_ worker.ResultStore   = (*HTTPWorkStore)(nil)
+	_ worker.ApprovalStore = (*HTTPWorkStore)(nil)
+)
 
 // NewHTTPWorkStore builds a worker WorkStore over the given client.
 func NewHTTPWorkStore(c *Client) *HTTPWorkStore {
-	return &HTTPWorkStore{c: c, ctx: context.Background()}
+	return NewHTTPWorkStoreWithContext(context.Background(), c)
 }
 
-// PollReady lists work items currently known to the service.
+// NewHTTPWorkStoreWithContext builds a worker WorkStore that uses ctx for all
+// client calls.
+func NewHTTPWorkStoreWithContext(ctx context.Context, c *Client) *HTTPWorkStore {
+	return &HTTPWorkStore{c: c, ctx: ctx}
+}
+
+// PollReady lists claimable work items globally. The global endpoint returns
+// items that can currently be claimed: ready items plus claimed items whose
+// lease has expired. Items still awaiting approval or in a terminal state are
+// skipped if the server ever includes them.
 func (s *HTTPWorkStore) PollReady() ([]worker.WorkItem, error) {
 	items, err := s.c.ListWorkItems(s.ctx, "")
 	if err != nil {
@@ -29,9 +42,30 @@ func (s *HTTPWorkStore) PollReady() ([]worker.WorkItem, error) {
 	}
 	out := make([]worker.WorkItem, 0, len(items))
 	for _, it := range items {
-		out = append(out, worker.WorkItem{ID: it.ID, InstanceID: it.InstanceID, ActivityID: it.ActivityID, State: it.State})
+		if it.State != "ready" && it.State != "claimed" {
+			continue
+		}
+		out = append(out, toWorkerItem(it))
 	}
 	return out, nil
+}
+
+func toWorkerItem(it WorkItem) worker.WorkItem {
+	w := worker.WorkItem{
+		ID: it.ID, InstanceID: it.InstanceID, ActivityID: it.ActivityID, State: it.State,
+		Result: it.Result, CheckpointRef: it.CheckpointRef, EffectCursor: it.EffectCursor,
+	}
+	if it.Approval != nil {
+		w.Approval = &worker.Approval{
+			State: it.Approval.State, PendingStage: it.Approval.PendingStage,
+			FinalArgs: it.Approval.FinalArgs, Reason: it.Approval.Reason,
+			RequestedBy: it.Approval.RequestedBy, RequestedAt: it.Approval.RequestedAt,
+			DecidedBy: it.Approval.DecidedBy, DecidedAt: it.Approval.DecidedAt,
+			Comment:       it.Approval.Comment,
+			CheckpointRef: it.Approval.CheckpointRef, EffectCursor: it.Approval.EffectCursor,
+		}
+	}
+	return w
 }
 
 // Claim claims a work item and returns its fencing token.
@@ -51,6 +85,22 @@ func (s *HTTPWorkStore) Heartbeat(id, token string, lease time.Duration) error {
 // Complete completes a claimed work item.
 func (s *HTTPWorkStore) Complete(id, token string) error {
 	return s.c.CompleteWorkItem(s.ctx, id, token)
+}
+
+// CompleteWithResult completes a claimed work item with a result payload and
+// checkpoint/effect references.
+func (s *HTTPWorkStore) CompleteWithResult(id, token string, res worker.WorkResult) error {
+	return s.c.CompleteWorkItemWithResult(s.ctx, id, token, WorkResult{
+		Result: res.Result, CheckpointRef: res.CheckpointRef, EffectCursor: res.EffectCursor,
+	})
+}
+
+// RequestApproval asks for human approval before a work item advances.
+func (s *HTTPWorkStore) RequestApproval(id, token string, req worker.ApprovalRequest) error {
+	return s.c.RequestWorkItemApproval(s.ctx, id, token, ApprovalRequest{
+		Actor: req.Actor, Reason: req.Reason, FinalArgs: req.FinalArgs,
+		CheckpointRef: req.CheckpointRef, EffectCursor: req.EffectCursor,
+	})
 }
 
 // Fail fails a claimed work item.

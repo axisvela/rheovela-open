@@ -44,11 +44,12 @@ under Apache, so community worker/client SDKs are not infected by AGPL.
 
 - Events are append-only (the `events` table); each stream gets a server-assigned
   aggregate sequence number `seq`, preventing duplicates/out-of-order.
-- `internal/engine` folds events with pure functions (`KnownEventTypes` — **13 types**:
+- `internal/engine` folds events with pure functions (`KnownEventTypes` — **16 types**:
   `RunOpened`, `StepEntered`, `StepCompleted`, `StepFailed`, `StepSkipped`,
   `RunClosed`, `StageAssigned`, `TimerFired`, `Migrated`,
   `CompensationExecuted`, `SubprocessStarted`, `ProcessSuspended`,
-  `ProcessResumed`) to rebuild run state.
+  `ProcessResumed`, `WorkItemApprovalRequested`, `WorkItemApproved`,
+  `WorkItemRejected`) to rebuild run state.
 - Projections (`run_contexts` / `process_instances`) are written in the same
   transaction as the event stream and can be rebuilt at any time via
   `RebuildProjection`.

@@ -62,7 +62,7 @@ AGPL 传染。
 ### JSON Schema + OpenAPI
 
 - `api/workflow.schema.json` —— `WorkflowDefinition`（draft-07）
-- `api/event.schema.json` —— `Event`（覆盖全部 13 种事件类型）
+- `api/event.schema.json` —— `Event`（覆盖全部 16 种事件类型，含 `WorkItemApprovalRequested`、`WorkItemApproved`、`WorkItemRejected`）
 - `api/openapi.yaml` —— HTTP Ops API + Worker API 路由
 - `api/schema_test.go` —— 保持 schema 与 `contracts` 一致并校验内置示例定义
 
@@ -90,10 +90,15 @@ go test ./api/ -v                 # schema 一致性 + 示例校验
 
 | Method | Path | 用途 |
 |--------|------|------|
-| `GET` | `/api/v1/work-items?instance=<id>` | 列出 ready 工作项 |
+| `GET` | `/api/v1/work-items` | 全局列出可领取工作项（`ready` + 租约过期的 `claimed`） |
+| `GET` | `/api/v1/work-items?instance=<id>` | 列出实例的工作项（可选 `state` 过滤） |
+| `GET` | `/api/v1/work-items/{id}` | 获取单个工作项及其 result、引用与审批记录 |
 | `POST` | `/api/v1/work-items/{id}/claim` | 领取 → `{token, lease, lease_until}` |
 | `POST` | `/api/v1/work-items/{id}/heartbeat` | 续租 `{token, lease}` |
-| `POST` | `/api/v1/work-items/{id}/complete` | 完成 `{token}` |
+| `POST` | `/api/v1/work-items/{id}/complete` | 完成 `{token}`；可带 `result`、`checkpoint_ref`、`effect_cursor` |
+| `POST` | `/api/v1/work-items/{id}/request-approval` | 暂停工作项，等待人工决策 |
+| `POST` | `/api/v1/work-items/{id}/approve` | 批准决策并重新入队为 `ready` |
+| `POST` | `/api/v1/work-items/{id}/reject` | 拒绝决策（需 close/replan/migration 处理） |
 | `POST` | `/api/v1/work-items/{id}/fail` | 失败 `{token, error}` |
 
 Worker 就是一个**循环**：poll ready 项 → claim（fencing token）→ 运行你的函数

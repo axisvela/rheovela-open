@@ -14,7 +14,7 @@ depends on this interface, not on a concrete storage implementation:
 
 ```go
 type WorkStore interface {
-    PollReady() ([]WorkItem, error)                                   // fetch all ready work items
+    PollReady() ([]WorkItem, error)                                   // fetch all claimable work items (ready + expired claimed)
     Claim(id string, lease time.Duration) (token string, err error)   // claim, returns a fencing token
     Heartbeat(id, token string, lease time.Duration) error            // renew the lease
     Complete(id, token string) error                                  // idempotent completion
@@ -30,16 +30,24 @@ writing after its lease expired and the item was re-claimed by another worker.
 
 ```go
 type WorkItem struct {
-    ID         string
-    InstanceID string
-    ActivityID string
-    State      string
+    ID            string
+    InstanceID    string
+    ActivityID    string
+    State         string
+    Result        json.RawMessage
+    CheckpointRef string
+    EffectCursor  string
+    Approval      *Approval
 }
 
 type WorkResult struct {
-    Status  string // "success" | "failure"
-    Error   string
-    Outcome string
+    Status        string // "success" | "failure" | "approval"
+    Error         string
+    Outcome       string
+    Result        json.RawMessage
+    CheckpointRef string
+    EffectCursor  string
+    Approval      *ApprovalRequest
 }
 ```
 
@@ -47,28 +55,44 @@ type WorkResult struct {
 
 ### Option A: embed core's `runtime.WorkerBridge` (recommended, local/edge)
 
-Core (AGPL) provides `WorkerBridge` in the public `runtime` package; it implements
-`WorkStore` on top of core's broker (`work_items` table + claim/lease/fencing
-semantics):
+Core (AGPL) ships two bridges in the public `runtime` package:
+
+- **`LegacyWorkerBridge`** (constructor `runtime.NewWorkerBridge`): implements
+  `WorkStore` only. `Complete` goes through the broker and **does not persist
+  results/checkpoint/effect_cursor**; approvals are unsupported. Kept for
+  compatibility.
+- **`WorkerBridge`** (constructor `runtime.NewWorkerBridgeWithService`):
+  implements `WorkStore` plus the optional `ResultStore` and `ApprovalStore`
+  ports. `Complete` / `CompleteWithResult` delegate to
+  `Service.CompleteWorkItem`, atomically advancing the stage, persisting the
+  result, and creating the next stage item. `RequestApproval` moves the item to
+  `awaiting_approval`. Production code should use this bridge.
 
 ```go
 import (
     "github.com/axisvela/rheovela/runtime"   // core public API
     worker "github.com/axisvela/rheovela-open/sdk/worker"
 )
-```
 
-Constructing `WorkerBridge` requires core's `Store`:
-
-```go
 db, err := runtime.OpenDB(dbPath)      // open SQLite
 st := runtime.NewStore(db)
-bridge := runtime.NewWorkerBridge(st)  // implements worker.WorkStore
+svc := runtime.NewService(st)
+bridge := runtime.NewWorkerBridgeWithService(st, svc,
+    runtime.WithWorkerActor("worker-1"), // recorded as the StepCompleted actor
+)
 ```
 
+- **`WithWorkerActor(actor)`**: sets the worker actor recorded on Service commands.
+  With an Identity provider configured, the actor must hold the execute scope
+  (and the approve scope for approval requests).
+- **`ResultStore`**: `CompleteWithResult(id, token, WorkResult)` persists the
+  result together with `checkpoint_ref` / `effect_cursor`.
+- **`ApprovalStore`**: `RequestApproval(id, token, ApprovalRequest)` requests a
+  human decision and fails closed when no Service is configured.
+
 Dependency direction: the `worker` SDK (Apache) itself has zero dependency on core;
-`WorkerBridge` lives on the core side and bridges core's broker semantics to the SDK's
-`WorkStore` port.
+both bridges live on the core side and bridge core's broker/service semantics to the
+SDK's ports.
 
 ### Option B: implement `WorkStore` yourself
 
@@ -116,7 +140,9 @@ func main() {
     }
     defer db.Close()
     st := runtime.NewStore(db)
-    bridge := runtime.NewWorkerBridge(st)
+    svc := runtime.NewService(st)
+    bridge := runtime.NewWorkerBridgeWithService(st, svc,
+        runtime.WithWorkerActor("worker-1"))
 
     // fn: runs the work item and returns success/failure
     fn := func(ctx context.Context, item worker.WorkItem) worker.WorkResult {
