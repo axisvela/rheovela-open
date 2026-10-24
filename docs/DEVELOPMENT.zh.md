@@ -234,7 +234,7 @@ rheo run open PurchaseApproval --var amount=1500 --as alice
 
 ## 7. 发布与版本
 
-按**语义版本 tag**（`v1.0.0`、`v0.9.0-beta`、`v1.0.0-rc.1`）版本化。开发里程碑
+按**语义版本 tag**（`v1.4.0`、`v1.1.0`、`v0.9.0-beta`）版本化。开发里程碑
 tag（`v1.x-core`）**不**产生 GitHub Release。
 
 | 产物 | 位置 | 如何 |

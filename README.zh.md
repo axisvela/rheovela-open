@@ -27,7 +27,7 @@ RHEOVELA 是一个 **Dynamic Process & Durable Workflow Platform（动态流程�
 
 ## 这个仓库 — rheovela-open
 
-**rheovela-open** 是 RHEOVELA 的**对外发布层**（Apache-2.0，当前 `v1.0.0-rc.1`）：版本化 contracts、5 语言 Worker SDK、HTTP Worker API、OpenAPI 与示例流程。内核（AGPL-3.0）位于 [rheovela](https://github.com/axisvela/rheovela)；企业能力位于 [rheovela-ee](https://github.com/axisvela/rheovela-ee)。完整功能见 [docs/FEATURES.md](docs/FEATURES.md)。
+**rheovela-open** 是 RHEOVELA 的**对外发布层**（Apache-2.0，当前 `v1.4.1`）：版本化 contracts、5 语言 Worker SDK、HTTP Worker API、OpenAPI 与示例流程。内核（AGPL-3.0）位于 [rheovela](https://github.com/axisvela/rheovela)；企业能力位于 [rheovela-ee](https://github.com/axisvela/rheovela-ee)。完整功能见 [docs/FEATURES.md](docs/FEATURES.md)。
 
 ## 目录
 
@@ -37,7 +37,7 @@ RHEOVELA 是一个 **Dynamic Process & Durable Workflow Platform（动态流程�
 | `sdk/` | worker SDK（5 种语言）— [Go](sdk/worker/) · [Python](sdk/python/) · [TypeScript](sdk/typescript/) · [Java](sdk/java/) · [Rust](sdk/rust/) |
 | `api/` | HTTP API reference — [README（Ops API）](api/README.md) · [OpenAPI 3.0 规范](api/openapi.yaml) · [workflow.schema.json](api/workflow.schema.json) · [event.schema.json](api/event.schema.json) |
 | `examples/` | 示例流程（RHEO IR DSL）— [README](examples/README.md) |
-| `docs/` | **功能与特性** — [FEATURES.md](docs/FEATURES.md)（[English](docs/FEATURES.en.md)）· 产品介绍 — [product.md](docs/product.md)（[English](docs/product.en.md)）· **运维手册** — [OPERATIONS.zh.md](docs/OPERATIONS.zh.md)（[English](docs/OPERATIONS.md)）· **开发手册** — [DEVELOPMENT.zh.md](docs/DEVELOPMENT.zh.md)（[English](docs/DEVELOPMENT.md)） |
+| `docs/` | **状态** — [STATUS.md](docs/STATUS.md) · **路线图** — [ROADMAP.md](docs/ROADMAP.md) · **功能与特性** — [FEATURES.md](docs/FEATURES.md)（[English](docs/FEATURES.en.md)）· 产品介绍 — [product.md](docs/product.md)（[English](docs/product.en.md)）· **运维手册** — [OPERATIONS.zh.md](docs/OPERATIONS.zh.md)（[English](docs/OPERATIONS.md)）· **开发手册** — [DEVELOPMENT.zh.md](docs/DEVELOPMENT.zh.md)（[English](docs/DEVELOPMENT.md)） |
 
 ## 快速开始（Worker SDK）
 
