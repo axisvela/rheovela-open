@@ -34,7 +34,10 @@
         "SubprocessStarted",
         "CompensationExecuted",
         "ProcessSuspended",
-        "ProcessResumed"
+        "ProcessResumed",
+        "WorkItemApprovalRequested",
+        "WorkItemApproved",
+        "WorkItemRejected"
       ]
     },
     "payload": {

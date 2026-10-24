@@ -5,6 +5,8 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/axisvela/rheovela-open/v3/contracts"
 )
 
 // loadSchema reads api/workflow.schema.json and returns its decoded root map.
@@ -207,7 +209,7 @@ func TestEventSchema(t *testing.T) {
 	if !ok || len(typeEnum) == 0 {
 		t.Fatalf("properties.type must declare a non-empty enum")
 	}
-	for _, wantType := range []string{"RunOpened", "ProcessSuspended"} {
+	for _, wantType := range contracts.KnownEventTypes {
 		if !containsAny(typeEnum, wantType) {
 			t.Errorf("type enum is missing %q", wantType)
 		}
