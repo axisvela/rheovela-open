@@ -1,0 +1,116 @@
+name: release
+
+on:
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+"
+      - "v[0-9]+.[0-9]+.[0-9]+-*"
+
+permissions:
+  contents: write
+
+jobs:
+  build-core:
+    name: build core CLI (${{ matrix.target.os }}/${{ matrix.target.arch }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        target:
+          - os: windows
+            arch: amd64
+            ext: .exe
+          - os: linux
+            arch: amd64
+            ext: ""
+          - os: linux
+            arch: arm64
+            ext: ""
+          - os: darwin
+            arch: amd64
+            ext: ""
+          - os: darwin
+            arch: arm64
+            ext: ""
+    steps:
+      # Core's go.mod replaces the open SDK with ../Rheovela-open and the
+      # Harmovela module with ../Harmovela/implementations/go, so all three
+      # checkouts must be siblings in the workspace.
+      - name: Checkout rheovela-open
+        uses: actions/checkout@v4
+        with:
+          path: Rheovela-open
+
+      - name: Checkout rheovela core at the same tag
+        uses: actions/checkout@v4
+        with:
+          repository: axisvela/rheovela
+          ref: ${{ github.ref_name }}
+          path: Rheovela
+
+      - name: Checkout Harmovela v3 module
+        uses: actions/checkout@v4
+        with:
+          repository: axisvela/harmovela
+          ref: v3.0.0
+          path: Harmovela
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: Rheovela/go.mod
+          cache-dependency-path: Rheovela/go.sum
+
+      - name: Build core CLI
+        working-directory: Rheovela
+        run: |
+          mkdir -p "${GITHUB_WORKSPACE}/artifacts"
+          ARTIFACT="rheo-${{ matrix.target.os }}-${{ matrix.target.arch }}${{ matrix.target.ext }}"
+          ldflags="-s -w -X main.version=${GITHUB_REF_NAME}"
+          GOOS=${{ matrix.target.os }} GOARCH=${{ matrix.target.arch }} CGO_ENABLED=0 \
+            go build -trimpath -ldflags "${ldflags}" \
+            -o "${GITHUB_WORKSPACE}/artifacts/${ARTIFACT}" ./cmd/rheo
+
+      - name: Hash artifact
+        run: |
+          cd "${GITHUB_WORKSPACE}/artifacts"
+          sha256sum "rheo-${{ matrix.target.os }}-${{ matrix.target.arch }}${{ matrix.target.ext }}" \
+            > "rheo-${{ matrix.target.os }}-${{ matrix.target.arch }}.sha256"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: rheo-${{ matrix.target.os }}-${{ matrix.target.arch }}
+          path: |
+            artifacts/rheo-${{ matrix.target.os }}-${{ matrix.target.arch }}${{ matrix.target.ext }}
+            artifacts/rheo-${{ matrix.target.os }}-${{ matrix.target.arch }}.sha256
+          if-no-files-found: error
+
+  release:
+    name: Publish open release with core binaries
+    needs: build-core
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Build SHA256SUMS manifest
+        run: |
+          cd artifacts
+          find . -type f -name "rheo-*" ! -name "*.sha256" -print0 | \
+            xargs -0 sha256sum | sort -k2 > SHA256SUMS
+          cat SHA256SUMS
+
+      - name: Create release and upload core binaries
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          VERSION="${GITHUB_REF_NAME}"
+          gh release create "${VERSION}" \
+            --title "${VERSION}" \
+            --notes "Release ${VERSION} of the RHEOVELA open SDK and the core \`rheo\` CLI.
+
+          The \`rheo\` binaries are built from \`axisvela/rheovela\` at tag ${VERSION}.
+          Built targets: windows/amd64, linux/amd64, linux/arm64, darwin/amd64, darwin/arm64.
+          SHA256SUMS is included for checksum verification." \
+            artifacts/rheo-*/rheo-* \
+            artifacts/SHA256SUMS
