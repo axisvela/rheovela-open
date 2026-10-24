@@ -2,12 +2,22 @@
 
 RHEOVELA open（`github.com/axisvela/rheovela-open`，Apache-2.0）发布记录：对外发布层（版本化 contracts、SDK、examples、CI、OpenAPI）。格式：最新在前；每个版本对应一个 git tag（三仓库统一语义版本 tag）。
 
-## Unreleased (core progress)
+## [v1.4.0] - 2026-10-24
 
 - Core adds the work-item retry policy (attempts / max_attempts): a failed
   item re-queues while attempts remain and becomes terminal at the bound.
 - Core adds cancel (POST /api/v1/work-items/{id}/cancel); the Go SDK exposes
   CancelWorkItem.
+- Durable worker SDK: `WorkItem`/`WorkResult` now carry `Result`,
+  `CheckpointRef`, `EffectCursor`, and `Approval`; optional `ResultStore` and
+  `ApprovalStore` ports; `Status == "approval"` requests human approval.
+- Client methods: `GetWorkItem`, `CompleteWorkItemWithResult`,
+  `RequestWorkItemApproval`, `ApproveWorkItem`, `RejectWorkItem`; claim response
+  includes `work_item`.
+- `HTTPWorkStore` polls claimable items (ready + expired claimed) and maps
+  result/checkpoint/effect/approval fields.
+- Work-item events registered in contracts/OpenAPI: `WorkItemApprovalRequested`,
+  `WorkItemApproved`, `WorkItemRejected`.
 
 ## [v1.1.0] - 2026-08-13
 
