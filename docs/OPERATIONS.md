@@ -56,7 +56,7 @@ powershell -ExecutionPolicy Bypass -File release/build.ps1
 Check the version:
 
 ```sh
-rheo --version   # → rheo v1.7.0 (stamped at release)
+rheo --version   # → rheo v1.7.1 (stamped at release)
 ```
 
 ### 1.3 Data directory
