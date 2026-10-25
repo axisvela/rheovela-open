@@ -53,7 +53,7 @@ powershell -ExecutionPolicy Bypass -File release/build.ps1
 查看版本：
 
 ```sh
-rheo --version   # → rheo v1.5.0（发布时注入）
+rheo --version   # → rheo v1.5.1（发布时注入）
 ```
 
 ### 1.3 数据目录
