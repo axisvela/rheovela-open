@@ -46,7 +46,7 @@ open-ended planning, and not a single agent's inference loop.
 ## This repository — rheovela-open
 
 **rheovela-open** is the **public release layer of RHEOVELA** (Apache-2.0,
-current `v1.7.1`): versioned contracts, 5-language Worker SDKs, the HTTP
+current `v1.7.2`): versioned contracts, 5-language Worker SDKs, the HTTP
 Worker API, OpenAPI spec and example workflows. The core engine (AGPL-3.0) lives
 in [rheovela](https://github.com/axisvela/rheovela); enterprise capabilities live
 in [rheovela-ee](https://github.com/axisvela/rheovela-ee). Full feature list in
