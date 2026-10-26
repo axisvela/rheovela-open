@@ -1,6 +1,6 @@
 # Rheovela-open Public Roadmap
 
-> Last updated: 2026-10-26 · current release `v1.7.4`（coordinated ecosystem release；功能基线 `v1.4.0`）
+> Last updated: 2026-10-26 · current release `v1.7.5`（coordinated ecosystem release；功能基线 `v1.4.0`）
 >
 > 本文是 open 的对外公开路线图。core 内核路线图见 core `docs/ROADMAP.md`；
 > 企业能力与内部发布一致性由 Rheovela-ee 私有仓库 `docs/ROADMAP.md` 跟踪。
@@ -14,18 +14,18 @@
 | HTTP API | OpenAPI 3.0、Worker HTTP API、work-item approval/retry/cancel |
 | Schemas | WorkflowDefinition JSON Schema、Event JSON Schema |
 | Examples | Go / Python / TypeScript runnable workers、RHEO IR samples |
-| SDK parity for v1.4.0 | Go / Python / TypeScript / Java / Rust SDK：result、checkpoint、effect cursor、approval、retry、cancel、claimable polling（unreleased，post-v1.7.4） |
-| Harmovela adapter | `sdk/go/harmovela` producer/observer adapter：将 Rheovela work-item 生命周期映射为 Harmovela `task.*` 事件（unreleased，post-v1.7.4）；仅 producer/observer，consume 方向由 core 负责，内置 transport 不包含 |
+| SDK parity for v1.4.0 | Go / Python / TypeScript / Java / Rust SDK：result、checkpoint、effect cursor、approval、retry、cancel、claimable polling（v1.7.5） |
+| Harmovela adapter | `sdk/go/harmovela` producer/observer adapter：将 Rheovela work-item 生命周期映射为 Harmovela `task.*` 事件（v1.7.5）；仅 producer/observer，consume 方向由 core 负责，内置 transport 不包含 |
 
 ## Next
 
-1. **.NET SDK**
-   - 第六种语言 worker/client SDK
-2. **BPMN / RHEO IR**
+1. **BPMN / RHEO IR**
    - 完整 RHEO IR 规范发布到 open
    - BPMN import/export 的标准覆盖扩展（子流程、消息流等）
-3. **Community Process Designer**
+2. **Community Process Designer**
    - 社区版流程设计器与 OpenAPI/contracts 对齐
+
+> `.NET SDK` 已明确不在计划内，不再作为 open 的交付项。
 
 ## Release Rules
 

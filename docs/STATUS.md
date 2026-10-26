@@ -1,6 +1,6 @@
-# Rheovela-open Status (v1.7.4)
+# Rheovela-open Status (v1.7.5)
 
-> Last updated: 2026-10-26 · current release `v1.7.4`（coordinated ecosystem release；功能基线 `v1.4.0`）· license Apache-2.0
+> Last updated: 2026-10-26 · current release `v1.7.5`（coordinated ecosystem release；功能基线 `v1.4.0`）· license Apache-2.0
 >
 > 本文是 open 的对外公开状态。内部发布一致性、企业能力缺口与详细 backlog
 > 由 Rheovela-ee 私有仓库 `docs/STATUS.md` 跟踪。
@@ -9,7 +9,7 @@
 
 | Item | State |
 |------|-------|
-| Release tag | `v1.7.4`（coordinated ecosystem release；功能基线 `v1.4.0`） |
+| Release tag | `v1.7.5`（coordinated ecosystem release；功能基线 `v1.4.0`） |
 | Contracts | `schema_version=1`；16 种事件（含 `WorkItemApprovalRequested` / `WorkItemApproved` / `WorkItemRejected`） |
 | OpenAPI | `api/openapi.yaml`；覆盖 instances、steps、work-items、suspend/resume、approval、retry/cancel、audit、sync、events、health/status/metrics |
 | JSON Schema | `api/workflow.schema.json`、`api/event.schema.json` |
@@ -26,13 +26,10 @@
 | Java worker | `sdk/java/` | 完整：`Result`、`CheckpointRef`、`EffectCursor`、approval、retry、cancel、claimable polling |
 | Rust worker | `sdk/rust/` | 完整：`Result`、`CheckpointRef`、`EffectCursor`、approval、retry、cancel、claimable polling |
 
-> Python/TypeScript/Java/Rust parity is post-`v1.7.4` work on `main`; it will
-> ship in the next coordinated release.
-
 Go SDK 的 work-item 客户端方法包括 `GetWorkItem`、`CompleteWorkItemWithResult`、
 `RequestWorkItemApproval`、`ApproveWorkItem`、`RejectWorkItem`、`CancelWorkItem`。
 
-## Verification (2026-10-26, v1.7.4 gate)
+## Verification (2026-10-26, v1.7.5 gate)
 
 ```sh
 # root module
@@ -52,9 +49,9 @@ Python / TypeScript / Java / Rust 由各自 CI job 独立验证，没有跨语�
 
 | Area | Boundary |
 |------|----------|
-| .NET SDK | 尚未发布 |
+| .NET SDK | 不计划（已明确不需要） |
 | Process Designer | 未包含在本仓库 |
-| Harmovela adapter | producer/observer adapter implemented in `sdk/go/harmovela` (unreleased after v1.7.4)；内置 WebSocket/gRPC/NATS transports 不包含；consumer direction 由 core 负责 |
+| Harmovela adapter | producer/observer adapter in `sdk/go/harmovela` (v1.7.5)；内置 WebSocket/gRPC/NATS transports 不包含；consumer direction 由 core 负责 |
 | BPMN / RHEO IR | core 提供子集实现；完整规范与扩展仍在路线图中 |
 
 内部发布细节（`/v3` 模块 tag、三仓库 release tag 对齐）不在公开文档展开。

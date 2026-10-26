@@ -2,6 +2,21 @@
 
 RHEOVELA open（`github.com/axisvela/rheovela-open`，Apache-2.0）发布记录：对外发布层（版本化 contracts、SDK、examples、CI、OpenAPI）。格式：最新在前；每个版本对应一个 git tag（三仓库统一语义版本 tag）。
 
+## [v1.7.5] - 2026-10-26
+
+### Added
+
+- Python, TypeScript, Java, and Rust worker SDKs now match the Go SDK's
+  v1.4.0 work-item surface: rich results, checkpoint/effect cursors, approval,
+  cancel, claimable polling, and attempt metadata.
+- New `sdk/go/harmovela` producer/observer adapter publishes Rheovela work-item
+  lifecycle as Harmovela `task.*` events through an injected Publisher.
+
+### Documentation
+
+- Coordinated ecosystem release with Rheovela core and Rheovela-ee `v1.7.5`.
+  No contracts or OpenAPI changes.
+
 ## [v1.7.4] - 2026-10-26
 
 ### Documentation

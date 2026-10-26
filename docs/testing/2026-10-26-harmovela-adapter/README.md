@@ -1,6 +1,6 @@
 # Harmovela Producer Adapter
 
-Date: 2026-10-26. Tracked locally under proc project 139. Unreleased after v1.7.4.
+Date: 2026-10-26. Tracked locally under proc project 139. Released in v1.7.5.
 
 ## Changes
 
