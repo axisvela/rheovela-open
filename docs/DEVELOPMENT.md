@@ -208,7 +208,8 @@ cd sdk/rust && cargo build --offline && cargo run --offline
 ### RHEO IR DSL
 
 `.rheo` files declare `process`, `activity`, `transition`, `compensate` lines
-and compile to a `WorkflowDefinition` JSON (via core `rheo ir tojson`):
+and compile to a `WorkflowDefinition` JSON (via core `rheo ir tojson`). The
+normative grammar is in [`RHEO-IR.md`](RHEO-IR.md).
 
 ```
 process PurchaseApproval v1 {

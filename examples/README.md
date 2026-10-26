@@ -4,7 +4,8 @@
 
 本目录包含 RHEOVELA 的示例流程，以 **RHEO IR（Intermediate Representation）DSL**
 形式呈现，对应 core 的 `internal/rheoir` 解析器（Wave 3.3）。IR 可编译为
-`WorkflowDefinition`（`schema_version=1`），再通过 core CLI 导入并运行。
+`WorkflowDefinition`（`schema_version=1`），再通过 core CLI 导入并运行。规范性语法
+与映射见 [`docs/RHEO-IR.md`](../docs/RHEO-IR.md)。
 
 > 说明：`rheo workflow define` 当前导入的是 **JSON** 形式的 `WorkflowDefinition`。
 > `.rheo` 文件是面向作者的 IR 源文本，由 core 的 `internal/rheoir`（`Parse` →

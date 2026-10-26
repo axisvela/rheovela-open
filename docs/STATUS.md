@@ -54,6 +54,6 @@ and [Harmovela adapter](testing/2026-10-26-harmovela-adapter/README.md).
 |------|----------|
 | Process Designer | 未包含在本仓库 |
 | Harmovela adapter | producer/observer adapter in `sdk/go/harmovela` (v1.7.5)；内置 WebSocket/gRPC/NATS transports 不包含；consumer direction 由 core 负责 |
-| BPMN / RHEO IR | core 提供子集实现；完整规范与扩展仍在路线图中 |
+| BPMN / RHEO IR | core 提供 BPMN import/export 子集；RHEO IR v1.0 规范已发布（[RHEO-IR.md](RHEO-IR.md)），delegation/evidence/migration 扩展保留 |
 
 内部发布细节（`/v3` 模块 tag、三仓库 release tag 对齐）不在公开文档展开。

@@ -5,7 +5,8 @@
 This directory contains RHEOVELA sample workflows written in the **RHEO IR
 (Intermediate Representation) DSL**, matching core's `internal/rheoir` parser
 (Wave 3.3). The IR compiles to a `WorkflowDefinition` (`schema_version=1`), which can
-then be imported and run via the core CLI.
+then be imported and run via the core CLI. The normative grammar and mapping are
+published in [`docs/RHEO-IR.md`](../docs/RHEO-IR.md).
 
 > Note: `rheo workflow define` currently imports the `WorkflowDefinition` as **JSON**.
 > `.rheo` files are author-facing IR source text, compiled to JSON by core's

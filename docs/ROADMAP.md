@@ -20,7 +20,7 @@
 ## Next
 
 1. **BPMN / RHEO IR**
-   - 完整 RHEO IR 规范发布到 open
+   - RHEO IR v1.0 规范已发布（[RHEO-IR.md](RHEO-IR.md)）；delegation/evidence/migration 扩展保留
    - BPMN import/export 的标准覆盖扩展（子流程、消息流等）
 2. **Community Process Designer**
    - 社区版流程设计器与 OpenAPI/contracts 对齐

@@ -2,6 +2,14 @@
 
 RHEOVELA open（`github.com/axisvela/rheovela-open`，Apache-2.0）发布记录：对外发布层（版本化 contracts、SDK、examples、CI、OpenAPI）。格式：最新在前；每个版本对应一个 git tag（三仓库统一语义版本 tag）。
 
+## [Unreleased]
+
+### Documentation
+
+- Published the normative RHEO IR v1.0 specification in `docs/RHEO-IR.md`,
+  covering grammar, compilation to `WorkflowDefinition`, validation, execution,
+  BPMN projection, and reserved extensions.
+
 ## [v1.7.5] - 2026-10-26
 
 ### Added

@@ -183,7 +183,8 @@ cd sdk/rust && cargo build --offline && cargo run --offline
 ### RHEO IR DSL
 
 `.rheo` 文件声明 `process`、`activity`、`transition`、`compensate` 行，可编译为
-`WorkflowDefinition` JSON（经 core `rheo ir tojson`）：
+`WorkflowDefinition` JSON（经 core `rheo ir tojson`）。规范性语法见
+[`RHEO-IR.md`](RHEO-IR.md)。
 
 ```
 process PurchaseApproval v1 {
