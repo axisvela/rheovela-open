@@ -29,16 +29,19 @@
 Go SDK 的 work-item 客户端方法包括 `GetWorkItem`、`CompleteWorkItemWithResult`、
 `RequestWorkItemApproval`、`ApproveWorkItem`、`RejectWorkItem`、`CancelWorkItem`。
 
-## Verification (2026-10-24)
+## Verification (2026-10-26, v1.7.3 gate)
 
 ```sh
 # root module
-go test ./... -count=1        # 3 packages ok; 15 tests
+go test ./... -count=1        # 3 packages ok
 
 # Go SDK module
 cd sdk/go
-go test ./... -count=1        # 2 packages ok; 29 tests
+go test ./... -count=1        # 2 packages ok
 ```
+
+Exact top-level test counts are tracked by CI; historical 15/29 figures are not
+the current baseline.
 
 Python / TypeScript / Java / Rust 由各自 CI job 独立验证，没有跨语言统一测试框架。
 
