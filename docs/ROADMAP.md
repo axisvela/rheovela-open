@@ -14,21 +14,18 @@
 | HTTP API | OpenAPI 3.0、Worker HTTP API、work-item approval/retry/cancel |
 | Schemas | WorkflowDefinition JSON Schema、Event JSON Schema |
 | Examples | Go / Python / TypeScript runnable workers、RHEO IR samples |
-| Durable worker (v1.4.0) | Go SDK：result、checkpoint、effect cursor、approval、retry、cancel、claimable polling |
+| SDK parity for v1.4.0 | Go / Python / TypeScript / Java / Rust SDK：result、checkpoint、effect cursor、approval、retry、cancel、claimable polling |
 
 ## Next
 
-1. **SDK parity for v1.4.0**
-   - Python / TypeScript / Java / Rust 对齐 approval、cancel、retry、result、checkpoint、effect cursor、claimable polling
-   - 统一各语言 worker 的能力矩阵与测试覆盖
-2. **.NET SDK**
+1. **.NET SDK**
    - 第六种语言 worker/client SDK
-3. **Harmovela adapter**
+2. **Harmovela adapter**
    - 跨组织协调与观察 fan-out 的 open 侧适配
-4. **BPMN / RHEO IR**
+3. **BPMN / RHEO IR**
    - 完整 RHEO IR 规范发布到 open
    - BPMN import/export 的标准覆盖扩展（子流程、消息流等）
-5. **Community Process Designer**
+4. **Community Process Designer**
    - 社区版流程设计器与 OpenAPI/contracts 对齐
 
 ## Release Rules
