@@ -26,6 +26,9 @@
 | Java worker | `sdk/java/` | 完整：`Result`、`CheckpointRef`、`EffectCursor`、approval、retry、cancel、claimable polling |
 | Rust worker | `sdk/rust/` | 完整：`Result`、`CheckpointRef`、`EffectCursor`、approval、retry、cancel、claimable polling |
 
+> Python/TypeScript/Java/Rust parity is post-`v1.7.4` work on `main`; it will
+> ship in the next coordinated release.
+
 Go SDK 的 work-item 客户端方法包括 `GetWorkItem`、`CompleteWorkItemWithResult`、
 `RequestWorkItemApproval`、`ApproveWorkItem`、`RejectWorkItem`、`CancelWorkItem`。
 

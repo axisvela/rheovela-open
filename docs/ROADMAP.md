@@ -14,7 +14,7 @@
 | HTTP API | OpenAPI 3.0、Worker HTTP API、work-item approval/retry/cancel |
 | Schemas | WorkflowDefinition JSON Schema、Event JSON Schema |
 | Examples | Go / Python / TypeScript runnable workers、RHEO IR samples |
-| SDK parity for v1.4.0 | Go / Python / TypeScript / Java / Rust SDK：result、checkpoint、effect cursor、approval、retry、cancel、claimable polling |
+| SDK parity for v1.4.0 | Go / Python / TypeScript / Java / Rust SDK：result、checkpoint、effect cursor、approval、retry、cancel、claimable polling（unreleased，post-v1.7.4） |
 
 ## Next
 

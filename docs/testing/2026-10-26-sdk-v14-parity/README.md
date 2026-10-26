@@ -1,6 +1,7 @@
 # Open SDK v1.4.0 Parity
 
 Date: 2026-10-26. Tracked locally under proc project 138.
+Status: unreleased after v1.7.4; will ship in the next coordinated release.
 
 ## Changes
 
