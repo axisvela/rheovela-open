@@ -15,17 +15,16 @@
 | Schemas | WorkflowDefinition JSON Schema、Event JSON Schema |
 | Examples | Go / Python / TypeScript runnable workers、RHEO IR samples |
 | SDK parity for v1.4.0 | Go / Python / TypeScript / Java / Rust SDK：result、checkpoint、effect cursor、approval、retry、cancel、claimable polling（unreleased，post-v1.7.4） |
+| Harmovela adapter | `sdk/go/harmovela` producer/observer adapter：将 Rheovela work-item 生命周期映射为 Harmovela `task.*` 事件（unreleased，post-v1.7.4）；仅 producer/observer，consume 方向由 core 负责，内置 transport 不包含 |
 
 ## Next
 
 1. **.NET SDK**
    - 第六种语言 worker/client SDK
-2. **Harmovela adapter**
-   - 跨组织协调与观察 fan-out 的 open 侧适配
-3. **BPMN / RHEO IR**
+2. **BPMN / RHEO IR**
    - 完整 RHEO IR 规范发布到 open
    - BPMN import/export 的标准覆盖扩展（子流程、消息流等）
-4. **Community Process Designer**
+3. **Community Process Designer**
    - 社区版流程设计器与 OpenAPI/contracts 对齐
 
 ## Release Rules

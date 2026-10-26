@@ -54,7 +54,7 @@ Python / TypeScript / Java / Rust 由各自 CI job 独立验证，没有跨语�
 |------|----------|
 | .NET SDK | 尚未发布 |
 | Process Designer | 未包含在本仓库 |
-| Harmovela adapter | 尚未在 open 落地 |
+| Harmovela adapter | producer/observer adapter implemented in `sdk/go/harmovela` (unreleased after v1.7.4)；内置 WebSocket/gRPC/NATS transports 不包含；consumer direction 由 core 负责 |
 | BPMN / RHEO IR | core 提供子集实现；完整规范与扩展仍在路线图中 |
 
 内部发布细节（`/v3` 模块 tag、三仓库 release tag 对齐）不在公开文档展开。
