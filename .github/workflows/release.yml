@@ -5,6 +5,8 @@ on:
     tags:
       - "v[0-9]+.[0-9]+.[0-9]+"
       - "v[0-9]+.[0-9]+.[0-9]+-*"
+      # /v3 module tags are not product releases and must not build binaries.
+      - "!v3.*"
 
 permissions:
   contents: write
