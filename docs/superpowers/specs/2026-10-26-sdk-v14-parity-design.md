@@ -26,7 +26,6 @@ This change aligns all four SDKs with the same HTTP contract.
 
 ## 3. Non-goals
 
-- .NET SDK.
 - Harmovela adapter.
 - Full JSON parser/object model for Java/Rust.
 - New server endpoints or retry endpoint (retry remains server-driven via
@@ -171,7 +170,6 @@ the old success/failure tuple):
 
 ## 10. Out of Scope
 
-- .NET SDK.
 - Harmovela adapter.
 - Full JSON object model in Java/Rust.
 - Server-side retry API changes.

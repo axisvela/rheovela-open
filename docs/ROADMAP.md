@@ -25,8 +25,6 @@
 2. **Community Process Designer**
    - 社区版流程设计器与 OpenAPI/contracts 对齐
 
-> `.NET SDK` 已明确不在计划内，不再作为 open 的交付项。
-
 ## Release Rules
 
 - 使用语义版本 tag（如 `v1.4.0`），不使用 `v1.x-core` 开发里程碑 tag。

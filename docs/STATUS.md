@@ -45,11 +45,13 @@ the current baseline.
 
 Python / TypeScript / Java / Rust 由各自 CI job 独立验证，没有跨语言统一测试框架。
 
+Release evidence: [SDK v1.4.0 parity](testing/2026-10-26-sdk-v14-parity/README.md)
+and [Harmovela adapter](testing/2026-10-26-harmovela-adapter/README.md).
+
 ## Public Limitations
 
 | Area | Boundary |
 |------|----------|
-| .NET SDK | 不计划（已明确不需要） |
 | Process Designer | 未包含在本仓库 |
 | Harmovela adapter | producer/observer adapter in `sdk/go/harmovela` (v1.7.5)；内置 WebSocket/gRPC/NATS transports 不包含；consumer direction 由 core 负责 |
 | BPMN / RHEO IR | core 提供子集实现；完整规范与扩展仍在路线图中 |
