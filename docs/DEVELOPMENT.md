@@ -266,7 +266,7 @@ each SDK is validated against the shared Worker API contract independently.
 Versioned by **semantic-version tags** (`v1.4.0`, `v1.1.0`, `v0.9.0-beta`).
 Development milestone tags (`v1.x-core`) never produce a GitHub Release.
 The `/v3` Go module tags are maintained alongside release tags by the internal
-release process. The current mapping is release `v1.9.0` ↔ root module `v3.3.0`
+release process. The current mapping is release `v1.10.0` ↔ root module `v3.4.0`
 and adapter module `sdk/go/harmovela/v3.0.0`
 (open root, Go SDK, core and EE); `v3.0.0` remains the initial `/v3` baseline.
 
