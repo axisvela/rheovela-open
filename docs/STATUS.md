@@ -54,6 +54,6 @@ and [Harmovela adapter](testing/2026-10-26-harmovela-adapter/README.md).
 |------|----------|
 | Process Designer | 静态社区设计器 `designer/`：编辑/校验/导入导出、BPMN DI 渲染、undo/redo、导入差异预览；可选 load/publish/list 直连 core workflows API |
 | Harmovela adapter | producer/observer adapter in `sdk/go/harmovela` (since v1.7.5)；内置 WebSocket/gRPC/NATS transports 不包含；consumer direction 由 core 负责 |
-| BPMN / RHEO IR | core 提供 BPMN import/export 子集，保留 gateway/event 语义、root event definitions/refs、root message/signal/error/escalation/interface/operation/endPoint、callActivity/transaction/eventSubProcess/adHocSubProcess、loop characteristics、data stores/item definitions/properties/dataInput/dataOutput、ioSpecification/inputSet/outputSet、resources/resource roles、categories/category values、participant interface/endPoint、dataState、artifacts、pools/processRef、choreography、data associations，以及完整 DI；RHEO IR v1.0 规范已发布（[RHEO-IR.md](RHEO-IR.md)），公开 conformance corpus 与稳定 `RHEOIRxxx` 错误码见 [`conformance/`](../conformance/README.md) |
+| BPMN / RHEO IR | core 提供 BPMN import/export 子集，保留 gateway/event 语义、root definitions、callActivity/transaction/eventSubProcess/adHocSubProcess、loop characteristics、data stores/IO、resources/roles、categories、participant interface/endPoint、dataState、collaboration/conversation、choreography、data associations、artifacts，以及完整 DI；RHEO IR v1.0 规范已发布（[RHEO-IR.md](RHEO-IR.md)），公开 conformance corpus 与稳定 `RHEOIRxxx` 错误码见 [`conformance/`](../conformance/README.md) |
 
 内部发布细节（`/v3` 模块 tag、三仓库 release tag 对齐）不在公开文档展开。

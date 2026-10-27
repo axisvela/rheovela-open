@@ -89,6 +89,7 @@ type BPMN struct {
 	Interfaces             []BPMNInterface       `json:"interfaces,omitempty"`
 	EndPoints              []BPMNEndPoint        `json:"end_points,omitempty"`
 	ProcessIOSpecification *BPMNIOSpecification  `json:"process_io_specification,omitempty"`
+	Collaboration          *BPMNCollaboration    `json:"collaboration,omitempty"`
 	Choreographies         []BPMNChoreography    `json:"choreographies,omitempty"`
 	DataAssociations       []BPMNDataAssociation `json:"data_associations,omitempty"`
 	Diagram                *BPMNDiagram          `json:"diagram,omitempty"`
@@ -363,6 +364,29 @@ type BPMNEndPoint struct {
 	Name string `json:"name,omitempty"`
 }
 
+type BPMNCollaboration struct {
+	ID            string             `json:"id"`
+	Name          string             `json:"name,omitempty"`
+	Conversations []BPMNConversation `json:"conversations,omitempty"`
+}
+
+type BPMNConversation struct {
+	ID                     string                 `json:"id"`
+	Name                   string                 `json:"name,omitempty"`
+	Element                string                 `json:"element"`
+	CalledCollaborationRef string                 `json:"called_collaboration_ref,omitempty"`
+	ParticipantRefs        []string               `json:"participant_refs,omitempty"`
+	MessageFlowRefs        []string               `json:"message_flow_refs,omitempty"`
+	Links                  []BPMNConversationLink `json:"links,omitempty"`
+	Conversations          []BPMNConversation     `json:"conversations,omitempty"`
+}
+
+type BPMNConversationLink struct {
+	ID     string `json:"id"`
+	Source string `json:"source,omitempty"`
+	Target string `json:"target,omitempty"`
+}
+
 type BPMNParticipantAssociation struct {
 	InnerParticipantRef string `json:"inner_participant_ref,omitempty"`
 	OuterParticipantRef string `json:"outer_participant_ref,omitempty"`
@@ -415,20 +439,25 @@ type BPMNNode struct {
 	Loop                     *BPMNLoop            `json:"loop,omitempty"`
 	ResourceRoles            []BPMNResourceRole   `json:"resource_roles,omitempty"`
 	IOSpecification          *BPMNIOSpecification `json:"io_specification,omitempty"`
+	ActivationCondition      string               `json:"activation_condition,omitempty"`
+	AdHocCompletionCondition string               `json:"ad_hoc_completion_condition,omitempty"`
 }
 
 // BPMNLoop preserves standardLoopCharacteristics or
 // multiInstanceLoopCharacteristics.
 type BPMNLoop struct {
-	Kind                string `json:"kind"`
-	IsSequential        *bool  `json:"is_sequential,omitempty"`
-	LoopCardinality     string `json:"loop_cardinality,omitempty"`
-	CompletionCondition string `json:"completion_condition,omitempty"`
-	Collection          string `json:"collection,omitempty"`
-	ElementVariable     string `json:"element_variable,omitempty"`
-	TestBefore          *bool  `json:"test_before,omitempty"`
-	LoopMaximum         string `json:"loop_maximum,omitempty"`
-	LoopCondition       string `json:"loop_condition,omitempty"`
+	Kind                 string `json:"kind"`
+	IsSequential         *bool  `json:"is_sequential,omitempty"`
+	LoopCardinality      string `json:"loop_cardinality,omitempty"`
+	CompletionCondition  string `json:"completion_condition,omitempty"`
+	Collection           string `json:"collection,omitempty"`
+	ElementVariable      string `json:"element_variable,omitempty"`
+	TestBefore           *bool  `json:"test_before,omitempty"`
+	LoopMaximum          string `json:"loop_maximum,omitempty"`
+	LoopCondition        string `json:"loop_condition,omitempty"`
+	Behavior             string `json:"behavior,omitempty"`
+	OneBehaviorEventRef  string `json:"one_behavior_event_ref,omitempty"`
+	NoneBehaviorEventRef string `json:"none_behavior_event_ref,omitempty"`
 }
 
 // BPMNEventDefinition preserves one eventDefinition element and its attributes.

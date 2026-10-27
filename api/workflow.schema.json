@@ -235,6 +235,7 @@
           "items": { "$ref": "#/definitions/bpmnArtifact" }
         },
         "process_io_specification": { "$ref": "#/definitions/bpmnIOSpecification" },
+        "collaboration": { "$ref": "#/definitions/bpmnCollaboration" },
         "messages": { "type": "array", "items": { "$ref": "#/definitions/bpmnMessage" } },
         "signals": { "type": "array", "items": { "$ref": "#/definitions/bpmnSignal" } },
         "errors": { "type": "array", "items": { "$ref": "#/definitions/bpmnError" } },
@@ -294,7 +295,9 @@
           "type": "array",
           "items": { "$ref": "#/definitions/bpmnResourceRole" }
         },
-        "io_specification": { "$ref": "#/definitions/bpmnIOSpecification" }
+        "io_specification": { "$ref": "#/definitions/bpmnIOSpecification" },
+        "activation_condition": { "type": "string" },
+        "ad_hoc_completion_condition": { "type": "string" }
       }
     },
     "bpmnLoop": {
@@ -310,7 +313,10 @@
         "element_variable": { "type": "string" },
         "test_before": { "type": "boolean" },
         "loop_maximum": { "type": "string" },
-        "loop_condition": { "type": "string" }
+        "loop_condition": { "type": "string" },
+        "behavior": { "type": "string" },
+        "one_behavior_event_ref": { "type": "string" },
+        "none_behavior_event_ref": { "type": "string" }
       }
     },
     "bpmnEventDefinition": {
@@ -715,6 +721,50 @@
       "properties": {
         "id": { "type": "string", "minLength": 1 },
         "name": { "type": "string" }
+      }
+    },
+    "bpmnCollaboration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "name": { "type": "string" },
+        "conversations": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/bpmnConversation" }
+        }
+      }
+    },
+    "bpmnConversation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "element"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "name": { "type": "string" },
+        "element": { "type": "string", "minLength": 1 },
+        "called_collaboration_ref": { "type": "string" },
+        "participant_refs": { "type": "array", "items": { "type": "string" } },
+        "message_flow_refs": { "type": "array", "items": { "type": "string" } },
+        "links": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/bpmnConversationLink" }
+        },
+        "conversations": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/bpmnConversation" }
+        }
+      }
+    },
+    "bpmnConversationLink": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "source": { "type": "string" },
+        "target": { "type": "string" }
       }
     },
     "bpmnParticipantAssociation": {
