@@ -1,0 +1,23 @@
+{
+  "workflow_id": "DelegationEvidence",
+  "title": "DelegationEvidence",
+  "source": "rheo-ir",
+  "stages": [
+    {
+      "id": "review",
+      "title": "review",
+      "assignee_spec": { "kind": "role", "role": "reviewer" },
+      "inputs": [],
+      "outputs": [],
+      "delegation": {
+        "kind": "role",
+        "delegatee": "approver",
+        "scopes": ["approve", "reject"],
+        "budget": 500,
+        "evidence": ["approval_receipt"]
+      },
+      "evidence": ["decision_reason", "second_signature"]
+    }
+  ],
+  "transitions": []
+}

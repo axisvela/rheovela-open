@@ -1,0 +1,15 @@
+{
+  "workflow_id": "Minimal",
+  "title": "Minimal",
+  "source": "rheo-ir",
+  "stages": [
+    {
+      "id": "start",
+      "title": "start",
+      "assignee_spec": { "kind": "open" },
+      "inputs": [],
+      "outputs": []
+    }
+  ],
+  "transitions": []
+}

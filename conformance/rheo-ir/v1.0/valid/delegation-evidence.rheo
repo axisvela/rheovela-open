@@ -1,0 +1,6 @@
+process DelegationEvidence v2 {
+  activity review : HumanTask role "reviewer"
+  delegate review to role "approver" scopes "approve,reject" budget 500 evidence "approval_receipt"
+  evidence review require "decision_reason"
+  evidence review require "second_signature"
+}

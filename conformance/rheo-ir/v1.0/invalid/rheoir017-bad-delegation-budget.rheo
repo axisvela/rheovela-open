@@ -1,0 +1,4 @@
+process X {
+  activity a : AgentTask
+  delegate a to role "r" budget nope
+}

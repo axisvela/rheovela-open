@@ -1,0 +1,6 @@
+process Comments {
+  // leading comment
+  activity a : AgentTask capability "https://example.com/a" // trailing comment
+  activity b : AgentTask effect_key 'literal-${id}'
+  transition a -> b when x >= 1 // condition comment
+}

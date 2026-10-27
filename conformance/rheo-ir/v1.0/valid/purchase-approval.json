@@ -1,0 +1,37 @@
+{
+  "workflow_id": "PurchaseApproval",
+  "title": "PurchaseApproval",
+  "source": "rheo-ir",
+  "stages": [
+    {
+      "id": "validate",
+      "title": "validate",
+      "assignee_spec": { "kind": "capability", "required": ["invoice.validate"] },
+      "inputs": [],
+      "outputs": [],
+      "timeout": "30m"
+    },
+    {
+      "id": "approve",
+      "title": "approve",
+      "assignee_spec": { "kind": "role", "role": "cost-center-owner" },
+      "inputs": [],
+      "outputs": []
+    },
+    {
+      "id": "post",
+      "title": "post",
+      "assignee_spec": { "kind": "capability", "required": ["erp.invoice.post"] },
+      "inputs": [],
+      "outputs": [],
+      "effect_key": "invoice/${id}"
+    }
+  ],
+  "transitions": [
+    { "from": "validate", "to": "approve", "condition": "amount >= 1000" },
+    { "from": "validate", "to": "post", "condition": "amount < 1000" }
+  ],
+  "compensations": [
+    { "for_activity": "post", "capability": "erp.invoice.reverse" }
+  ]
+}

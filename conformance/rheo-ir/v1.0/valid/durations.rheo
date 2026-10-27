@@ -1,0 +1,8 @@
+process Durations {
+  activity days : AgentTask timeout 2d
+  activity hours : AgentTask timeout 1.5h
+  activity millis : AgentTask timeout 500ms
+  activity micros : AgentTask timeout 10us
+  activity nanos : AgentTask timeout 250ns
+  activity zero : AgentTask timeout 0s
+}

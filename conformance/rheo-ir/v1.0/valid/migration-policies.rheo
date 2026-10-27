@@ -1,0 +1,12 @@
+process MigrationPolicies {
+  activity keep : ServiceTask capability "keep"
+  activity drop : ServiceTask capability "drop"
+  activity undo : ServiceTask capability "undo"
+  activity other : ServiceTask
+
+  migration keep policy "preserve"
+  migration drop policy "ignore"
+  migration undo policy "compensate"
+
+  compensate undo with capability "undo.cap"
+}

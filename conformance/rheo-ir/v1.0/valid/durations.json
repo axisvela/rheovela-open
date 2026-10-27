@@ -1,0 +1,56 @@
+{
+  "workflow_id": "Durations",
+  "title": "Durations",
+  "source": "rheo-ir",
+  "stages": [
+    {
+      "id": "days",
+      "title": "days",
+      "assignee_spec": { "kind": "open" },
+      "inputs": [],
+      "outputs": [],
+      "timeout": "2d"
+    },
+    {
+      "id": "hours",
+      "title": "hours",
+      "assignee_spec": { "kind": "open" },
+      "inputs": [],
+      "outputs": [],
+      "timeout": "1.5h"
+    },
+    {
+      "id": "millis",
+      "title": "millis",
+      "assignee_spec": { "kind": "open" },
+      "inputs": [],
+      "outputs": [],
+      "timeout": "500ms"
+    },
+    {
+      "id": "micros",
+      "title": "micros",
+      "assignee_spec": { "kind": "open" },
+      "inputs": [],
+      "outputs": [],
+      "timeout": "10us"
+    },
+    {
+      "id": "nanos",
+      "title": "nanos",
+      "assignee_spec": { "kind": "open" },
+      "inputs": [],
+      "outputs": [],
+      "timeout": "250ns"
+    },
+    {
+      "id": "zero",
+      "title": "zero",
+      "assignee_spec": { "kind": "open" },
+      "inputs": [],
+      "outputs": [],
+      "timeout": "0s"
+    }
+  ],
+  "transitions": []
+}

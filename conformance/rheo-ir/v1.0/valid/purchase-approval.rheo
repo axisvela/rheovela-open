@@ -1,0 +1,11 @@
+// Purchase approval with capability, role, effect key and timeout.
+process PurchaseApproval v1 {
+  activity validate : AgentTask capability "invoice.validate" timeout 30m
+  activity approve : HumanTask role "cost-center-owner"
+  activity post : ServiceTask capability "erp.invoice.post" effect_key "invoice/${id}"
+
+  transition validate -> approve when amount >= 1000
+  transition validate -> post when amount < 1000
+
+  compensate post with capability "erp.invoice.reverse"
+}

@@ -1,0 +1,25 @@
+{
+  "workflow_id": "Comments",
+  "title": "Comments",
+  "source": "rheo-ir",
+  "stages": [
+    {
+      "id": "a",
+      "title": "a",
+      "assignee_spec": { "kind": "capability", "required": ["https://example.com/a"] },
+      "inputs": [],
+      "outputs": []
+    },
+    {
+      "id": "b",
+      "title": "b",
+      "assignee_spec": { "kind": "open" },
+      "inputs": [],
+      "outputs": [],
+      "effect_key": "'literal-${id}'"
+    }
+  ],
+  "transitions": [
+    { "from": "a", "to": "b", "condition": "x >= 1" }
+  ]
+}

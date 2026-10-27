@@ -22,13 +22,17 @@ document.
 An implementation conforms to this specification if it:
 
 1. accepts every valid program in section 4;
-2. rejects malformed programs with an error that identifies the offending line;
+2. rejects malformed programs with a stable `RHEOIRxxx` code and the offending
+   1-based line (section 7);
 3. compiles a parsed process to `WorkflowDefinition` as defined in section 6;
 4. preserves compensation declarations for the compensation planner.
 
+A public corpus of valid and invalid programs with expected output lives in
+[`conformance/rheo-ir/v1.0/`](../conformance/rheo-ir/v1.0/manifest.json).
+
 ## 3. Lexical Rules
 
-- The source is UTF-8 text.
+- The source is UTF-8 text and MUST NOT start with a byte-order mark (BOM).
 - Lines are separated by `\n` (a trailing `\r` is ignored as whitespace).
 - Blank lines are ignored.
 - `//` starts a line comment. A `//` inside a single- or double-quoted value is
@@ -36,9 +40,10 @@ An implementation conforms to this specification if it:
 - Whitespace separates tokens. Indentation is insignificant.
 - `ident` is any non-whitespace token that does not contain `{`, `}`, `:`, `->`
   or `//`. Implementations SHOULD use `[A-Za-z_][A-Za-z0-9_.-]*`.
-- A `value` is either a double-quoted string, a single-quoted string, or a bare
-  token. The v1.0 parser removes surrounding double quotes only; single quotes
-  are preserved literally.
+- A `value` is a single whitespace-delimited token, optionally wrapped in double
+  or single quotes. The v1.0 parser removes surrounding double quotes only;
+  single quotes are preserved literally. Quoted values MUST NOT contain
+  whitespace, and backslash escape sequences are not interpreted.
 - A `duration` is a decimal number followed by one of `d`, `h`, `m`, `s`, `ms`,
   `us`, `ns`. Fractional values are allowed (for example `1.5h`).
 
@@ -64,9 +69,10 @@ migration     = "migration" WS ident WS "policy" WS value
 condition     = 1*( any non-newline character )
 ```
 
-The process block MAY be closed on the same line (`process P { }`), but it MUST
-contain at least one `activity` declaration. Declarations after the closing `}`
-are invalid.
+Declarations are line-oriented and MUST NOT share a line with the process block
+or with another declaration. `process P { }` is syntactically recognized but is
+always rejected because the block contains no activities. Declarations after
+the closing `}` are invalid.
 
 ### 4.1 Examples
 
@@ -203,24 +209,60 @@ Compiled JSON example:
 
 ## 7. Validation and Diagnostics
 
-The parser returns `ErrParse`-wrapped errors. The following are parse errors:
+The parser returns `ErrParse`-wrapped `*ParseError` values. Every error carries a
+stable code and the 1-based source line:
 
-- missing `process` declaration;
-- missing `{` after the process declaration;
-- unterminated process block;
-- process with no activities;
-- unknown declaration keyword;
-- malformed activity (`activity <id> : <kind>` required);
-- missing attribute value;
-- unknown activity attribute;
-- malformed timeout or timeout unit;
-- malformed transition (missing `->`, missing endpoint, or missing `when`);
-- malformed compensation (missing `with`, or missing capability value);
-- content after the closing `}`.
+```
+rheo ir parse error [RHEOIR007] line 3: malformed activity line: "activity"
+```
+
+| Code | Condition |
+|------|-----------|
+| `RHEOIR001` | missing `process` declaration |
+| `RHEOIR002` | first non-comment line is not a process declaration |
+| `RHEOIR003` | malformed process declaration (missing `{` or trailing tokens) |
+| `RHEOIR004` | unterminated process block |
+| `RHEOIR005` | process has no activities |
+| `RHEOIR006` | unknown declaration keyword inside the block |
+| `RHEOIR007` | malformed activity (`activity <id> : <kind>` required) |
+| `RHEOIR008` | missing value for an activity attribute |
+| `RHEOIR009` | unknown activity attribute |
+| `RHEOIR010` | malformed timeout value or unit |
+| `RHEOIR011` | malformed transition (missing `->`, endpoint, or empty `when`) |
+| `RHEOIR012` | malformed compensation |
+| `RHEOIR013` | content or a stray `}` after the process block |
+| `RHEOIR014` | malformed process version (only `v` + decimal digits) |
+| `RHEOIR015` | unknown delegation kind or malformed delegate declaration |
+| `RHEOIR016` | missing delegation delegatee |
+| `RHEOIR017` | malformed delegation budget |
+| `RHEOIR018` | unknown delegation attribute or missing value |
+| `RHEOIR019` | malformed evidence declaration |
+| `RHEOIR020` | malformed migration declaration |
+| `RHEOIR021` | unknown migration policy |
+| `RHEOIR022` | `delegate`/`evidence`/`migration` references an unknown activity |
 
 After compilation, `rheo workflow validate <file>` performs definition-level
 checks: non-empty stages, unique ids, transition endpoints exist, the transition
 graph is acyclic, and conditions use the supported operator set.
+
+### 7.1 Syntax boundaries in v1.0
+
+The following limits are intentional and MUST NOT be inferred as supported
+syntax:
+
+- A quoted value MUST NOT contain whitespace; `capability "invoice validate"` is
+  not a single value.
+- Single-quoted values are preserved including the quotes.
+- Backslash escapes are not interpreted.
+- A UTF-8 BOM before `process` is rejected.
+- A `duration` uses exactly one unit suffix; `1h30m` is not supported.
+- `kind` is a single free-form token.
+- Declarations MUST be on separate lines.
+- Repeated `delegate` and `migration` declarations for one activity keep the last
+  value; repeated `evidence` declarations append.
+- Duplicate activity ids, transition endpoints, cycles and condition operators
+  are diagnosed by `rheo workflow validate`, not by `Parse`.
+- Conditions are copied verbatim; the parser does not evaluate them.
 
 ## 8. Execution Model
 
@@ -267,8 +309,14 @@ Until specified, authors MUST express these concerns through the compiled
 
 ## 11. Conformance Checklist
 
+The normative program corpus is
+[`conformance/rheo-ir/v1.0/`](../conformance/rheo-ir/v1.0/manifest.json); see
+[`conformance/README.md`](../conformance/README.md) for how to run it.
+
 - [ ] `process` is the first non-comment line.
 - [ ] The process block is closed and contains at least one activity.
+- [ ] Every invalid program fails with the documented `RHEOIRxxx` code and line.
+- [ ] Valid programs compile to the expected `WorkflowDefinition`.
 - [ ] Activity ids are unique and referenced by existing transitions.
 - [ ] Conditions use supported operators and valid operands.
 - [ ] Timeout values use a supported unit.

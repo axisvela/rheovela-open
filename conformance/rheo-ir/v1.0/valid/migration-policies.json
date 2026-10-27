@@ -1,0 +1,42 @@
+{
+  "workflow_id": "MigrationPolicies",
+  "title": "MigrationPolicies",
+  "source": "rheo-ir",
+  "stages": [
+    {
+      "id": "keep",
+      "title": "keep",
+      "assignee_spec": { "kind": "capability", "required": ["keep"] },
+      "inputs": [],
+      "outputs": [],
+      "migration_policy": "preserve"
+    },
+    {
+      "id": "drop",
+      "title": "drop",
+      "assignee_spec": { "kind": "capability", "required": ["drop"] },
+      "inputs": [],
+      "outputs": [],
+      "migration_policy": "ignore"
+    },
+    {
+      "id": "undo",
+      "title": "undo",
+      "assignee_spec": { "kind": "capability", "required": ["undo"] },
+      "inputs": [],
+      "outputs": [],
+      "migration_policy": "compensate"
+    },
+    {
+      "id": "other",
+      "title": "other",
+      "assignee_spec": { "kind": "open" },
+      "inputs": [],
+      "outputs": []
+    }
+  ],
+  "transitions": [],
+  "compensations": [
+    { "for_activity": "undo", "capability": "undo.cap" }
+  ]
+}

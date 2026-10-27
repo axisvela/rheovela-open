@@ -1,0 +1,38 @@
+{
+  "schema": "rheo-ir-conformance",
+  "version": "1.0",
+  "cases": {
+    "valid": [
+      { "name": "minimal", "source": "valid/minimal.rheo", "expected": "valid/minimal.json" },
+      { "name": "purchase-approval", "source": "valid/purchase-approval.rheo", "expected": "valid/purchase-approval.json" },
+      { "name": "delegation-evidence", "source": "valid/delegation-evidence.rheo", "expected": "valid/delegation-evidence.json" },
+      { "name": "migration-policies", "source": "valid/migration-policies.rheo", "expected": "valid/migration-policies.json" },
+      { "name": "comments-quotes", "source": "valid/comments-quotes.rheo", "expected": "valid/comments-quotes.json" },
+      { "name": "durations", "source": "valid/durations.rheo", "expected": "valid/durations.json" }
+    ],
+    "invalid": [
+      { "name": "rheoir001-missing-process", "source": "invalid/rheoir001-missing-process.rheo", "expected": "invalid/rheoir001-missing-process.json" },
+      { "name": "rheoir002-expected-process", "source": "invalid/rheoir002-expected-process.rheo", "expected": "invalid/rheoir002-expected-process.json" },
+      { "name": "rheoir003-malformed-process", "source": "invalid/rheoir003-malformed-process.rheo", "expected": "invalid/rheoir003-malformed-process.json" },
+      { "name": "rheoir004-unterminated-block", "source": "invalid/rheoir004-unterminated-block.rheo", "expected": "invalid/rheoir004-unterminated-block.json" },
+      { "name": "rheoir005-no-activities", "source": "invalid/rheoir005-no-activities.rheo", "expected": "invalid/rheoir005-no-activities.json" },
+      { "name": "rheoir006-unknown-declaration", "source": "invalid/rheoir006-unknown-declaration.rheo", "expected": "invalid/rheoir006-unknown-declaration.json" },
+      { "name": "rheoir007-malformed-activity", "source": "invalid/rheoir007-malformed-activity.rheo", "expected": "invalid/rheoir007-malformed-activity.json" },
+      { "name": "rheoir008-missing-attribute-value", "source": "invalid/rheoir008-missing-attribute-value.rheo", "expected": "invalid/rheoir008-missing-attribute-value.json" },
+      { "name": "rheoir009-unknown-attribute", "source": "invalid/rheoir009-unknown-attribute.rheo", "expected": "invalid/rheoir009-unknown-attribute.json" },
+      { "name": "rheoir010-bad-timeout", "source": "invalid/rheoir010-bad-timeout.rheo", "expected": "invalid/rheoir010-bad-timeout.json" },
+      { "name": "rheoir011-malformed-transition", "source": "invalid/rheoir011-malformed-transition.rheo", "expected": "invalid/rheoir011-malformed-transition.json" },
+      { "name": "rheoir012-malformed-compensation", "source": "invalid/rheoir012-malformed-compensation.rheo", "expected": "invalid/rheoir012-malformed-compensation.json" },
+      { "name": "rheoir013-content-after-block", "source": "invalid/rheoir013-content-after-block.rheo", "expected": "invalid/rheoir013-content-after-block.json" },
+      { "name": "rheoir014-bad-version", "source": "invalid/rheoir014-bad-version.rheo", "expected": "invalid/rheoir014-bad-version.json" },
+      { "name": "rheoir015-unknown-delegation-kind", "source": "invalid/rheoir015-unknown-delegation-kind.rheo", "expected": "invalid/rheoir015-unknown-delegation-kind.json" },
+      { "name": "rheoir016-bad-delegation-target", "source": "invalid/rheoir016-bad-delegation-target.rheo", "expected": "invalid/rheoir016-bad-delegation-target.json" },
+      { "name": "rheoir017-bad-delegation-budget", "source": "invalid/rheoir017-bad-delegation-budget.rheo", "expected": "invalid/rheoir017-bad-delegation-budget.json" },
+      { "name": "rheoir018-unknown-delegation-attribute", "source": "invalid/rheoir018-unknown-delegation-attribute.rheo", "expected": "invalid/rheoir018-unknown-delegation-attribute.json" },
+      { "name": "rheoir019-malformed-evidence", "source": "invalid/rheoir019-malformed-evidence.rheo", "expected": "invalid/rheoir019-malformed-evidence.json" },
+      { "name": "rheoir020-malformed-migration", "source": "invalid/rheoir020-malformed-migration.rheo", "expected": "invalid/rheoir020-malformed-migration.json" },
+      { "name": "rheoir021-unknown-migration-policy", "source": "invalid/rheoir021-unknown-migration-policy.rheo", "expected": "invalid/rheoir021-unknown-migration-policy.json" },
+      { "name": "rheoir022-unknown-activity-reference", "source": "invalid/rheoir022-unknown-activity-reference.rheo", "expected": "invalid/rheoir022-unknown-activity-reference.json" }
+    ]
+  }
+}
