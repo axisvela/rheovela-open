@@ -151,5 +151,18 @@ th { color: var(--muted); font-weight: 600; }
 .graph .edge { stroke: var(--muted); stroke-width: 1.4; }
 .graph .edge-label { fill: var(--muted); font-size: 10px; }
 
-#status { color: var(--muted); min-height: 1.4em; }
-#status.error { color: var(--danger); }
+#status, #core-status { color: var(--muted); min-height: 1.4em; }
+#status.error, #core-status.error { color: var(--danger); }
+
+.result {
+  margin: 12px 0 0;
+  padding: 10px;
+  max-height: 220px;
+  overflow: auto;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--muted);
+  font-size: 0.8rem;
+  white-space: pre-wrap;
+}

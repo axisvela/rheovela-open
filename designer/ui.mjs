@@ -1,3 +1,4 @@
+import { CoreAPIError, listWorkflows, loadWorkflow, publishWorkflow } from "./core.mjs";
 import {
   addStage,
   addTransition,
@@ -45,6 +46,25 @@ function setStatus(message, isError = false) {
   const el = $("status");
   el.textContent = message;
   el.classList.toggle("error", isError);
+}
+
+function setCoreStatus(message, isError = false) {
+  const el = $("core-status");
+  el.textContent = message;
+  el.classList.toggle("error", isError);
+}
+
+function coreOptions() {
+  return {
+    url: $("core-url").value,
+    tenant: $("core-tenant").value.trim(),
+    token: $("core-token").value.trim(),
+  };
+}
+
+function describeError(err) {
+  if (err instanceof CoreAPIError) return `core ${err.status}: ${err.body}`;
+  return err?.message || String(err);
 }
 
 function renderMeta() {
@@ -302,6 +322,48 @@ $("apply-json").addEventListener("click", () => {
     setStatus("JSON applied.");
   } catch (err) {
     setStatus(`Invalid JSON: ${err.message}`, true);
+  }
+});
+
+$("core-load").addEventListener("click", async () => {
+  const { url, ...opts } = coreOptions();
+  const id = $("core-workflow-id").value.trim() || wf.workflow_id;
+  try {
+    const loaded = await loadWorkflow(url, id, opts);
+    wf = normalizeWorkflow(loaded);
+    renderAll();
+    $("core-workflow-id").value = wf.workflow_id;
+    setCoreStatus(`Loaded ${wf.workflow_id}.`);
+  } catch (err) {
+    setCoreStatus(`Load failed: ${describeError(err)}`, true);
+  }
+});
+
+$("core-publish").addEventListener("click", async () => {
+  const errors = validateWorkflow(wf);
+  if (errors.length > 0) {
+    renderValidation();
+    setCoreStatus(`Cannot publish: ${errors.length} validation error(s).`, true);
+    return;
+  }
+  const { url, ...opts } = coreOptions();
+  try {
+    const result = await publishWorkflow(url, wf, opts);
+    setCoreStatus(`Published ${result.workflow_id}@${result.version}.`);
+    $("core-result").textContent = JSON.stringify(result, null, 2);
+  } catch (err) {
+    setCoreStatus(`Publish failed: ${describeError(err)}`, true);
+  }
+});
+
+$("core-list").addEventListener("click", async () => {
+  const { url, ...opts } = coreOptions();
+  try {
+    const list = await listWorkflows(url, opts);
+    $("core-result").textContent = JSON.stringify(list, null, 2);
+    setCoreStatus(`${list.length} workflow(s).`);
+  } catch (err) {
+    setCoreStatus(`List failed: ${describeError(err)}`, true);
   }
 });
 

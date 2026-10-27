@@ -25,6 +25,18 @@ No build step or external JavaScript dependency is required.
 - Import/export `WorkflowDefinition` JSON.
 - Preserve delegation/evidence metadata (`Stage.delegation`, `Stage.evidence`).
 - Load a sample expense-approval workflow.
+- Optional Core API integration:
+  - `Load from core` uses `GET /api/v1/workflows/{id}`.
+  - `Publish to core` uses `POST /api/v1/workflows`.
+  - `List workflows` uses `GET /api/v1/workflows`.
+  - Optional `X-Tenant-ID` and `Authorization: Bearer` headers.
+
+### Core API / CORS
+
+The designer is static and fetches the configured core URL from the browser. If
+the page and core are not same-origin, the browser requires CORS on the core
+server (or a same-origin reverse proxy). Publish is blocked while the local
+validation panel reports errors.
 
 ## Scope
 
@@ -36,8 +48,10 @@ imported with `rheo workflow define`.
 ## Tests
 
 ```sh
-node --test designer/model.test.mjs
+node --test designer/model.test.mjs designer/core.test.mjs
 ```
 
 The model tests cover structural validation, DAG cycles, stage/transition
-removal cascades, JSON round-trips, and delegation/evidence preservation.
+removal cascades, JSON round-trips, and delegation/evidence preservation. The
+core client tests cover load/list/publish URLs, headers, request bodies, and
+non-2xx error handling.

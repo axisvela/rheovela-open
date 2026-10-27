@@ -45,7 +45,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with: { node-version: '22' }
-      - run: node --test designer/model.test.mjs
+      - run: node --test designer/model.test.mjs designer/core.test.mjs
   java:
     runs-on: ubuntu-latest
     steps:

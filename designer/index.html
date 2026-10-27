@@ -46,6 +46,27 @@
   </section>
 
   <section class="panel">
+    <h2>Core API</h2>
+    <p class="muted">
+      Optional publish/load via <code>GET/POST /api/v1/workflows</code>. The browser
+      must be able to reach the core URL (same origin or CORS-enabled reverse proxy).
+    </p>
+    <div class="grid">
+      <label>Base URL <input id="core-url" value="http://127.0.0.1:8080" autocomplete="off"></label>
+      <label>Tenant <input id="core-tenant" placeholder="optional" autocomplete="off"></label>
+      <label>Bearer token <input id="core-token" type="password" placeholder="optional" autocomplete="off"></label>
+      <label>Workflow ID to load <input id="core-workflow-id" autocomplete="off"></label>
+    </div>
+    <div class="actions">
+      <button id="core-load" type="button">Load from core</button>
+      <button id="core-publish" type="button">Publish to core</button>
+      <button id="core-list" type="button" class="secondary">List workflows</button>
+    </div>
+    <pre id="core-result" class="result"></pre>
+    <p id="core-status" role="status"></p>
+  </section>
+
+  <section class="panel">
     <h2>Transitions</h2>
     <form id="transition-form" class="inline-form">
       <label>From <select id="transition-from"></select></label>
