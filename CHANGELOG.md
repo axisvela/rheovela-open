@@ -14,9 +14,10 @@ RHEOVELA open（`github.com/axisvela/rheovela-open`，Apache-2.0）发布记录�
 - RHEO IR `delegate` and `evidence` declarations compile to
   `Stage.delegation` and `Stage.evidence`.
 - Static Community Process Designer (`designer/`) for WorkflowDefinition JSON:
-  stage/transition editing, DAG preview, validation, import/export, and
-  delegation/evidence preservation. It can optionally load/publish/list through
-  the core workflows API. Node model and core-client tests run in CI.
+  stage/transition editing, per-stage assignee/evidence/delegation editing, DAG
+  preview, validation, import/export, and delegation/evidence preservation. It
+  can optionally load/publish/list through the core workflows API. Node model
+  and core-client tests run in CI.
 
 ### Documentation
 

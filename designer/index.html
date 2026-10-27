@@ -45,6 +45,41 @@
     </table>
   </section>
 
+  <section class="panel" id="stage-editor" hidden>
+    <h2>Edit stage <span id="stage-editor-id"></span></h2>
+    <form id="stage-editor-form">
+      <div class="grid">
+        <label>Title <input id="edit-stage-title" autocomplete="off"></label>
+        <label>Assignee kind
+          <select id="edit-assignee-kind">
+            <option value="open">open</option>
+            <option value="role">role</option>
+            <option value="capability">capability</option>
+            <option value="actor">actor</option>
+          </select>
+        </label>
+        <label>Assignee value <input id="edit-assignee-value" autocomplete="off"></label>
+        <label>Evidence (comma-separated) <input id="edit-evidence" autocomplete="off"></label>
+        <label>Delegation kind
+          <select id="edit-delegation-kind">
+            <option value="">none</option>
+            <option value="actor">actor</option>
+            <option value="role">role</option>
+            <option value="capability">capability</option>
+          </select>
+        </label>
+        <label>Delegatee <input id="edit-delegatee" autocomplete="off"></label>
+        <label>Scopes (comma-separated) <input id="edit-scopes" autocomplete="off"></label>
+        <label>Budget <input id="edit-budget" type="number" min="0" step="1" value="0"></label>
+        <label>Delegation evidence (comma-separated) <input id="edit-delegation-evidence" autocomplete="off"></label>
+      </div>
+      <div class="actions">
+        <button type="submit">Save stage</button>
+        <button id="stage-editor-cancel" type="button" class="secondary">Cancel</button>
+      </div>
+    </form>
+  </section>
+
   <section class="panel">
     <h2>Core API</h2>
     <p class="muted">

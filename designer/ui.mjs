@@ -8,11 +8,20 @@ import {
   removeStage,
   removeTransition,
   serializeWorkflow,
+  updateStage,
   validateWorkflow,
 } from "./model.mjs";
 
 const $ = (id) => document.getElementById(id);
 let wf = emptyWorkflow();
+let editingStageID = null;
+
+function splitCSV(value) {
+  return String(value || "")
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+}
 
 const example = {
   workflow_id: "ExpenseApproval",
@@ -92,19 +101,50 @@ function renderStages() {
     }
     meta.textContent = bits.join(" · ");
     const actions = document.createElement("td");
+    const edit = document.createElement("button");
+    edit.type = "button";
+    edit.className = "secondary";
+    edit.textContent = "Edit";
+    edit.addEventListener("click", () => openStageEditor(stage.id));
     const remove = document.createElement("button");
     remove.type = "button";
     remove.className = "danger";
     remove.textContent = "Remove";
     remove.addEventListener("click", () => {
       wf = removeStage(wf, stage.id);
+      if (editingStageID === stage.id) closeStageEditor();
       renderAll();
       setStatus(`Removed stage ${stage.id}.`);
     });
-    actions.append(remove);
+    actions.append(edit, remove);
     tr.append(id, title, meta, actions);
     tbody.append(tr);
   }
+}
+
+function openStageEditor(id) {
+  const stage = wf.stages.find((s) => s.id === id);
+  if (!stage) return;
+  editingStageID = id;
+  $("stage-editor").hidden = false;
+  $("stage-editor-id").textContent = id;
+  $("edit-stage-title").value = stage.title || "";
+  const assignee = stage.assignee_spec || { kind: "open" };
+  $("edit-assignee-kind").value = assignee.kind || "open";
+  $("edit-assignee-value").value = assignee.role || assignee.actor_id || (assignee.required || [])[0] || "";
+  $("edit-evidence").value = (stage.evidence || []).join(", ");
+  const delegation = stage.delegation;
+  $("edit-delegation-kind").value = delegation?.kind || "";
+  $("edit-delegatee").value = delegation?.delegatee || "";
+  $("edit-scopes").value = (delegation?.scopes || []).join(", ");
+  $("edit-budget").value = String(delegation?.budget || 0);
+  $("edit-delegation-evidence").value = (delegation?.evidence || []).join(", ");
+  $("edit-stage-title").focus();
+}
+
+function closeStageEditor() {
+  editingStageID = null;
+  $("stage-editor").hidden = true;
 }
 
 function renderTransitionSelects() {
@@ -288,6 +328,43 @@ $("stage-form").addEventListener("submit", (e) => {
     setStatus(err.message, true);
   }
 });
+
+$("stage-editor-form").addEventListener("submit", (e) => {
+  e.preventDefault();
+  if (!editingStageID) return;
+  const assigneeKind = $("edit-assignee-kind").value;
+  const assigneeValue = $("edit-assignee-value").value.trim();
+  let assignee = { kind: "open" };
+  if (assigneeKind === "role") assignee = { kind: "role", role: assigneeValue };
+  if (assigneeKind === "capability") assignee = { kind: "capability", required: assigneeValue ? [assigneeValue] : [] };
+  if (assigneeKind === "actor") assignee = { kind: "actor", actor_id: assigneeValue };
+  const delegationKind = $("edit-delegation-kind").value;
+  const delegation = delegationKind
+    ? {
+        kind: delegationKind,
+        delegatee: $("edit-delegatee").value.trim(),
+        scopes: splitCSV($("edit-scopes").value),
+        budget: Number($("edit-budget").value || 0),
+        evidence: splitCSV($("edit-delegation-evidence").value),
+      }
+    : null;
+  try {
+    wf = updateStage(wf, editingStageID, {
+      title: $("edit-stage-title").value,
+      assignee,
+      evidence: splitCSV($("edit-evidence").value),
+      delegation,
+    });
+    const id = editingStageID;
+    closeStageEditor();
+    renderAll();
+    setStatus(`Updated stage ${id}.`);
+  } catch (err) {
+    setStatus(err.message, true);
+  }
+});
+
+$("stage-editor-cancel").addEventListener("click", closeStageEditor);
 
 $("transition-form").addEventListener("submit", (e) => {
   e.preventDefault();

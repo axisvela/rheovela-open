@@ -18,6 +18,8 @@ No build step or external JavaScript dependency is required.
 ## Features
 
 - Edit workflow id/title and add/remove stages.
+- Edit per-stage title, assignee spec, evidence, and delegation
+  (kind/delegatee/scopes/budget/evidence).
 - Add/remove transitions with optional `when` conditions.
 - Render a simple layered DAG preview.
 - Validate required fields, duplicate stage ids, missing transition endpoints,

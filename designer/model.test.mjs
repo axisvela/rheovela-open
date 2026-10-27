@@ -9,6 +9,7 @@ import {
   removeStage,
   removeTransition,
   serializeWorkflow,
+  updateStage,
   validateWorkflow,
 } from "./model.mjs";
 
@@ -77,6 +78,29 @@ test("removeTransition removes only the selected edge", () => {
   wf = addTransition(wf, "b", "a");
   wf = removeTransition(wf, 0);
   assert.deepEqual(wf.transitions, [{ from: "b", to: "a" }]);
+});
+
+test("updateStage edits title, assignee, evidence, and delegation", () => {
+  let wf = addStage(emptyWorkflow(), "a", "A");
+  wf = updateStage(wf, "a", {
+    title: "Approve",
+    assignee: { kind: "role", role: "lead" },
+    evidence: ["receipt"],
+    delegation: { kind: "role", delegatee: "lead", scopes: ["approve"], budget: 10, evidence: ["delegation"] },
+  });
+  const stage = wf.stages[0];
+  assert.equal(stage.title, "Approve");
+  assert.deepEqual(stage.assignee_spec, { kind: "role", role: "lead" });
+  assert.deepEqual(stage.evidence, ["receipt"]);
+  assert.equal(stage.delegation.delegatee, "lead");
+
+  wf = updateStage(wf, "a", { delegation: null, evidence: [] });
+  assert.equal(wf.stages[0].delegation, undefined);
+  assert.deepEqual(wf.stages[0].evidence, []);
+});
+
+test("updateStage rejects an unknown stage", () => {
+  assert.throws(() => updateStage(emptyWorkflow(), "ghost", { title: "x" }), /unknown stage/);
 });
 
 test("serialize and normalize round-trip", () => {

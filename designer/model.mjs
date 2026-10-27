@@ -132,6 +132,23 @@ export function addStage(wf, id, title) {
   return next;
 }
 
+export function updateStage(wf, id, patch = {}) {
+  const next = normalizeWorkflow(wf);
+  const stage = next.stages.find((s) => s.id === id);
+  if (!stage) throw new Error(`unknown stage: ${id}`);
+  if (patch.title !== undefined) stage.title = String(patch.title);
+  if (patch.assignee !== undefined) stage.assignee_spec = patch.assignee;
+  if (patch.evidence !== undefined) stage.evidence = [...patch.evidence];
+  if (patch.delegation !== undefined) {
+    if (patch.delegation === null) {
+      delete stage.delegation;
+    } else {
+      stage.delegation = patch.delegation;
+    }
+  }
+  return next;
+}
+
 export function removeStage(wf, id) {
   const next = normalizeWorkflow(wf);
   next.stages = next.stages.filter((stage) => stage.id !== id);
