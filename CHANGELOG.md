@@ -17,6 +17,8 @@ RHEOVELA open（`github.com/axisvela/rheovela-open`，Apache-2.0）发布记录�
   `Stage.migration_policy`; migration analysis honors the per-stage policy.
 - RHEO IR `effect_key` and `timeout` now compile to `Stage.effect_key` and
   `Stage.timeout`.
+- Designer can import BPMN XML through the core preview endpoint
+  (`POST /api/v1/workflows/import-bpmn`) and load the result into the editor.
 
 ## [v1.8.0] - 2026-10-27
 

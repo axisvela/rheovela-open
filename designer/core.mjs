@@ -43,6 +43,17 @@ export async function loadWorkflow(url, id, options = {}) {
   });
 }
 
+export async function importBPMN(url, xml, options = {}) {
+  const fetchImpl = options.fetchImpl || fetch;
+  const h = headers(options);
+  h["Content-Type"] = "application/xml";
+  return request(fetchImpl, `${baseURL(url)}/api/v1/workflows/import-bpmn`, {
+    method: "POST",
+    headers: h,
+    body: xml,
+  });
+}
+
 export async function publishWorkflow(url, wf, options = {}) {
   const fetchImpl = options.fetchImpl || fetch;
   return request(fetchImpl, `${baseURL(url)}/api/v1/workflows`, {

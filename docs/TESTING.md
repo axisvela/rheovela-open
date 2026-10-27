@@ -27,7 +27,7 @@ Last verified: 2026-10-27.
 | TypeScript | `node --test --experimental-strip-types sdk/typescript/worker.test.ts` | `typescript` | 15 tests pass |
 | Java | `javac -d out sdk/java/worker/Worker.java sdk/java/example/Example.java` then `java -cp out example.Example` | `java` | prints `ok` |
 | Rust | `cd sdk/rust && cargo test --offline && cargo run --offline` | `rust` | 5 tests pass; `processed=2` |
-| Designer | `node --test designer/model.test.mjs designer/core.test.mjs` | `designer` | 16 tests pass |
+| Designer | `node --test designer/model.test.mjs designer/core.test.mjs` | `designer` | 17 tests pass |
 
 ## Run everything locally
 

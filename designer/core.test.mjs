@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import { CoreAPIError, listWorkflows, loadWorkflow, publishWorkflow } from "./core.mjs";
+import { CoreAPIError, importBPMN, listWorkflows, loadWorkflow, publishWorkflow } from "./core.mjs";
 
 function mockFetch(handler) {
   const calls = [];
@@ -52,6 +52,20 @@ test("publishWorkflow sends JSON and tenant/bearer headers", async () => {
   assert.equal(call.opts.headers["X-Tenant-ID"], "acme");
   assert.equal(call.opts.headers.Authorization, "Bearer t0ken");
   assert.deepEqual(JSON.parse(call.opts.body), wf);
+});
+
+test("importBPMN posts XML and returns the preview", async () => {
+  const preview = { workflow: { workflow_id: "imported" }, report: { unmapped: [] } };
+  const { impl, calls } = mockFetch(() => jsonResponse(200, preview));
+  const xml = "<bpmn:definitions/>";
+  const got = await importBPMN("http://core", xml, { fetchImpl: impl, tenant: "acme" });
+  assert.deepEqual(got, preview);
+  const call = calls[0];
+  assert.equal(call.url, "http://core/api/v1/workflows/import-bpmn");
+  assert.equal(call.opts.method, "POST");
+  assert.equal(call.opts.headers["Content-Type"], "application/xml");
+  assert.equal(call.opts.headers["X-Tenant-ID"], "acme");
+  assert.equal(call.opts.body, xml);
 });
 
 test("non-2xx responses throw CoreAPIError", async () => {

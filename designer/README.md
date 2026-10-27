@@ -31,6 +31,8 @@ No build step or external JavaScript dependency is required.
   - `Load from core` uses `GET /api/v1/workflows/{id}`.
   - `Publish to core` uses `POST /api/v1/workflows`.
   - `List workflows` uses `GET /api/v1/workflows`.
+  - `Import BPMN` previews XML via `POST /api/v1/workflows/import-bpmn` and
+    loads the imported definition into the editor.
   - Optional `X-Tenant-ID` and `Authorization: Bearer` headers.
 
 ### Core API / CORS

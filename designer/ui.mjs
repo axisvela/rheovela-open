@@ -1,4 +1,4 @@
-import { CoreAPIError, listWorkflows, loadWorkflow, publishWorkflow } from "./core.mjs";
+import { CoreAPIError, importBPMN, listWorkflows, loadWorkflow, publishWorkflow } from "./core.mjs";
 import {
   addStage,
   addTransition,
@@ -458,6 +458,30 @@ $("export-json").addEventListener("click", () => {
   a.download = `${wf.workflow_id || "workflow"}.json`;
   a.click();
   URL.revokeObjectURL(url);
+});
+
+$("import-bpmn").addEventListener("change", async (e) => {
+  const file = e.target.files?.[0];
+  if (!file) return;
+  const { url, ...opts } = coreOptions();
+  try {
+    const result = await importBPMN(url, await file.text(), opts);
+    wf = normalizeWorkflow(result.workflow);
+    renderAll();
+    $("core-result").textContent = JSON.stringify(
+      { report: result.report, validation: result.validation },
+      null,
+      2,
+    );
+    const invalid = result.validation && result.validation.valid === false;
+    setCoreStatus(
+      invalid ? `Imported ${file.name} with validation errors.` : `Imported ${file.name}.`,
+      invalid,
+    );
+  } catch (err) {
+    setCoreStatus(`BPMN import failed: ${describeError(err)}`, true);
+  }
+  e.target.value = "";
 });
 
 $("import-json").addEventListener("change", async (e) => {
