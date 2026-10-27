@@ -110,6 +110,17 @@ type Stage struct {
 	Inputs       []string       `json:"inputs"`
 	Outputs      []string       `json:"outputs"`
 	Gate         *GateCondition `json:"gate,omitempty"`
+	Delegation   *Delegation    `json:"delegation,omitempty"`
+	Evidence     []string       `json:"evidence,omitempty"`
+}
+
+// Delegation describes an authority delegation attached to a stage.
+type Delegation struct {
+	Kind      string   `json:"kind"`
+	Delegatee string   `json:"delegatee"`
+	Scopes    []string `json:"scopes,omitempty"`
+	Budget    int64    `json:"budget,omitempty"`
+	Evidence  []string `json:"evidence,omitempty"`
 }
 
 type AssigneeSpec struct {

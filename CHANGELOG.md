@@ -11,6 +11,11 @@ RHEOVELA open（`github.com/axisvela/rheovela-open`，Apache-2.0）发布记录�
 - `WorkflowDefinition.bpmn` preserves subprocess internals, boundary/intermediate
   event kinds, gateway types, participants and message flows for full BPMN
   import/export round-trips.
+- RHEO IR `delegate` and `evidence` declarations compile to
+  `Stage.delegation` and `Stage.evidence`.
+- Static Community Process Designer (`designer/`) for WorkflowDefinition JSON:
+  stage/transition editing, DAG preview, validation, import/export, and
+  delegation/evidence preservation. Node model tests run in CI.
 
 ### Documentation
 

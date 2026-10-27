@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>RHEOVELA Process Designer</title>
+  <link rel="stylesheet" href="designer.css">
+</head>
+<body>
+<header>
+  <h1>RHEOVELA Process Designer</h1>
+  <p>
+    Community designer for <code>WorkflowDefinition</code> JSON.
+    Aligned with the public contracts and <a href="../api/openapi.yaml">OpenAPI</a>.
+    This page is static: it does not call the core API.
+  </p>
+</header>
+
+<main>
+  <section class="panel">
+    <h2>Workflow</h2>
+    <div class="grid">
+      <label>Workflow ID <input id="workflow-id" autocomplete="off"></label>
+      <label>Title <input id="workflow-title" autocomplete="off"></label>
+      <label>Source <input id="workflow-source" value="designer" readonly></label>
+    </div>
+    <div class="actions">
+      <button id="new-workflow" type="button">New</button>
+      <button id="load-example" type="button">Load example</button>
+      <button id="export-json" type="button">Export JSON</button>
+      <label class="file-button">Import JSON<input id="import-json" type="file" accept="application/json,.json" hidden></label>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>Stages</h2>
+    <form id="stage-form" class="inline-form">
+      <label>ID <input id="stage-id" required autocomplete="off"></label>
+      <label>Title <input id="stage-title" autocomplete="off"></label>
+      <button type="submit">Add stage</button>
+    </form>
+    <table>
+      <thead><tr><th>ID</th><th>Title</th><th>Delegation / Evidence</th><th></th></tr></thead>
+      <tbody id="stage-rows"></tbody>
+    </table>
+  </section>
+
+  <section class="panel">
+    <h2>Transitions</h2>
+    <form id="transition-form" class="inline-form">
+      <label>From <select id="transition-from"></select></label>
+      <label>To <select id="transition-to"></select></label>
+      <label>Condition <input id="transition-condition" placeholder="amount >= 1000" autocomplete="off"></label>
+      <button type="submit">Add transition</button>
+    </form>
+    <table>
+      <thead><tr><th>From</th><th>To</th><th>Condition</th><th></th></tr></thead>
+      <tbody id="transition-rows"></tbody>
+    </table>
+  </section>
+
+  <section class="panel">
+    <h2>Graph</h2>
+    <div id="graph" class="graph"></div>
+  </section>
+
+  <section class="panel">
+    <h2>Validation</h2>
+    <ul id="validation" class="validation"></ul>
+    <div class="actions">
+      <button id="validate-json" type="button">Validate</button>
+      <button id="apply-json" type="button">Apply JSON</button>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>WorkflowDefinition JSON</h2>
+    <textarea id="json-editor" spellcheck="false" rows="18"></textarea>
+    <p id="status" role="status"></p>
+  </section>
+</main>
+
+<script type="module" src="ui.mjs"></script>
+</body>
+</html>

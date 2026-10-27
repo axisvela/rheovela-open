@@ -91,7 +91,13 @@ func TestWorkflowDefinitionJSONRoundTrip(t *testing.T) {
 		Title:      "论文投稿流程",
 		Source:     "pipeline",
 		Stages: []contracts.Stage{
-			{ID: "research", Title: "调研", Inputs: []string{"topic"}, Outputs: []string{"lit_review"}},
+			{
+				ID: "research", Title: "调研", Inputs: []string{"topic"}, Outputs: []string{"lit_review"},
+				Evidence: []string{"source_log"},
+				Delegation: &contracts.Delegation{
+					Kind: "role", Delegatee: "research-lead", Scopes: []string{"research"}, Budget: 100,
+				},
+			},
 			{ID: "draft", Title: "起草", Inputs: []string{"lit_review"}, Outputs: []string{"manuscript"}},
 			{ID: "review", Title: "评审", Inputs: []string{"manuscript"}, Outputs: []string{"review_notes"}},
 			{ID: "submit", Title: "提交", Inputs: []string{"manuscript", "review_notes"}, Outputs: []string{"submission_id"}},
@@ -124,6 +130,9 @@ func TestWorkflowDefinitionJSONRoundTrip(t *testing.T) {
 	assert.Len(t, decoded.Stages, 4)
 	assert.Len(t, decoded.Transitions, 3)
 	assert.Len(t, decoded.Compensations, 1)
+	require.NotNil(t, decoded.Stages[0].Delegation)
+	assert.Equal(t, "research-lead", decoded.Stages[0].Delegation.Delegatee)
+	assert.Equal(t, []string{"source_log"}, decoded.Stages[0].Evidence)
 	require.NotNil(t, decoded.BPMN)
 	assert.Len(t, decoded.BPMN.Nodes, 2)
 	assert.Len(t, decoded.BPMN.Participants, 1)

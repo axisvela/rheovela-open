@@ -81,8 +81,36 @@
               "type": "string"
             }
           },
-          "gate": {
+    "delegation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "delegatee"],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": ["actor", "role", "capability"]
+        },
+        "delegatee": { "type": "string", "minLength": 1 },
+        "scopes": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "budget": { "type": "integer" },
+        "evidence": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "gate": {
             "$ref": "#/definitions/gate"
+          },
+          "delegation": {
+            "$ref": "#/definitions/delegation"
+          },
+          "evidence": {
+            "type": "array",
+            "items": { "type": "string" }
           }
         }
       }

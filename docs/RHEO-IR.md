@@ -48,7 +48,7 @@ An implementation conforms to this specification if it:
 program       = process-decl *( WS declaration ) WS
 process-decl  = "process" WS ident [ WS version ] WS "{" [ WS "}" ]
 version       = "v" 1*DIGIT
-declaration   = activity / transition / compensate
+declaration   = activity / transition / compensate / delegate / evidence
 activity      = "activity" WS ident WS ":" WS kind *( WS attribute )
 kind          = ident
 attribute     = "capability" WS value
@@ -57,6 +57,9 @@ attribute     = "capability" WS value
               / "timeout" WS duration
 transition    = "transition" WS ident WS "->" WS ident [ WS "when" WS condition ]
 compensate    = "compensate" WS ident WS "with" WS ( "capability" WS value / ident )
+delegate      = "delegate" WS ident WS "to" WS ("actor"/"role"/"capability") WS value
+                *( WS ("scopes" WS value / "budget" WS integer / "evidence" WS value) )
+evidence      = "evidence" WS ident WS "require" WS value
 condition     = 1*( any non-newline character )
 ```
 
@@ -76,6 +79,8 @@ process PurchaseApproval v1 {
   transition validate -> post when amount < 1000
 
   compensate post with capability "erp.invoice.reverse"
+  delegate approve to role "cost-center-lead" scopes "approve,reject" budget 500
+  evidence approve require "approval_receipt"
 }
 ```
 
@@ -136,6 +141,19 @@ has already succeeded.
 - Compensating an activity that never succeeded is a no-op; compensation MUST
   NOT fabricate a return to the original external state.
 
+### 5.5 Delegation and evidence
+
+`delegate <activity> to actor|role|capability "<value>" [scopes "<csv>"] [budget <int>] [evidence "<duty>"]`
+attaches an authority delegation to a stage.
+
+- `scopes` is a comma-separated list copied to `Delegation.scopes`.
+- `budget` is a non-negative integer copied to `Delegation.budget`.
+- `evidence` may be repeated and copies duties to `Delegation.evidence`.
+- `evidence <activity> require "<duty>"` appends standalone evidence duties to
+  `Stage.evidence`.
+- Delegation/evidence are metadata for authorization and audit adapters; the
+  runtime does not grant scopes or collect evidence automatically.
+
 ## 6. Compilation to WorkflowDefinition
 
 | IR element | WorkflowDefinition field |
@@ -149,6 +167,8 @@ has already succeeded.
 | `when <condition>` | `transitions[].condition` |
 | `effect_key` / `timeout` | retained in IR AST; not in `WorkflowDefinition` v1 |
 | `compensate ...` | `compensations[] = {for_activity, compensate_with/capability}` |
+| `delegate ...` | `stages[].delegation = {kind, delegatee, scopes, budget, evidence}` |
+| `evidence ... require` | `stages[].evidence[]` |
 
 The compiler MUST emit `inputs: []` and `outputs: []` for every stage.
 
@@ -225,8 +245,6 @@ them.
 
 The following extensions are reserved and are not part of v1.0:
 
-- delegation and capability grants beyond `AssigneeSpec`;
-- evidence requirements attached to activities;
 - migration/replan annotations;
 - explicit effect-ledger actions beyond `effect_key`;
 - subprocess/materialization declarations.
