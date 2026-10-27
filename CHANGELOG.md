@@ -9,8 +9,8 @@ RHEOVELA open（`github.com/axisvela/rheovela-open`，Apache-2.0）发布记录�
 - `WorkflowDefinition.compensations` carries declared activity/capability
   compensation actions, compiled from RHEO IR `compensate` statements.
 - `WorkflowDefinition.bpmn` preserves subprocess internals, boundary/intermediate
-  event kinds, gateway types, participants and message flows for full BPMN
-  import/export round-trips.
+  event kinds, gateway types, participants, message flows, lanes and data
+  objects for full BPMN import/export round-trips.
 - RHEO IR `delegate` and `evidence` declarations compile to
   `Stage.delegation` and `Stage.evidence`.
 - Static Community Process Designer (`designer/`) for WorkflowDefinition JSON:

@@ -167,6 +167,14 @@
         "message_flows": {
           "type": "array",
           "items": { "$ref": "#/definitions/bpmnMessageFlow" }
+        },
+        "lanes": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/bpmnLane" }
+        },
+        "data_objects": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/bpmnDataObject" }
         }
       }
     },
@@ -212,6 +220,29 @@
         "id": { "type": "string", "minLength": 1 },
         "source": { "type": "string", "minLength": 1 },
         "target": { "type": "string", "minLength": 1 }
+      }
+    },
+    "bpmnLane": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "name": { "type": "string" },
+        "node_ids": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "bpmnDataObject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "name": { "type": "string" },
+        "ref": { "type": "string" }
       }
     },
     "compensation": {

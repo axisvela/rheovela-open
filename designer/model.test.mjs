@@ -62,10 +62,12 @@ test("removing a stage cascades transitions and compensations", () => {
   wf = addStage(wf, "b", "B");
   wf = addTransition(wf, "a", "b");
   wf.compensations = [{ for_activity: "a", capability: "undo.a" }];
+  wf.bpmn = { lanes: [{ id: "lane", node_ids: ["a", "b"] }] };
   wf = removeStage(wf, "a");
   assert.deepEqual(wf.stages.map((s) => s.id), ["b"]);
   assert.deepEqual(wf.transitions, []);
   assert.deepEqual(wf.compensations, []);
+  assert.deepEqual(wf.bpmn.lanes[0].node_ids, ["b"]);
 });
 
 test("removeTransition removes only the selected edge", () => {

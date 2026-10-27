@@ -64,10 +64,26 @@ type WorkflowDefinition struct {
 // BPMN preserves non-executable BPMN structure so import/export can round-trip
 // subprocesses, boundary events and collaborations.
 type BPMN struct {
-	Nodes         []BPMNNode         `json:"nodes,omitempty"`
-	InternalFlows []BPMNFlow         `json:"internal_flows,omitempty"`
-	Participants  []BPMNParticipant  `json:"participants,omitempty"`
-	MessageFlows  []BPMNMessageFlow  `json:"message_flows,omitempty"`
+	Nodes         []BPMNNode        `json:"nodes,omitempty"`
+	InternalFlows []BPMNFlow        `json:"internal_flows,omitempty"`
+	Participants  []BPMNParticipant `json:"participants,omitempty"`
+	MessageFlows  []BPMNMessageFlow `json:"message_flows,omitempty"`
+	Lanes         []BPMNLane        `json:"lanes,omitempty"`
+	DataObjects   []BPMNDataObject  `json:"data_objects,omitempty"`
+}
+
+type BPMNLane struct {
+	ID      string   `json:"id"`
+	Name    string   `json:"name,omitempty"`
+	NodeIDs []string `json:"node_ids,omitempty"`
+}
+
+// BPMNDataObject records a dataObject (Ref empty) or dataObjectReference
+// (Ref points at the referenced dataObject).
+type BPMNDataObject struct {
+	ID   string `json:"id"`
+	Name string `json:"name,omitempty"`
+	Ref  string `json:"ref,omitempty"`
 }
 
 // BPMNNode maps a workflow stage (or a subprocess-internal node) back to its

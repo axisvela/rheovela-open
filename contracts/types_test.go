@@ -117,6 +117,8 @@ func TestWorkflowDefinitionJSONRoundTrip(t *testing.T) {
 			},
 			Participants: []contracts.BPMNParticipant{{ID: "p1", Name: "author"}},
 			MessageFlows: []contracts.BPMNMessageFlow{{ID: "mf1", Source: "p1", Target: "p2"}},
+			Lanes:        []contracts.BPMNLane{{ID: "lane1", Name: "Authors", NodeIDs: []string{"research"}}},
+			DataObjects:  []contracts.BPMNDataObject{{ID: "d1", Name: "Manuscript", Ref: "d0"}},
 		},
 	}
 
@@ -137,4 +139,6 @@ func TestWorkflowDefinitionJSONRoundTrip(t *testing.T) {
 	assert.Len(t, decoded.BPMN.Nodes, 2)
 	assert.Len(t, decoded.BPMN.Participants, 1)
 	assert.Len(t, decoded.BPMN.MessageFlows, 1)
+	assert.Len(t, decoded.BPMN.Lanes, 1)
+	assert.Len(t, decoded.BPMN.DataObjects, 1)
 }

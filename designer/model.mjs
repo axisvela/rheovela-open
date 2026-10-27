@@ -140,6 +140,10 @@ export function removeStage(wf, id) {
   if (next.bpmn) {
     next.bpmn.nodes = (next.bpmn.nodes || []).filter((n) => n.id !== id && n.attached_to !== id);
     next.bpmn.internal_flows = (next.bpmn.internal_flows || []).filter((f) => f.from !== id && f.to !== id);
+    next.bpmn.lanes = (next.bpmn.lanes || []).map((lane) => ({
+      ...lane,
+      node_ids: (lane.node_ids || []).filter((nodeID) => nodeID !== id),
+    }));
   }
   return next;
 }
