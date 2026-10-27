@@ -21,7 +21,7 @@
 ## Next
 
 1. **BPMN / RHEO IR**
-   - RHEO IR v1.0 规范已发布（[RHEO-IR.md](RHEO-IR.md)）；delegation/evidence 已支持，migration 扩展保留
+   - RHEO IR v1.0 规范已发布（[RHEO-IR.md](RHEO-IR.md)）；delegation/evidence/migration policy 已支持，effect 扩展保留
    - BPMN import/export 的标准覆盖扩展（子流程、消息流等）
 
 ## Release Rules

@@ -154,8 +154,9 @@ type Stage struct {
 	Inputs       []string       `json:"inputs"`
 	Outputs      []string       `json:"outputs"`
 	Gate         *GateCondition `json:"gate,omitempty"`
-	Delegation   *Delegation    `json:"delegation,omitempty"`
-	Evidence     []string       `json:"evidence,omitempty"`
+	Delegation    *Delegation `json:"delegation,omitempty"`
+	Evidence      []string    `json:"evidence,omitempty"`
+	MigrationPolicy string    `json:"migration_policy,omitempty"`
 }
 
 // Delegation describes an authority delegation attached to a stage.

@@ -139,6 +139,13 @@ export function updateStage(wf, id, patch = {}) {
   if (patch.title !== undefined) stage.title = String(patch.title);
   if (patch.assignee !== undefined) stage.assignee_spec = patch.assignee;
   if (patch.evidence !== undefined) stage.evidence = [...patch.evidence];
+  if (patch.migrationPolicy !== undefined) {
+    if (patch.migrationPolicy) {
+      stage.migration_policy = patch.migrationPolicy;
+    } else {
+      delete stage.migration_policy;
+    }
+  }
   if (patch.delegation !== undefined) {
     if (patch.delegation === null) {
       delete stage.delegation;

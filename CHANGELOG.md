@@ -8,6 +8,8 @@ RHEOVELA open（`github.com/axisvela/rheovela-open`，Apache-2.0）发布记录�
 
 - `WorkflowDefinition.bpmn.diagram` preserves BPMN DI shapes, bounds, edges and
   waypoints for import/export round-trips.
+- RHEO IR `migration <activity> policy "preserve|ignore|compensate"` compiles to
+  `Stage.migration_policy`; migration analysis honors the per-stage policy.
 
 ## [v1.8.0] - 2026-10-27
 

@@ -111,6 +111,10 @@
           "evidence": {
             "type": "array",
             "items": { "type": "string" }
+          },
+          "migration_policy": {
+            "type": "string",
+            "enum": ["preserve", "ignore", "compensate"]
           }
         }
       }

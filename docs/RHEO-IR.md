@@ -48,7 +48,7 @@ An implementation conforms to this specification if it:
 program       = process-decl *( WS declaration ) WS
 process-decl  = "process" WS ident [ WS version ] WS "{" [ WS "}" ]
 version       = "v" 1*DIGIT
-declaration   = activity / transition / compensate / delegate / evidence
+declaration   = activity / transition / compensate / delegate / evidence / migration
 activity      = "activity" WS ident WS ":" WS kind *( WS attribute )
 kind          = ident
 attribute     = "capability" WS value
@@ -60,6 +60,7 @@ compensate    = "compensate" WS ident WS "with" WS ( "capability" WS value / ide
 delegate      = "delegate" WS ident WS "to" WS ("actor"/"role"/"capability") WS value
                 *( WS ("scopes" WS value / "budget" WS integer / "evidence" WS value) )
 evidence      = "evidence" WS ident WS "require" WS value
+migration     = "migration" WS ident WS "policy" WS value
 condition     = 1*( any non-newline character )
 ```
 
@@ -154,6 +155,17 @@ attaches an authority delegation to a stage.
 - Delegation/evidence are metadata for authorization and audit adapters; the
   runtime does not grant scopes or collect evidence automatically.
 
+### 5.6 Migration policy
+
+`migration <activity> policy "preserve|ignore|compensate"` annotates how a stage
+may be removed by a live migration.
+
+- `preserve` always blocks removal.
+- `ignore` allows removal without a compensation requirement.
+- `compensate` uses the migration compensation mode (`manual`/`auto`) and
+  requires a declared compensation for `auto`.
+- An absent policy uses the migration-wide compensation mode.
+
 ## 6. Compilation to WorkflowDefinition
 
 | IR element | WorkflowDefinition field |
@@ -169,6 +181,7 @@ attaches an authority delegation to a stage.
 | `compensate ...` | `compensations[] = {for_activity, compensate_with/capability}` |
 | `delegate ...` | `stages[].delegation = {kind, delegatee, scopes, budget, evidence}` |
 | `evidence ... require` | `stages[].evidence[]` |
+| `migration ... policy` | `stages[].migration_policy` |
 
 The compiler MUST emit `inputs: []` and `outputs: []` for every stage.
 
@@ -246,7 +259,7 @@ them.
 
 The following extensions are reserved and are not part of v1.0:
 
-- migration/replan annotations;
+- replan annotations beyond the stage migration policy;
 - explicit effect-ledger actions beyond `effect_key`;
 - subprocess/materialization declarations.
 

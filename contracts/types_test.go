@@ -93,7 +93,8 @@ func TestWorkflowDefinitionJSONRoundTrip(t *testing.T) {
 		Stages: []contracts.Stage{
 			{
 				ID: "research", Title: "调研", Inputs: []string{"topic"}, Outputs: []string{"lit_review"},
-				Evidence: []string{"source_log"},
+				Evidence:        []string{"source_log"},
+				MigrationPolicy: "preserve",
 				Delegation: &contracts.Delegation{
 					Kind: "role", Delegatee: "research-lead", Scopes: []string{"research"}, Budget: 100,
 				},
@@ -140,6 +141,7 @@ func TestWorkflowDefinitionJSONRoundTrip(t *testing.T) {
 	require.NotNil(t, decoded.Stages[0].Delegation)
 	assert.Equal(t, "research-lead", decoded.Stages[0].Delegation.Delegatee)
 	assert.Equal(t, []string{"source_log"}, decoded.Stages[0].Evidence)
+	assert.Equal(t, "preserve", decoded.Stages[0].MigrationPolicy)
 	require.NotNil(t, decoded.BPMN)
 	assert.Len(t, decoded.BPMN.Nodes, 2)
 	assert.Len(t, decoded.BPMN.Participants, 1)
