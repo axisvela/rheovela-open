@@ -233,8 +233,9 @@ RHEO IR and BPMN are separate formats:
   preserved in `WorkflowDefinition.bpmn` and are not executable transitions.
 - BPMN export uses `WorkflowDefinition.bpmn` metadata to emit `subProcess`,
   boundary/intermediate events, gateway types, participants, message flows,
-  `laneSet`/`lane` and `dataObject`/`dataObjectReference`. Without metadata it
-  falls back to the flat `startEvent`/`task`/`endEvent` subset.
+  `laneSet`/`lane`, `dataObject`/`dataObjectReference` and BPMN DI
+  (`BPMNDiagram`/`BPMNShape`/`BPMNEdge`/waypoints). Without metadata it falls
+  back to the flat `startEvent`/`task`/`endEvent` subset.
 
 ## 10. Versioning and Reserved Extensions
 

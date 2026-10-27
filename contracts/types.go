@@ -70,6 +70,34 @@ type BPMN struct {
 	MessageFlows  []BPMNMessageFlow `json:"message_flows,omitempty"`
 	Lanes         []BPMNLane        `json:"lanes,omitempty"`
 	DataObjects   []BPMNDataObject  `json:"data_objects,omitempty"`
+	Diagram       *BPMNDiagram      `json:"diagram,omitempty"`
+}
+
+type BPMNDiagram struct {
+	ID      string      `json:"id,omitempty"`
+	PlaneID string      `json:"plane_id,omitempty"`
+	Shapes  []BPMNShape `json:"shapes,omitempty"`
+	Edges   []BPMNEdge  `json:"edges,omitempty"`
+}
+
+type BPMNShape struct {
+	ID          string  `json:"id"`
+	BPMNElement string  `json:"bpmn_element,omitempty"`
+	X           float64 `json:"x"`
+	Y           float64 `json:"y"`
+	Width       float64 `json:"width"`
+	Height      float64 `json:"height"`
+}
+
+type BPMNEdge struct {
+	ID          string      `json:"id"`
+	BPMNElement string      `json:"bpmn_element,omitempty"`
+	Waypoints   []BPMNPoint `json:"waypoints,omitempty"`
+}
+
+type BPMNPoint struct {
+	X float64 `json:"x"`
+	Y float64 `json:"y"`
 }
 
 type BPMNLane struct {

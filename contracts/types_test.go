@@ -119,6 +119,11 @@ func TestWorkflowDefinitionJSONRoundTrip(t *testing.T) {
 			MessageFlows: []contracts.BPMNMessageFlow{{ID: "mf1", Source: "p1", Target: "p2"}},
 			Lanes:        []contracts.BPMNLane{{ID: "lane1", Name: "Authors", NodeIDs: []string{"research"}}},
 			DataObjects:  []contracts.BPMNDataObject{{ID: "d1", Name: "Manuscript", Ref: "d0"}},
+			Diagram: &contracts.BPMNDiagram{
+				ID: "diagram", PlaneID: "plane",
+				Shapes: []contracts.BPMNShape{{ID: "shape1", BPMNElement: "research", X: 10, Y: 20, Width: 100, Height: 60}},
+				Edges:  []contracts.BPMNEdge{{ID: "edge1", BPMNElement: "flow1", Waypoints: []contracts.BPMNPoint{{X: 1, Y: 2}}}},
+			},
 		},
 	}
 
@@ -141,4 +146,7 @@ func TestWorkflowDefinitionJSONRoundTrip(t *testing.T) {
 	assert.Len(t, decoded.BPMN.MessageFlows, 1)
 	assert.Len(t, decoded.BPMN.Lanes, 1)
 	assert.Len(t, decoded.BPMN.DataObjects, 1)
+	require.NotNil(t, decoded.BPMN.Diagram)
+	assert.Len(t, decoded.BPMN.Diagram.Shapes, 1)
+	assert.Len(t, decoded.BPMN.Diagram.Edges, 1)
 }

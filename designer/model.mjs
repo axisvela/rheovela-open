@@ -161,6 +161,11 @@ export function removeStage(wf, id) {
       ...lane,
       node_ids: (lane.node_ids || []).filter((nodeID) => nodeID !== id),
     }));
+    if (next.bpmn.diagram) {
+      next.bpmn.diagram.shapes = (next.bpmn.diagram.shapes || []).filter(
+        (shape) => shape.bpmn_element !== id,
+      );
+    }
   }
   return next;
 }

@@ -175,6 +175,9 @@
         "data_objects": {
           "type": "array",
           "items": { "$ref": "#/definitions/bpmnDataObject" }
+        },
+        "diagram": {
+          "$ref": "#/definitions/bpmnDiagram"
         }
       }
     },
@@ -243,6 +246,57 @@
         "id": { "type": "string", "minLength": 1 },
         "name": { "type": "string" },
         "ref": { "type": "string" }
+      }
+    },
+    "bpmnDiagram": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string" },
+        "plane_id": { "type": "string" },
+        "shapes": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/bpmnShape" }
+        },
+        "edges": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/bpmnEdge" }
+        }
+      }
+    },
+    "bpmnShape": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "x", "y", "width", "height"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "bpmn_element": { "type": "string" },
+        "x": { "type": "number" },
+        "y": { "type": "number" },
+        "width": { "type": "number" },
+        "height": { "type": "number" }
+      }
+    },
+    "bpmnEdge": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "bpmn_element": { "type": "string" },
+        "waypoints": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/bpmnPoint" }
+        }
+      }
+    },
+    "bpmnPoint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["x", "y"],
+      "properties": {
+        "x": { "type": "number" },
+        "y": { "type": "number" }
       }
     },
     "compensation": {
