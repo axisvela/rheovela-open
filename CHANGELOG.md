@@ -2,6 +2,14 @@
 
 RHEOVELA open（`github.com/axisvela/rheovela-open`，Apache-2.0）发布记录：对外发布层（版本化 contracts、SDK、examples、CI、OpenAPI）。格式：最新在前；每个版本对应一个 git tag（三仓库统一语义版本 tag）。
 
+## [Unreleased]
+
+### Added
+
+- BPMN definitions/process/activity `extensionElements` (structured tree),
+  `documentation`, `import`, `relationship`, `auditing`/`monitoring`, and
+  start-event `isInterrupting`.
+
 ## [v1.16.0] - 2026-10-27
 
 ### Added

@@ -308,7 +308,9 @@ RHEO IR and BPMN are separate formats:
   preserved. Resource parameter bindings and assignment expressions,
   participant `interfaceRef`/`endPointRef`, data-object `dataState`, and
   process/activity `ioSpecification`/`inputSet`/`outputSet` round-trip as
-  metadata. Root `message`/`signal`/`error`/`escalation`/
+  metadata. Definitions/process/activity `extensionElements` (structured tree),
+  `documentation`, `import`, `relationship`, `auditing`/`monitoring`, and
+  start-event `isInterrupting` are preserved. Root `message`/`signal`/`error`/`escalation`/
   `interface`/`operation`/`endPoint` declarations are also preserved.
 - BPMN collaboration conversations (`conversation`, `subConversation`,
   `callConversation`, `conversationLink`), complex-gateway activation

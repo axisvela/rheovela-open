@@ -236,6 +236,11 @@
         },
         "process_io_specification": { "$ref": "#/definitions/bpmnIOSpecification" },
         "collaboration": { "$ref": "#/definitions/bpmnCollaboration" },
+        "extension_elements": { "type": "array", "items": { "$ref": "#/definitions/bpmnExtension" } },
+        "process_extensions": { "type": "array", "items": { "$ref": "#/definitions/bpmnExtension" } },
+        "documentation": { "type": "array", "items": { "type": "string" } },
+        "imports": { "type": "array", "items": { "$ref": "#/definitions/bpmnImport" } },
+        "relationships": { "type": "array", "items": { "$ref": "#/definitions/bpmnRelationship" } },
         "messages": { "type": "array", "items": { "$ref": "#/definitions/bpmnMessage" } },
         "signals": { "type": "array", "items": { "$ref": "#/definitions/bpmnSignal" } },
         "errors": { "type": "array", "items": { "$ref": "#/definitions/bpmnError" } },
@@ -297,7 +302,10 @@
         },
         "io_specification": { "$ref": "#/definitions/bpmnIOSpecification" },
         "activation_condition": { "type": "string" },
-        "ad_hoc_completion_condition": { "type": "string" }
+        "ad_hoc_completion_condition": { "type": "string" },
+        "documentation": { "type": "array", "items": { "type": "string" } },
+        "extension_elements": { "type": "array", "items": { "$ref": "#/definitions/bpmnExtension" } },
+        "is_interrupting": { "type": "boolean" }
       }
     },
     "bpmnLoop": {
@@ -357,7 +365,10 @@
         "id": { "type": "string", "minLength": 1 },
         "name": { "type": "string" },
         "is_executable": { "type": "boolean" },
-        "participant": { "type": "string" }
+        "participant": { "type": "string" },
+        "documentation": { "type": "array", "items": { "type": "string" } },
+        "auditing": { "type": "boolean" },
+        "monitoring": { "type": "boolean" }
       }
     },
     "bpmnParticipant": {
@@ -721,6 +732,46 @@
       "properties": {
         "id": { "type": "string", "minLength": 1 },
         "name": { "type": "string" }
+      }
+    },
+    "bpmnAttribute": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "value"],
+      "properties": {
+        "name": { "type": "string" },
+        "value": { "type": "string" }
+      }
+    },
+    "bpmnExtension": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["element"],
+      "properties": {
+        "element": { "type": "string", "minLength": 1 },
+        "attributes": { "type": "array", "items": { "$ref": "#/definitions/bpmnAttribute" } },
+        "text": { "type": "string" },
+        "children": { "type": "array", "items": { "$ref": "#/definitions/bpmnExtension" } }
+      }
+    },
+    "bpmnImport": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "namespace": { "type": "string" },
+        "location": { "type": "string" },
+        "import_type": { "type": "string" }
+      }
+    },
+    "bpmnRelationship": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "type": { "type": "string" },
+        "sources": { "type": "array", "items": { "type": "string" } },
+        "targets": { "type": "array", "items": { "type": "string" } }
       }
     },
     "bpmnCollaboration": {

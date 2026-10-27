@@ -90,6 +90,11 @@ type BPMN struct {
 	EndPoints              []BPMNEndPoint        `json:"end_points,omitempty"`
 	ProcessIOSpecification *BPMNIOSpecification  `json:"process_io_specification,omitempty"`
 	Collaboration          *BPMNCollaboration    `json:"collaboration,omitempty"`
+	ExtensionElements      []BPMNExtension       `json:"extension_elements,omitempty"`
+	ProcessExtensions      []BPMNExtension       `json:"process_extensions,omitempty"`
+	Documentation          []string              `json:"documentation,omitempty"`
+	Imports                []BPMNImport          `json:"imports,omitempty"`
+	Relationships          []BPMNRelationship    `json:"relationships,omitempty"`
 	Choreographies         []BPMNChoreography    `json:"choreographies,omitempty"`
 	DataAssociations       []BPMNDataAssociation `json:"data_associations,omitempty"`
 	Diagram                *BPMNDiagram          `json:"diagram,omitempty"`
@@ -97,10 +102,39 @@ type BPMN struct {
 
 // BPMNProcess preserves a process/pool declaration.
 type BPMNProcess struct {
-	ID           string `json:"id"`
-	Name         string `json:"name,omitempty"`
-	IsExecutable bool   `json:"is_executable,omitempty"`
-	Participant  string `json:"participant,omitempty"`
+	ID            string   `json:"id"`
+	Name          string   `json:"name,omitempty"`
+	IsExecutable  bool     `json:"is_executable,omitempty"`
+	Participant   string   `json:"participant,omitempty"`
+	Documentation []string `json:"documentation,omitempty"`
+	Auditing      *bool    `json:"auditing,omitempty"`
+	Monitoring    *bool    `json:"monitoring,omitempty"`
+}
+
+type BPMNAttribute struct {
+	Name  string `json:"name"`
+	Value string `json:"value"`
+}
+
+// BPMNExtension preserves an arbitrary extension element tree.
+type BPMNExtension struct {
+	Element    string          `json:"element"`
+	Attributes []BPMNAttribute `json:"attributes,omitempty"`
+	Text       string          `json:"text,omitempty"`
+	Children   []BPMNExtension `json:"children,omitempty"`
+}
+
+type BPMNImport struct {
+	Namespace  string `json:"namespace,omitempty"`
+	Location   string `json:"location,omitempty"`
+	ImportType string `json:"import_type,omitempty"`
+}
+
+type BPMNRelationship struct {
+	ID      string   `json:"id"`
+	Type    string   `json:"type,omitempty"`
+	Sources []string `json:"sources,omitempty"`
+	Targets []string `json:"targets,omitempty"`
 }
 
 // BPMNChoreography preserves a choreography diagram.
@@ -441,6 +475,9 @@ type BPMNNode struct {
 	IOSpecification          *BPMNIOSpecification `json:"io_specification,omitempty"`
 	ActivationCondition      string               `json:"activation_condition,omitempty"`
 	AdHocCompletionCondition string               `json:"ad_hoc_completion_condition,omitempty"`
+	Documentation            []string             `json:"documentation,omitempty"`
+	ExtensionElements        []BPMNExtension      `json:"extension_elements,omitempty"`
+	IsInterrupting           *bool                `json:"is_interrupting,omitempty"`
 }
 
 // BPMNLoop preserves standardLoopCharacteristics or
