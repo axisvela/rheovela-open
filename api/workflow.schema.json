@@ -194,6 +194,30 @@
           "type": "array",
           "items": { "$ref": "#/definitions/bpmnDataObject" }
         },
+        "data_stores": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/bpmnDataStore" }
+        },
+        "data_store_refs": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/bpmnDataStoreRef" }
+        },
+        "properties": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/bpmnProperty" }
+        },
+        "item_definitions": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/bpmnItemDefinition" }
+        },
+        "event_definitions": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/bpmnEventDefinition" }
+        },
+        "artifacts": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/bpmnArtifact" }
+        },
         "choreographies": {
           "type": "array",
           "items": { "$ref": "#/definitions/bpmnChoreography" }
@@ -233,7 +257,16 @@
         "called_element": { "type": "string" },
         "triggered_by_event": { "type": "boolean" },
         "is_for_compensation": { "type": "boolean" },
-        "loop": { "$ref": "#/definitions/bpmnLoop" }
+        "ordering": { "type": "string" },
+        "cancel_remaining_instances": { "type": "boolean" },
+        "method": { "type": "string" },
+        "completion_quantity": { "type": "string" },
+        "start_quantity": { "type": "string" },
+        "loop": { "$ref": "#/definitions/bpmnLoop" },
+        "event_definition_refs": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
       }
     },
     "bpmnLoop": {
@@ -257,6 +290,7 @@
       "additionalProperties": false,
       "required": ["kind"],
       "properties": {
+        "id": { "type": "string" },
         "kind": { "type": "string", "minLength": 1 },
         "ref": { "type": "string" },
         "name": { "type": "string" },
@@ -405,7 +439,65 @@
       "properties": {
         "id": { "type": "string", "minLength": 1 },
         "name": { "type": "string" },
-        "ref": { "type": "string" }
+        "ref": { "type": "string" },
+        "item_subject_ref": { "type": "string" },
+        "is_collection": { "type": "boolean" }
+      }
+    },
+    "bpmnDataStore": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "name": { "type": "string" },
+        "item_subject_ref": { "type": "string" },
+        "is_unlimited": { "type": "boolean" },
+        "capacity": { "type": "string" }
+      }
+    },
+    "bpmnDataStoreRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "name": { "type": "string" },
+        "data_store_ref": { "type": "string" }
+      }
+    },
+    "bpmnProperty": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "name": { "type": "string" },
+        "item_subject_ref": { "type": "string" }
+      }
+    },
+    "bpmnItemDefinition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "structure_ref": { "type": "string" },
+        "is_collection": { "type": "boolean" }
+      }
+    },
+    "bpmnArtifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "element"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "element": { "type": "string", "minLength": 1 },
+        "text": { "type": "string" },
+        "source": { "type": "string" },
+        "target": { "type": "string" },
+        "association_direction": { "type": "string" },
+        "category_value_ref": { "type": "string" }
       }
     },
     "bpmnDiagram": {

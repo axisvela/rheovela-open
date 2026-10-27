@@ -297,6 +297,11 @@ RHEO IR and BPMN are separate formats:
   preserved as stage metadata.
 - BPMN DI preserves the plane `bpmnElement`/resolution, shape and edge
   attributes, label bounds, and `BPMNLabelStyle` font metadata.
+- BPMN data stores, data-store references, properties, item definitions,
+  data-object item/collection metadata, root event definitions,
+  `eventDefinitionRef`, text annotations, associations and groups are preserved
+  as metadata. Ad-hoc ordering/cancel attributes, transaction method and
+  activity quantity attributes are also retained.
 - BPMN export uses `WorkflowDefinition.bpmn` metadata to emit `subProcess`,
   boundary/intermediate events, gateway types, participants, message flows,
   `laneSet`/`lane`, `dataObject`/`dataObjectReference` and BPMN DI

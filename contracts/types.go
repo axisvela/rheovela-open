@@ -72,6 +72,12 @@ type BPMN struct {
 	MessageFlows     []BPMNMessageFlow     `json:"message_flows,omitempty"`
 	Lanes            []BPMNLane            `json:"lanes,omitempty"`
 	DataObjects      []BPMNDataObject      `json:"data_objects,omitempty"`
+	DataStores       []BPMNDataStore       `json:"data_stores,omitempty"`
+	DataStoreRefs    []BPMNDataStoreRef    `json:"data_store_refs,omitempty"`
+	Properties       []BPMNProperty        `json:"properties,omitempty"`
+	ItemDefinitions  []BPMNItemDefinition  `json:"item_definitions,omitempty"`
+	EventDefinitions []BPMNEventDefinition `json:"event_definitions,omitempty"`
+	Artifacts        []BPMNArtifact        `json:"artifacts,omitempty"`
 	Choreographies   []BPMNChoreography    `json:"choreographies,omitempty"`
 	DataAssociations []BPMNDataAssociation `json:"data_associations,omitempty"`
 	Diagram          *BPMNDiagram          `json:"diagram,omitempty"`
@@ -197,9 +203,48 @@ type BPMNLane struct {
 // BPMNDataObject records a dataObject (Ref empty) or dataObjectReference
 // (Ref points at the referenced dataObject).
 type BPMNDataObject struct {
-	ID   string `json:"id"`
-	Name string `json:"name,omitempty"`
-	Ref  string `json:"ref,omitempty"`
+	ID             string `json:"id"`
+	Name           string `json:"name,omitempty"`
+	Ref            string `json:"ref,omitempty"`
+	ItemSubjectRef string `json:"item_subject_ref,omitempty"`
+	IsCollection   *bool  `json:"is_collection,omitempty"`
+}
+
+type BPMNDataStore struct {
+	ID             string `json:"id"`
+	Name           string `json:"name,omitempty"`
+	ItemSubjectRef string `json:"item_subject_ref,omitempty"`
+	IsUnlimited    *bool  `json:"is_unlimited,omitempty"`
+	Capacity       string `json:"capacity,omitempty"`
+}
+
+type BPMNDataStoreRef struct {
+	ID           string `json:"id"`
+	Name         string `json:"name,omitempty"`
+	DataStoreRef string `json:"data_store_ref,omitempty"`
+}
+
+type BPMNProperty struct {
+	ID             string `json:"id"`
+	Name           string `json:"name,omitempty"`
+	ItemSubjectRef string `json:"item_subject_ref,omitempty"`
+}
+
+type BPMNItemDefinition struct {
+	ID           string `json:"id"`
+	StructureRef string `json:"structure_ref,omitempty"`
+	IsCollection *bool  `json:"is_collection,omitempty"`
+}
+
+// BPMNArtifact preserves textAnnotation, association or group.
+type BPMNArtifact struct {
+	ID                   string `json:"id"`
+	Element              string `json:"element"`
+	Text                 string `json:"text,omitempty"`
+	Source               string `json:"source,omitempty"`
+	Target               string `json:"target,omitempty"`
+	AssociationDirection string `json:"association_direction,omitempty"`
+	CategoryValueRef     string `json:"category_value_ref,omitempty"`
 }
 
 // BPMNNode maps a workflow stage (or a subprocess-internal node) back to its
@@ -220,16 +265,22 @@ type BPMNNode struct {
 	DefaultFlow      string `json:"default_flow,omitempty"`
 
 	// Event semantics.
-	CancelActivity   *bool                 `json:"cancel_activity,omitempty"`
-	ParallelMultiple *bool                 `json:"parallel_multiple,omitempty"`
-	Direction        string                `json:"direction,omitempty"`
-	EventDefinitions []BPMNEventDefinition `json:"event_definitions,omitempty"`
+	CancelActivity      *bool                 `json:"cancel_activity,omitempty"`
+	ParallelMultiple    *bool                 `json:"parallel_multiple,omitempty"`
+	Direction           string                `json:"direction,omitempty"`
+	EventDefinitions    []BPMNEventDefinition `json:"event_definitions,omitempty"`
+	EventDefinitionRefs []string              `json:"event_definition_refs,omitempty"`
 
 	// Activity/subprocess semantics.
-	CalledElement     string    `json:"called_element,omitempty"`
-	TriggeredByEvent  *bool     `json:"triggered_by_event,omitempty"`
-	IsForCompensation *bool     `json:"is_for_compensation,omitempty"`
-	Loop              *BPMNLoop `json:"loop,omitempty"`
+	CalledElement            string    `json:"called_element,omitempty"`
+	TriggeredByEvent         *bool     `json:"triggered_by_event,omitempty"`
+	IsForCompensation        *bool     `json:"is_for_compensation,omitempty"`
+	Ordering                 string    `json:"ordering,omitempty"`
+	CancelRemainingInstances *bool     `json:"cancel_remaining_instances,omitempty"`
+	Method                   string    `json:"method,omitempty"`
+	CompletionQuantity       string    `json:"completion_quantity,omitempty"`
+	StartQuantity            string    `json:"start_quantity,omitempty"`
+	Loop                     *BPMNLoop `json:"loop,omitempty"`
 }
 
 // BPMNLoop preserves standardLoopCharacteristics or
@@ -248,6 +299,7 @@ type BPMNLoop struct {
 
 // BPMNEventDefinition preserves one eventDefinition element and its attributes.
 type BPMNEventDefinition struct {
+	ID                string `json:"id,omitempty"`
 	Kind              string `json:"kind"`
 	Ref               string `json:"ref,omitempty"`
 	Name              string `json:"name,omitempty"`

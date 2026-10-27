@@ -14,6 +14,11 @@ RHEOVELA open（`github.com/axisvela/rheovela-open`，Apache-2.0）发布记录�
 - BPMN `callActivity`, `transaction`, `adHocSubProcess`, `eventSubProcess`,
   `sendTask`/`receiveTask`/`manualTask`, `calledElement`, `triggeredByEvent`,
   `isForCompensation`, and standard/multi-instance loop characteristics.
+- BPMN data stores, data-store references, properties, item definitions,
+  `dataObject.itemSubjectRef`/`isCollection`, root event definitions and
+  `eventDefinitionRef`.
+- BPMN text annotations, associations and groups; ad-hoc ordering/cancel
+  attributes, transaction method and activity quantity attributes.
 
 ## [v1.11.0] - 2026-10-27
 
