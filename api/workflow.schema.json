@@ -166,6 +166,10 @@
           "type": "array",
           "items": { "$ref": "#/definitions/bpmnNode" }
         },
+        "flows": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/bpmnFlow" }
+        },
         "internal_flows": {
           "type": "array",
           "items": { "$ref": "#/definitions/bpmnFlow" }
@@ -201,7 +205,34 @@
         "name": { "type": "string" },
         "event_kind": { "type": "string" },
         "attached_to": { "type": "string" },
-        "parent_subprocess": { "type": "string" }
+        "parent_subprocess": { "type": "string" },
+        "gateway_direction": { "type": "string" },
+        "event_gateway_type": { "type": "string" },
+        "instantiate": { "type": "boolean" },
+        "default_flow": { "type": "string" },
+        "cancel_activity": { "type": "boolean" },
+        "parallel_multiple": { "type": "boolean" },
+        "direction": { "type": "string" },
+        "event_definitions": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/bpmnEventDefinition" }
+        }
+      }
+    },
+    "bpmnEventDefinition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind"],
+      "properties": {
+        "kind": { "type": "string", "minLength": 1 },
+        "ref": { "type": "string" },
+        "name": { "type": "string" },
+        "time_date": { "type": "string" },
+        "time_duration": { "type": "string" },
+        "time_cycle": { "type": "string" },
+        "activity_ref": { "type": "string" },
+        "wait_for_completion": { "type": "boolean" },
+        "condition": { "type": "string" }
       }
     },
     "bpmnFlow": {
@@ -212,6 +243,7 @@
         "id": { "type": "string", "minLength": 1 },
         "from": { "type": "string", "minLength": 1 },
         "to": { "type": "string", "minLength": 1 },
+        "name": { "type": "string" },
         "condition": { "type": "string" },
         "parent_subprocess": { "type": "string" }
       }

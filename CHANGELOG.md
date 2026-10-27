@@ -10,6 +10,11 @@ RHEOVELA open（`github.com/axisvela/rheovela-open`，Apache-2.0）发布记录�
   embedded through `conformance.RHEOIRv1` and covered by a structure test.
 - Stable `RHEOIRxxx` parse error codes and v1.0 syntax boundaries documented in
   `docs/RHEO-IR.md`.
+- `BPMNNode` gateway fields (`gateway_direction`, `event_gateway_type`,
+  `instantiate`, `default_flow`), event fields (`cancel_activity`,
+  `parallel_multiple`, `direction`, `event_definitions`) and
+  `BPMNEventDefinition`; `BPMN.flows` and `BPMNFlow.name` preserve top-level
+  sequence flows. Updated `api/workflow.schema.json`.
 
 ## [v1.9.0] - 2026-10-27
 

@@ -65,6 +65,7 @@ type WorkflowDefinition struct {
 // subprocesses, boundary events and collaborations.
 type BPMN struct {
 	Nodes         []BPMNNode        `json:"nodes,omitempty"`
+	Flows         []BPMNFlow        `json:"flows,omitempty"`
 	InternalFlows []BPMNFlow        `json:"internal_flows,omitempty"`
 	Participants  []BPMNParticipant `json:"participants,omitempty"`
 	MessageFlows  []BPMNMessageFlow `json:"message_flows,omitempty"`
@@ -123,6 +124,31 @@ type BPMNNode struct {
 	EventKind        string `json:"event_kind,omitempty"`
 	AttachedTo       string `json:"attached_to,omitempty"`
 	ParentSubprocess string `json:"parent_subprocess,omitempty"`
+
+	// Gateway semantics.
+	GatewayDirection string `json:"gateway_direction,omitempty"`
+	EventGatewayType string `json:"event_gateway_type,omitempty"`
+	Instantiate      *bool  `json:"instantiate,omitempty"`
+	DefaultFlow      string `json:"default_flow,omitempty"`
+
+	// Event semantics.
+	CancelActivity   *bool                `json:"cancel_activity,omitempty"`
+	ParallelMultiple *bool                `json:"parallel_multiple,omitempty"`
+	Direction        string               `json:"direction,omitempty"`
+	EventDefinitions []BPMNEventDefinition `json:"event_definitions,omitempty"`
+}
+
+// BPMNEventDefinition preserves one eventDefinition element and its attributes.
+type BPMNEventDefinition struct {
+	Kind              string `json:"kind"`
+	Ref               string `json:"ref,omitempty"`
+	Name              string `json:"name,omitempty"`
+	TimeDate          string `json:"time_date,omitempty"`
+	TimeDuration      string `json:"time_duration,omitempty"`
+	TimeCycle         string `json:"time_cycle,omitempty"`
+	ActivityRef       string `json:"activity_ref,omitempty"`
+	WaitForCompletion *bool  `json:"wait_for_completion,omitempty"`
+	Condition         string `json:"condition,omitempty"`
 }
 
 // BPMNFlow is a sequenceFlow inside a subprocess.
@@ -130,6 +156,7 @@ type BPMNFlow struct {
 	ID               string `json:"id"`
 	From             string `json:"from"`
 	To               string `json:"to"`
+	Name             string `json:"name,omitempty"`
 	Condition        string `json:"condition,omitempty"`
 	ParentSubprocess string `json:"parent_subprocess,omitempty"`
 }
