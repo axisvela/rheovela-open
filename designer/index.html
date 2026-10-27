@@ -28,8 +28,11 @@
       <button id="new-workflow" type="button">New</button>
       <button id="load-example" type="button">Load example</button>
       <button id="export-json" type="button">Export JSON</button>
+      <button id="undo" type="button" class="secondary" disabled>Undo</button>
+      <button id="redo" type="button" class="secondary" disabled>Redo</button>
       <label class="file-button">Import JSON<input id="import-json" type="file" accept="application/json,.json" hidden></label>
     </div>
+    <p class="muted">Ctrl/Cmd+Z undo · Ctrl/Cmd+Shift+Z or Ctrl+Y redo.</p>
   </section>
 
   <section class="panel">
@@ -129,6 +132,21 @@
   <section class="panel">
     <h2>Graph</h2>
     <div id="graph" class="graph"></div>
+  </section>
+
+  <section class="panel" id="bpmn-di-panel" hidden>
+    <h2>BPMN DI</h2>
+    <p class="muted">Layout preserved from the imported BPMN diagram.</p>
+    <div id="bpmn-diagram" class="diagram"></div>
+  </section>
+
+  <section class="panel" id="import-preview" hidden>
+    <h2>Import preview</h2>
+    <div id="import-diff" class="diff"></div>
+    <div class="actions">
+      <button id="apply-import" type="button">Apply import</button>
+      <button id="discard-import" type="button" class="secondary">Discard</button>
+    </div>
   </section>
 
   <section class="panel">

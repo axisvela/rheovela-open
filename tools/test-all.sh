@@ -26,6 +26,6 @@ echo "==> Rust"
 (cd sdk/rust && cargo test --offline && cargo run --offline)
 
 echo "==> Designer"
-node --test designer/model.test.mjs designer/core.test.mjs
+node --test designer/model.test.mjs designer/core.test.mjs designer/history.test.mjs designer/diagram.test.mjs designer/diff.test.mjs
 
 echo "All language checks passed."

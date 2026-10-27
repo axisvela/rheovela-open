@@ -1,7 +1,10 @@
 import { CoreAPIError, importBPMN, listWorkflows, loadWorkflow, publishWorkflow } from "./core.mjs";
+import { bpmnDiagramLayout } from "./diagram.mjs";
+import { createHistory } from "./history.mjs";
 import {
   addStage,
   addTransition,
+  diffWorkflows,
   emptyWorkflow,
   layoutWorkflow,
   normalizeWorkflow,
@@ -14,7 +17,16 @@ import {
 
 const $ = (id) => document.getElementById(id);
 let wf = emptyWorkflow();
+const history = createHistory(wf);
 let editingStageID = null;
+let pendingImport = null;
+
+function commit(next, message, isError = false) {
+  wf = next;
+  history.push(wf);
+  renderAll();
+  setStatus(message, isError);
+}
 
 function splitCSV(value) {
   return String(value || "")
@@ -111,10 +123,8 @@ function renderStages() {
     remove.className = "danger";
     remove.textContent = "Remove";
     remove.addEventListener("click", () => {
-      wf = removeStage(wf, stage.id);
       if (editingStageID === stage.id) closeStageEditor();
-      renderAll();
-      setStatus(`Removed stage ${stage.id}.`);
+      commit(removeStage(wf, stage.id), `Removed stage ${stage.id}.`);
     });
     actions.append(edit, remove);
     tr.append(id, title, meta, actions);
@@ -185,9 +195,7 @@ function renderTransitions() {
     remove.className = "danger";
     remove.textContent = "Remove";
     remove.addEventListener("click", () => {
-      wf = removeTransition(wf, index);
-      renderAll();
-      setStatus("Removed transition.");
+      commit(removeTransition(wf, index), "Removed transition.");
     });
     actions.append(remove);
     row.append(from, to, condition, actions);
@@ -276,6 +284,154 @@ function renderGraph() {
   host.append(svg);
 }
 
+function renderHistoryButtons() {
+  $("undo").disabled = !history.canUndo();
+  $("redo").disabled = !history.canRedo();
+}
+
+function undo() {
+  if (!history.canUndo()) return;
+  closeStageEditor();
+  wf = history.undo();
+  renderAll();
+  setStatus("Undo.");
+}
+
+function redo() {
+  if (!history.canRedo()) return;
+  closeStageEditor();
+  wf = history.redo();
+  renderAll();
+  setStatus("Redo.");
+}
+
+function renderBPMNDiagram() {
+  const panel = $("bpmn-di-panel");
+  const host = $("bpmn-diagram");
+  const layout = bpmnDiagramLayout(wf);
+  host.replaceChildren();
+  if (!layout) {
+    panel.hidden = true;
+    return;
+  }
+  panel.hidden = false;
+  const svgNS = "http://www.w3.org/2000/svg";
+  const svg = document.createElementNS(svgNS, "svg");
+  svg.setAttribute("viewBox", `0 0 ${layout.width} ${layout.height}`);
+  svg.setAttribute("width", String(Math.min(layout.width, 1100)));
+  svg.setAttribute("height", String(Math.min(layout.height, 700)));
+  for (const edge of layout.edges) {
+    if (edge.points.length < 2) continue;
+    const line = document.createElementNS(svgNS, "polyline");
+    line.setAttribute("class", "di-edge");
+    line.setAttribute("points", edge.points.map((point) => `${point.x},${point.y}`).join(" "));
+    svg.append(line);
+  }
+  for (const shape of layout.shapes) {
+    const group = document.createElementNS(svgNS, "g");
+    group.setAttribute("class", `di-shape ${shape.element}`);
+    const rect = document.createElementNS(svgNS, "rect");
+    rect.setAttribute("x", String(shape.x));
+    rect.setAttribute("y", String(shape.y));
+    rect.setAttribute("width", String(shape.width));
+    rect.setAttribute("height", String(shape.height));
+    rect.setAttribute("rx", "6");
+    group.append(rect);
+    if (shape.width >= 30) {
+      const label = document.createElementNS(svgNS, "text");
+      label.setAttribute("x", String(shape.x + 6));
+      label.setAttribute("y", String(shape.y + Math.min(18, Math.max(12, shape.height / 2))));
+      label.textContent =
+        shape.label.length > 28 ? `${shape.label.slice(0, 25)}...` : shape.label;
+      group.append(label);
+    }
+    svg.append(group);
+  }
+  host.append(svg);
+}
+
+function renderImportPreview() {
+  const panel = $("import-preview");
+  const host = $("import-diff");
+  if (!pendingImport) {
+    panel.hidden = true;
+    host.replaceChildren();
+    return;
+  }
+  panel.hidden = false;
+  const diff = diffWorkflows(wf, pendingImport.workflow);
+  pendingImport.diff = diff;
+  host.replaceChildren();
+
+  const source = document.createElement("p");
+  source.className = "muted";
+  source.textContent = pendingImport.source
+    ? `Pending import: ${pendingImport.source}`
+    : "Pending import";
+  host.append(source);
+  if (diff.empty) {
+    const empty = document.createElement("p");
+    empty.textContent = "No changes.";
+    host.append(empty);
+    return;
+  }
+
+  const list = document.createElement("ul");
+  const add = (text, className) => {
+    const li = document.createElement("li");
+    li.textContent = text;
+    if (className) li.className = className;
+    list.append(li);
+  };
+  for (const change of diff.workflow) {
+    add(
+      `workflow ${change.field}: ${JSON.stringify(change.before)} -> ${JSON.stringify(change.after)}`,
+    );
+  }
+  for (const id of diff.stages.added) add(`+ stage ${id}`, "diff-add");
+  for (const id of diff.stages.removed) add(`- stage ${id}`, "diff-remove");
+  for (const change of diff.stages.changed) {
+    add(`~ stage ${change.id} (${change.fields.join(", ")})`, "diff-change");
+  }
+  for (const key of diff.transitions.added) add(`+ transition ${key}`, "diff-add");
+  for (const key of diff.transitions.removed) add(`- transition ${key}`, "diff-remove");
+  for (const key of diff.compensations.added) add(`+ compensation ${key}`, "diff-add");
+  for (const key of diff.compensations.removed) add(`- compensation ${key}`, "diff-remove");
+
+  const bpmnBits = [];
+  if (diff.bpmn.before !== diff.bpmn.after) {
+    bpmnBits.push(`BPMN metadata present: ${diff.bpmn.before} -> ${diff.bpmn.after}`);
+  }
+  for (const [label, value] of [
+    ["nodes", diff.bpmn.nodes],
+    ["shapes", diff.bpmn.shapes],
+    ["edges", diff.bpmn.edges],
+    ["participants", diff.bpmn.participants],
+    ["choreographies", diff.bpmn.choreographies],
+    ["data associations", diff.bpmn.dataAssociations],
+  ]) {
+    if (value.added.length) bpmnBits.push(`+ ${label}: ${value.added.join(", ")}`);
+    if (value.removed.length) bpmnBits.push(`- ${label}: ${value.removed.join(", ")}`);
+  }
+  if (bpmnBits.length) add(`BPMN: ${bpmnBits.join("; ")}`);
+  host.append(list);
+}
+
+function previewImport(workflow, meta = {}) {
+  pendingImport = {
+    workflow: normalizeWorkflow(workflow),
+    source: meta.source || "",
+    meta,
+  };
+  renderImportPreview();
+}
+
+function clearImportPreview() {
+  pendingImport = null;
+  $("import-preview").hidden = true;
+  $("import-diff").replaceChildren();
+}
+
 function renderValidation() {
   const list = $("validation");
   list.replaceChildren();
@@ -304,8 +460,17 @@ function renderAll() {
   renderTransitionSelects();
   renderTransitions();
   renderGraph();
+  renderBPMNDiagram();
+  renderImportPreview();
   renderValidation();
   syncJSON();
+  renderHistoryButtons();
+}
+
+function recordTextEdit() {
+  if (JSON.stringify(history.current()) === JSON.stringify(wf)) return;
+  history.push(wf);
+  renderHistoryButtons();
 }
 
 $("workflow-id").addEventListener("input", (e) => {
@@ -313,20 +478,21 @@ $("workflow-id").addEventListener("input", (e) => {
   renderValidation();
   syncJSON();
 });
+$("workflow-id").addEventListener("change", recordTextEdit);
 $("workflow-title").addEventListener("input", (e) => {
   wf.title = e.target.value;
   renderValidation();
   syncJSON();
 });
+$("workflow-title").addEventListener("change", recordTextEdit);
 
 $("stage-form").addEventListener("submit", (e) => {
   e.preventDefault();
   try {
-    wf = addStage(wf, $("stage-id").value, $("stage-title").value);
+    const next = addStage(wf, $("stage-id").value, $("stage-title").value);
     $("stage-id").value = "";
     $("stage-title").value = "";
-    renderAll();
-    setStatus("Stage added.");
+    commit(next, "Stage added.");
   } catch (err) {
     setStatus(err.message, true);
   }
@@ -352,7 +518,7 @@ $("stage-editor-form").addEventListener("submit", (e) => {
       }
     : null;
   try {
-    wf = updateStage(wf, editingStageID, {
+    const next = updateStage(wf, editingStageID, {
       title: $("edit-stage-title").value,
       assignee,
       evidence: splitCSV($("edit-evidence").value),
@@ -363,33 +529,44 @@ $("stage-editor-form").addEventListener("submit", (e) => {
     });
     const id = editingStageID;
     closeStageEditor();
-    renderAll();
-    setStatus(`Updated stage ${id}.`);
+    commit(next, `Updated stage ${id}.`);
   } catch (err) {
     setStatus(err.message, true);
   }
 });
 
 $("stage-editor-cancel").addEventListener("click", closeStageEditor);
+$("undo").addEventListener("click", undo);
+$("redo").addEventListener("click", redo);
+$("apply-import").addEventListener("click", () => {
+  if (!pendingImport) return;
+  const pending = pendingImport;
+  clearImportPreview();
+  commit(pending.workflow, `Applied import${pending.source ? ` from ${pending.source}` : ""}.`);
+});
+$("discard-import").addEventListener("click", () => {
+  const source = pendingImport?.source;
+  clearImportPreview();
+  setStatus(source ? `Discarded import from ${source}.` : "Discarded import.");
+});
 
 $("transition-form").addEventListener("submit", (e) => {
   e.preventDefault();
-  wf = addTransition(wf, $("transition-from").value, $("transition-to").value, $("transition-condition").value);
+  const next = addTransition(wf, $("transition-from").value, $("transition-to").value, $("transition-condition").value);
   $("transition-condition").value = "";
-  renderAll();
-  setStatus("Transition added.");
+  commit(next, "Transition added.");
 });
 
 $("new-workflow").addEventListener("click", () => {
   wf = emptyWorkflow();
+  history.reset(wf);
+  clearImportPreview();
   renderAll();
   setStatus("New workflow.");
 });
 
 $("load-example").addEventListener("click", () => {
-  wf = normalizeWorkflow(example);
-  renderAll();
-  setStatus("Example loaded.");
+  commit(normalizeWorkflow(example), "Example loaded.");
 });
 
 $("validate-json").addEventListener("click", () => {
@@ -400,9 +577,7 @@ $("validate-json").addEventListener("click", () => {
 
 $("apply-json").addEventListener("click", () => {
   try {
-    wf = normalizeWorkflow($("json-editor").value);
-    renderAll();
-    setStatus("JSON applied.");
+    commit(normalizeWorkflow($("json-editor").value), "JSON applied.");
   } catch (err) {
     setStatus(`Invalid JSON: ${err.message}`, true);
   }
@@ -413,8 +588,7 @@ $("core-load").addEventListener("click", async () => {
   const id = $("core-workflow-id").value.trim() || wf.workflow_id;
   try {
     const loaded = await loadWorkflow(url, id, opts);
-    wf = normalizeWorkflow(loaded);
-    renderAll();
+    commit(normalizeWorkflow(loaded), `Loaded ${$("core-workflow-id").value || id}.`);
     $("core-workflow-id").value = wf.workflow_id;
     setCoreStatus(`Loaded ${wf.workflow_id}.`);
   } catch (err) {
@@ -466,8 +640,11 @@ $("import-bpmn").addEventListener("change", async (e) => {
   const { url, ...opts } = coreOptions();
   try {
     const result = await importBPMN(url, await file.text(), opts);
-    wf = normalizeWorkflow(result.workflow);
-    renderAll();
+    previewImport(result.workflow, {
+      source: file.name,
+      report: result.report,
+      validation: result.validation,
+    });
     $("core-result").textContent = JSON.stringify(
       { report: result.report, validation: result.validation },
       null,
@@ -475,7 +652,9 @@ $("import-bpmn").addEventListener("change", async (e) => {
     );
     const invalid = result.validation && result.validation.valid === false;
     setCoreStatus(
-      invalid ? `Imported ${file.name} with validation errors.` : `Imported ${file.name}.`,
+      invalid
+        ? `Previewed ${file.name} with validation errors. Review the diff before applying.`
+        : `Previewed ${file.name}. Review the diff and apply.`,
       invalid,
     );
   } catch (err) {
@@ -488,13 +667,27 @@ $("import-json").addEventListener("change", async (e) => {
   const file = e.target.files?.[0];
   if (!file) return;
   try {
-    wf = normalizeWorkflow(await file.text());
-    renderAll();
-    setStatus(`Imported ${file.name}.`);
+    previewImport(await file.text(), { source: file.name });
+    setStatus(`Previewed ${file.name}. Review the diff and apply.`);
   } catch (err) {
     setStatus(`Import failed: ${err.message}`, true);
   }
   e.target.value = "";
+});
+
+document.addEventListener("keydown", (e) => {
+  const tag = (e.target?.tagName || "").toLowerCase();
+  if (tag === "input" || tag === "textarea" || tag === "select") return;
+  if (!(e.ctrlKey || e.metaKey)) return;
+  const key = e.key.toLowerCase();
+  if (key === "z") {
+    e.preventDefault();
+    if (e.shiftKey) redo();
+    else undo();
+  } else if (key === "y") {
+    e.preventDefault();
+    redo();
+  }
 });
 
 renderAll();

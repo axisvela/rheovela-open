@@ -203,6 +203,147 @@ export function serializeWorkflow(wf) {
   return JSON.stringify(normalizeWorkflow(wf), null, 2);
 }
 
+const STAGE_DIFF_FIELDS = [
+  "title",
+  "assignee",
+  "assignee_spec",
+  "owner_skill",
+  "inputs",
+  "outputs",
+  "gate",
+  "delegation",
+  "evidence",
+  "migration_policy",
+  "effect_key",
+  "timeout",
+];
+
+const WORKFLOW_DIFF_FIELDS = ["workflow_id", "title", "source", "project_id", "kind"];
+
+function stable(value) {
+  if (value === undefined) return "undefined";
+  return JSON.stringify(value);
+}
+
+function multisetDiff(before, after) {
+  const beforeCounts = new Map();
+  const afterCounts = new Map();
+  for (const key of before) beforeCounts.set(key, (beforeCounts.get(key) || 0) + 1);
+  for (const key of after) afterCounts.set(key, (afterCounts.get(key) || 0) + 1);
+  const added = [];
+  const removed = [];
+  for (const [key, count] of afterCounts) {
+    const diff = count - (beforeCounts.get(key) || 0);
+    for (let i = 0; i < diff; i++) added.push(key);
+  }
+  for (const [key, count] of beforeCounts) {
+    const diff = count - (afterCounts.get(key) || 0);
+    for (let i = 0; i < diff; i++) removed.push(key);
+  }
+  return { added, removed };
+}
+
+function transitionKey(tr) {
+  if (!tr) return "";
+  const condition = tr.condition ? ` when ${tr.condition}` : "";
+  return `${tr.from} -> ${tr.to}${condition}`;
+}
+
+function compensationKey(c) {
+  if (!c) return "";
+  const target = c.capability ? `capability ${c.capability}` : c.compensate_with || "";
+  return `${c.for_activity} with ${target}`;
+}
+
+function idDiff(before, after) {
+  const beforeIDs = new Set((before || []).map((item) => item.id));
+  const afterIDs = new Set((after || []).map((item) => item.id));
+  return {
+    added: [...afterIDs].filter((id) => !beforeIDs.has(id)),
+    removed: [...beforeIDs].filter((id) => !afterIDs.has(id)),
+  };
+}
+
+/**
+ * Compare two workflows for import previews.
+ *
+ * Returns added/removed/changed stages, transition and compensation multisets,
+ * changed workflow fields, and BPMN metadata counts.
+ */
+export function diffWorkflows(beforeInput, afterInput) {
+  const before = normalizeWorkflow(beforeInput);
+  const after = normalizeWorkflow(afterInput);
+  const beforeStages = new Map(before.stages.map((stage) => [stage.id, stage]));
+  const afterStages = new Map(after.stages.map((stage) => [stage.id, stage]));
+
+  const addedStages = [...afterStages.keys()].filter((id) => !beforeStages.has(id));
+  const removedStages = [...beforeStages.keys()].filter((id) => !afterStages.has(id));
+  const changedStages = [];
+  for (const [id, stage] of afterStages) {
+    const prev = beforeStages.get(id);
+    if (!prev) continue;
+    const fields = STAGE_DIFF_FIELDS.filter((field) => stable(prev[field]) !== stable(stage[field]));
+    if (fields.length > 0) changedStages.push({ id, fields });
+  }
+
+  const transitions = multisetDiff(
+    before.transitions.map(transitionKey),
+    after.transitions.map(transitionKey),
+  );
+  const compensations = multisetDiff(
+    before.compensations.map(compensationKey),
+    after.compensations.map(compensationKey),
+  );
+  const workflow = WORKFLOW_DIFF_FIELDS
+    .filter((field) => stable(before[field]) !== stable(after[field]))
+    .map((field) => ({ field, before: before[field], after: after[field] }));
+
+  const beforeBPMN = before.bpmn || {};
+  const afterBPMN = after.bpmn || {};
+  const beforeDiagram = beforeBPMN.diagram || {};
+  const afterDiagram = afterBPMN.diagram || {};
+  const bpmn = {
+    before: Boolean(before.bpmn),
+    after: Boolean(after.bpmn),
+    nodes: idDiff(beforeBPMN.nodes, afterBPMN.nodes),
+    shapes: idDiff(beforeDiagram.shapes, afterDiagram.shapes),
+    edges: idDiff(beforeDiagram.edges, afterDiagram.edges),
+    participants: idDiff(beforeBPMN.participants, afterBPMN.participants),
+    choreographies: idDiff(beforeBPMN.choreographies, afterBPMN.choreographies),
+    dataAssociations: idDiff(beforeBPMN.data_associations, afterBPMN.data_associations),
+  };
+  const empty =
+    addedStages.length === 0 &&
+    removedStages.length === 0 &&
+    changedStages.length === 0 &&
+    transitions.added.length === 0 &&
+    transitions.removed.length === 0 &&
+    compensations.added.length === 0 &&
+    compensations.removed.length === 0 &&
+    workflow.length === 0 &&
+    bpmn.nodes.added.length === 0 &&
+    bpmn.nodes.removed.length === 0 &&
+    bpmn.shapes.added.length === 0 &&
+    bpmn.shapes.removed.length === 0 &&
+    bpmn.edges.added.length === 0 &&
+    bpmn.edges.removed.length === 0 &&
+    bpmn.participants.added.length === 0 &&
+    bpmn.participants.removed.length === 0 &&
+    bpmn.choreographies.added.length === 0 &&
+    bpmn.choreographies.removed.length === 0 &&
+    bpmn.dataAssociations.added.length === 0 &&
+    bpmn.dataAssociations.removed.length === 0;
+
+  return {
+    workflow,
+    stages: { added: addedStages, removed: removedStages, changed: changedStages },
+    transitions,
+    compensations,
+    bpmn,
+    empty,
+  };
+}
+
 export function layoutWorkflow(input) {
   const wf = normalizeWorkflow(input);
   const ids = wf.stages.map((s) => s.id);

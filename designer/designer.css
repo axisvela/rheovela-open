@@ -151,6 +151,29 @@ th { color: var(--muted); font-weight: 600; }
 .graph .edge { stroke: var(--muted); stroke-width: 1.4; }
 .graph .edge-label { fill: var(--muted); font-size: 10px; }
 
+.diagram {
+  overflow: auto;
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  min-height: 160px;
+  padding: 8px;
+}
+
+.diagram svg { display: block; }
+.diagram text { fill: var(--text); font-size: 11px; pointer-events: none; }
+.diagram .di-shape rect { fill: var(--panel); stroke: var(--accent); stroke-width: 1.4; }
+.diagram .di-shape[class*="Gateway"] rect { fill: #fff7e6; }
+.diagram .di-shape[class*="Event"] rect { fill: #eef6ff; }
+.diagram .di-edge { fill: none; stroke: var(--muted); stroke-width: 1.2; }
+
+.diff ul { margin: 0; padding-left: 20px; }
+.diff li { font-size: 0.9rem; }
+.diff li.diff-add { color: #15803d; }
+.diff li.diff-remove { color: var(--danger); }
+.diff li.diff-change { color: var(--accent); }
+
+button:disabled { opacity: 0.5; cursor: not-allowed; }
+
 #status, #core-status { color: var(--muted); min-height: 1.4em; }
 #status.error, #core-status.error { color: var(--danger); }
 

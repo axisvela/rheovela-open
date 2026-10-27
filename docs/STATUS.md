@@ -52,7 +52,7 @@ and [Harmovela adapter](testing/2026-10-26-harmovela-adapter/README.md).
 
 | Area | Boundary |
 |------|----------|
-| Process Designer | 已提供静态社区设计器 `designer/`（编辑/校验/导入导出；可选 load/publish/list 直连 core workflows API） |
+| Process Designer | 静态社区设计器 `designer/`：编辑/校验/导入导出、BPMN DI 渲染、undo/redo、导入差异预览；可选 load/publish/list 直连 core workflows API |
 | Harmovela adapter | producer/observer adapter in `sdk/go/harmovela` (since v1.7.5)；内置 WebSocket/gRPC/NATS transports 不包含；consumer direction 由 core 负责 |
 | BPMN / RHEO IR | core 提供 BPMN import/export 子集，保留全部 gateway 类型/方向/default/instantiate、完整 eventDefinition（含 start/end）、顶层 flow id、pools/processRef、choreography、data associations 与 DI；RHEO IR v1.0 规范已发布（[RHEO-IR.md](RHEO-IR.md)），delegation/evidence/migration policy/effect_key/timeout 扩展已支持；公开 conformance corpus 与稳定 `RHEOIRxxx` 错误码见 [`conformance/`](../conformance/README.md) |
 

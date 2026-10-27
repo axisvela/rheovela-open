@@ -73,7 +73,7 @@ python -m unittest discover -s sdk/python -v                # Python SDK
 node --test --experimental-strip-types sdk/typescript/worker.test.ts  # TypeScript SDK
 javac -d out sdk/java/worker/Worker.java sdk/java/example/Example.java && java -cp out example.Example  # Java SDK
 (cd sdk/rust && cargo test --offline && cargo run --offline) # Rust SDK
-node --test designer/model.test.mjs designer/core.test.mjs  # Designer
+node --test designer/model.test.mjs designer/core.test.mjs designer/history.test.mjs designer/diagram.test.mjs designer/diff.test.mjs  # Designer
 ```
 
 全量运行：`tools/test-all.ps1`（PowerShell）或 `tools/test-all.sh`。完整命令、

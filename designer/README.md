@@ -22,6 +22,12 @@ No build step or external JavaScript dependency is required.
   policy, and delegation (kind/delegatee/scopes/budget/evidence).
 - Add/remove transitions with optional `when` conditions.
 - Render a simple layered DAG preview.
+- Render preserved BPMN DI shapes and edges (`bpmn.diagram`) when a workflow was
+  imported from BPMN.
+- Undo/redo for structural edits, stage edits, text fields, JSON apply, and
+  imports (`Ctrl/Cmd+Z`, `Ctrl/Cmd+Shift+Z`, `Ctrl+Y`).
+- Import preview: show a stage/transition/compensation/BPMN diff before applying
+  a JSON or BPMN import.
 - Validate required fields, duplicate stage ids, missing transition endpoints,
   cycles, compensation references, and delegation kinds.
 - Import/export `WorkflowDefinition` JSON.
@@ -44,18 +50,21 @@ validation panel reports errors.
 
 ## Scope
 
-This is a community editor, not an enterprise console. It does not publish to a
-running core server, manage tenants, approve migrations, or render BPMN DI
-layout. The exported JSON can be validated with `rheo workflow validate` and
-imported with `rheo workflow define`.
+This is a community editor, not an enterprise console. It renders preserved BPMN
+DI layout but is not a full BPMN modeler: it does not edit DI shapes, publish to
+a running core server, manage tenants, or approve migrations. The exported JSON
+can be validated with `rheo workflow validate` and imported with
+`rheo workflow define`.
 
 ## Tests
 
 ```sh
-node --test designer/model.test.mjs designer/core.test.mjs
+node --test designer/model.test.mjs designer/core.test.mjs \
+  designer/history.test.mjs designer/diagram.test.mjs designer/diff.test.mjs
 ```
 
 The model tests cover structural validation, DAG cycles, stage/transition
 removal cascades, JSON round-trips, and delegation/evidence preservation. The
 core client tests cover load/list/publish URLs, headers, request bodies, and
-non-2xx error handling.
+non-2xx error handling. History, DI layout, and import diff tests cover undo/redo
+truncation, viewport normalization, and added/removed/changed metadata.

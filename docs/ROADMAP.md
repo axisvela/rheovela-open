@@ -16,7 +16,7 @@
 | Examples | Go / Python / TypeScript runnable workers、RHEO IR samples |
 | SDK parity for v1.4.0 | Go / Python / TypeScript / Java / Rust SDK：result、checkpoint、effect cursor、approval、retry、cancel、claimable polling（v1.7.5） |
 | Harmovela adapter | `sdk/go/harmovela` producer/observer adapter：将 Rheovela work-item 生命周期映射为 Harmovela `task.*` 事件（v1.7.5）；仅 producer/observer，consume 方向由 core 负责，内置 transport 不包含 |
-| Community Process Designer | 静态 `designer/`：WorkflowDefinition 编辑、校验、JSON 导入导出、delegation/evidence 保留；不直连 core API |
+| Community Process Designer | 静态 `designer/`：WorkflowDefinition 编辑、校验、JSON 导入导出、delegation/evidence 保留、BPMN DI 渲染、undo/redo、导入差异预览；可选直连 core API |
 
 ## Next
 

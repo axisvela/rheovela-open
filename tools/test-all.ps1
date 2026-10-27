@@ -36,7 +36,7 @@ try {
     } finally { Pop-Location }
 
     Write-Host "==> Designer"
-    node --test designer/model.test.mjs designer/core.test.mjs
+    node --test designer/model.test.mjs designer/core.test.mjs designer/history.test.mjs designer/diagram.test.mjs designer/diff.test.mjs
 
     Write-Host "All language checks passed."
 } finally {
