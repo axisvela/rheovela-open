@@ -15,6 +15,10 @@ RHEOVELA open（`github.com/axisvela/rheovela-open`，Apache-2.0）发布记录�
   `parallel_multiple`, `direction`, `event_definitions`) and
   `BPMNEventDefinition`; `BPMN.flows` and `BPMNFlow.name` preserve top-level
   sequence flows. Updated `api/workflow.schema.json`.
+- `BPMNProcess`, `BPMNParticipant.process_ref`, `BPMNNode.process_id`,
+  `BPMNChoreography`/`BPMNChoreographyTask`,
+  `BPMNDataAssociation`/`BPMNAssignment` and the matching
+  `BPMN.processes`/`choreographies`/`data_associations` collections.
 
 ## [v1.9.0] - 2026-10-27
 

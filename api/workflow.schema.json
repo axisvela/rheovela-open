@@ -174,6 +174,10 @@
           "type": "array",
           "items": { "$ref": "#/definitions/bpmnFlow" }
         },
+        "processes": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/bpmnProcess" }
+        },
         "participants": {
           "type": "array",
           "items": { "$ref": "#/definitions/bpmnParticipant" }
@@ -189,6 +193,14 @@
         "data_objects": {
           "type": "array",
           "items": { "$ref": "#/definitions/bpmnDataObject" }
+        },
+        "choreographies": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/bpmnChoreography" }
+        },
+        "data_associations": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/bpmnDataAssociation" }
         },
         "diagram": {
           "$ref": "#/definitions/bpmnDiagram"
@@ -206,6 +218,7 @@
         "event_kind": { "type": "string" },
         "attached_to": { "type": "string" },
         "parent_subprocess": { "type": "string" },
+        "process_id": { "type": "string" },
         "gateway_direction": { "type": "string" },
         "event_gateway_type": { "type": "string" },
         "instantiate": { "type": "boolean" },
@@ -248,13 +261,87 @@
         "parent_subprocess": { "type": "string" }
       }
     },
+    "bpmnProcess": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "name": { "type": "string" },
+        "is_executable": { "type": "boolean" },
+        "participant": { "type": "string" }
+      }
+    },
     "bpmnParticipant": {
       "type": "object",
       "additionalProperties": false,
       "required": ["id"],
       "properties": {
         "id": { "type": "string", "minLength": 1 },
-        "name": { "type": "string" }
+        "name": { "type": "string" },
+        "process_ref": { "type": "string" }
+      }
+    },
+    "bpmnChoreography": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "name": { "type": "string" },
+        "participant_refs": { "type": "array", "items": { "type": "string" } },
+        "tasks": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/bpmnChoreographyTask" }
+        },
+        "message_flows": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/bpmnMessageFlow" }
+        }
+      }
+    },
+    "bpmnChoreographyTask": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "element"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "name": { "type": "string" },
+        "element": { "type": "string", "minLength": 1 },
+        "initiating_participant_ref": { "type": "string" },
+        "participant_refs": { "type": "array", "items": { "type": "string" } },
+        "message_flow_refs": { "type": "array", "items": { "type": "string" } },
+        "loop_type": { "type": "string" },
+        "parent_choreography": { "type": "string" },
+        "tasks": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/bpmnChoreographyTask" }
+        }
+      }
+    },
+    "bpmnDataAssociation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "element", "owner"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "element": { "type": "string", "minLength": 1 },
+        "owner": { "type": "string", "minLength": 1 },
+        "sources": { "type": "array", "items": { "type": "string" } },
+        "targets": { "type": "array", "items": { "type": "string" } },
+        "transformations": { "type": "array", "items": { "type": "string" } },
+        "assignments": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/bpmnAssignment" }
+        }
+      }
+    },
+    "bpmnAssignment": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "from": { "type": "string" },
+        "to": { "type": "string" }
       }
     },
     "bpmnMessageFlow": {

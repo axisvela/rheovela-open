@@ -50,10 +50,10 @@ type Event struct {
 }
 
 type WorkflowDefinition struct {
-	WorkflowID  string       `json:"workflow_id"`
-	ProjectID   string       `json:"project_id,omitempty"`
-	Title       string       `json:"title"`
-	Kind        string       `json:"kind,omitempty"`
+	WorkflowID    string         `json:"workflow_id"`
+	ProjectID     string         `json:"project_id,omitempty"`
+	Title         string         `json:"title"`
+	Kind          string         `json:"kind,omitempty"`
 	Source        string         `json:"source"`
 	Stages        []Stage        `json:"stages"`
 	Transitions   []Transition   `json:"transitions"`
@@ -64,14 +64,65 @@ type WorkflowDefinition struct {
 // BPMN preserves non-executable BPMN structure so import/export can round-trip
 // subprocesses, boundary events and collaborations.
 type BPMN struct {
-	Nodes         []BPMNNode        `json:"nodes,omitempty"`
-	Flows         []BPMNFlow        `json:"flows,omitempty"`
-	InternalFlows []BPMNFlow        `json:"internal_flows,omitempty"`
-	Participants  []BPMNParticipant `json:"participants,omitempty"`
-	MessageFlows  []BPMNMessageFlow `json:"message_flows,omitempty"`
-	Lanes         []BPMNLane        `json:"lanes,omitempty"`
-	DataObjects   []BPMNDataObject  `json:"data_objects,omitempty"`
-	Diagram       *BPMNDiagram      `json:"diagram,omitempty"`
+	Nodes            []BPMNNode            `json:"nodes,omitempty"`
+	Flows            []BPMNFlow            `json:"flows,omitempty"`
+	InternalFlows    []BPMNFlow            `json:"internal_flows,omitempty"`
+	Processes        []BPMNProcess         `json:"processes,omitempty"`
+	Participants     []BPMNParticipant     `json:"participants,omitempty"`
+	MessageFlows     []BPMNMessageFlow     `json:"message_flows,omitempty"`
+	Lanes            []BPMNLane            `json:"lanes,omitempty"`
+	DataObjects      []BPMNDataObject      `json:"data_objects,omitempty"`
+	Choreographies   []BPMNChoreography    `json:"choreographies,omitempty"`
+	DataAssociations []BPMNDataAssociation `json:"data_associations,omitempty"`
+	Diagram          *BPMNDiagram          `json:"diagram,omitempty"`
+}
+
+// BPMNProcess preserves a process/pool declaration.
+type BPMNProcess struct {
+	ID           string `json:"id"`
+	Name         string `json:"name,omitempty"`
+	IsExecutable bool   `json:"is_executable,omitempty"`
+	Participant  string `json:"participant,omitempty"`
+}
+
+// BPMNChoreography preserves a choreography diagram.
+type BPMNChoreography struct {
+	ID              string                 `json:"id"`
+	Name            string                 `json:"name,omitempty"`
+	ParticipantRefs []string               `json:"participant_refs,omitempty"`
+	Tasks           []BPMNChoreographyTask `json:"tasks,omitempty"`
+	MessageFlows    []BPMNMessageFlow      `json:"message_flows,omitempty"`
+}
+
+// BPMNChoreographyTask preserves a choreographyTask, subChoreography or
+// callChoreography.
+type BPMNChoreographyTask struct {
+	ID                       string                 `json:"id"`
+	Name                     string                 `json:"name,omitempty"`
+	Element                  string                 `json:"element"`
+	InitiatingParticipantRef string                 `json:"initiating_participant_ref,omitempty"`
+	ParticipantRefs          []string               `json:"participant_refs,omitempty"`
+	MessageFlowRefs          []string               `json:"message_flow_refs,omitempty"`
+	LoopType                 string                 `json:"loop_type,omitempty"`
+	ParentChoreography       string                 `json:"parent_choreography,omitempty"`
+	Tasks                    []BPMNChoreographyTask `json:"tasks,omitempty"`
+}
+
+// BPMNDataAssociation preserves a dataInputAssociation or dataOutputAssociation.
+type BPMNDataAssociation struct {
+	ID              string           `json:"id"`
+	Element         string           `json:"element"`
+	Owner           string           `json:"owner"`
+	Sources         []string         `json:"sources,omitempty"`
+	Targets         []string         `json:"targets,omitempty"`
+	Transformations []string         `json:"transformations,omitempty"`
+	Assignments     []BPMNAssignment `json:"assignments,omitempty"`
+}
+
+// BPMNAssignment preserves an assignment inside a data association.
+type BPMNAssignment struct {
+	From string `json:"from,omitempty"`
+	To   string `json:"to,omitempty"`
 }
 
 type BPMNDiagram struct {
@@ -124,6 +175,7 @@ type BPMNNode struct {
 	EventKind        string `json:"event_kind,omitempty"`
 	AttachedTo       string `json:"attached_to,omitempty"`
 	ParentSubprocess string `json:"parent_subprocess,omitempty"`
+	ProcessID        string `json:"process_id,omitempty"`
 
 	// Gateway semantics.
 	GatewayDirection string `json:"gateway_direction,omitempty"`
@@ -132,9 +184,9 @@ type BPMNNode struct {
 	DefaultFlow      string `json:"default_flow,omitempty"`
 
 	// Event semantics.
-	CancelActivity   *bool                `json:"cancel_activity,omitempty"`
-	ParallelMultiple *bool                `json:"parallel_multiple,omitempty"`
-	Direction        string               `json:"direction,omitempty"`
+	CancelActivity   *bool                 `json:"cancel_activity,omitempty"`
+	ParallelMultiple *bool                 `json:"parallel_multiple,omitempty"`
+	Direction        string                `json:"direction,omitempty"`
 	EventDefinitions []BPMNEventDefinition `json:"event_definitions,omitempty"`
 }
 
@@ -162,8 +214,9 @@ type BPMNFlow struct {
 }
 
 type BPMNParticipant struct {
-	ID   string `json:"id"`
-	Name string `json:"name,omitempty"`
+	ID         string `json:"id"`
+	Name       string `json:"name,omitempty"`
+	ProcessRef string `json:"process_ref,omitempty"`
 }
 
 type BPMNMessageFlow struct {
@@ -173,19 +226,19 @@ type BPMNMessageFlow struct {
 }
 
 type Stage struct {
-	ID           string         `json:"id"`
-	Title        string         `json:"title"`
-	Assignee     string         `json:"assignee,omitempty"`
-	AssigneeSpec *AssigneeSpec  `json:"assignee_spec,omitempty"`
-	OwnerSkill   string         `json:"owner_skill,omitempty"`
-	Inputs       []string       `json:"inputs"`
-	Outputs      []string       `json:"outputs"`
-	Gate         *GateCondition `json:"gate,omitempty"`
-	Delegation    *Delegation `json:"delegation,omitempty"`
-	Evidence        []string    `json:"evidence,omitempty"`
-	MigrationPolicy string      `json:"migration_policy,omitempty"`
-	EffectKey       string      `json:"effect_key,omitempty"`
-	Timeout         string      `json:"timeout,omitempty"`
+	ID              string         `json:"id"`
+	Title           string         `json:"title"`
+	Assignee        string         `json:"assignee,omitempty"`
+	AssigneeSpec    *AssigneeSpec  `json:"assignee_spec,omitempty"`
+	OwnerSkill      string         `json:"owner_skill,omitempty"`
+	Inputs          []string       `json:"inputs"`
+	Outputs         []string       `json:"outputs"`
+	Gate            *GateCondition `json:"gate,omitempty"`
+	Delegation      *Delegation    `json:"delegation,omitempty"`
+	Evidence        []string       `json:"evidence,omitempty"`
+	MigrationPolicy string         `json:"migration_policy,omitempty"`
+	EffectKey       string         `json:"effect_key,omitempty"`
+	Timeout         string         `json:"timeout,omitempty"`
 }
 
 // Delegation describes an authority delegation attached to a stage.
