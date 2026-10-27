@@ -55,6 +55,7 @@ type WorkflowDefinition struct {
 	Title         string         `json:"title"`
 	Kind          string         `json:"kind,omitempty"`
 	Source        string         `json:"source"`
+	ExecutionMode string         `json:"execution_mode,omitempty"`
 	Stages        []Stage        `json:"stages"`
 	Transitions   []Transition   `json:"transitions"`
 	Compensations []Compensation `json:"compensations,omitempty"`
