@@ -4,6 +4,11 @@ RHEOVELA open（`github.com/axisvela/rheovela-open`，Apache-2.0）发布记录�
 
 ## [Unreleased]
 
+### Added
+
+- `WorkflowDefinition.compensations` carries declared activity/capability
+  compensation actions, compiled from RHEO IR `compensate` statements.
+
 ### Documentation
 
 - Published the normative RHEO IR v1.0 specification in `docs/RHEO-IR.md`,

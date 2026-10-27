@@ -54,9 +54,10 @@ type WorkflowDefinition struct {
 	ProjectID   string       `json:"project_id,omitempty"`
 	Title       string       `json:"title"`
 	Kind        string       `json:"kind,omitempty"`
-	Source      string       `json:"source"`
-	Stages      []Stage      `json:"stages"`
-	Transitions []Transition `json:"transitions"`
+	Source        string         `json:"source"`
+	Stages        []Stage        `json:"stages"`
+	Transitions   []Transition   `json:"transitions"`
+	Compensations []Compensation `json:"compensations,omitempty"`
 }
 
 type Stage struct {
@@ -96,6 +97,14 @@ type Transition struct {
 	From      string `json:"from"`
 	To        string `json:"to"`
 	Condition string `json:"condition,omitempty"`
+}
+
+// Compensation declares how to compensate a completed stage. CompensateWith
+// names another stage; Capability names a compensating capability.
+type Compensation struct {
+	ForActivity    string `json:"for_activity"`
+	CompensateWith string `json:"compensate_with,omitempty"`
+	Capability     string `json:"capability,omitempty"`
 }
 
 type RunContext struct {

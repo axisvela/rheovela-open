@@ -130,7 +130,7 @@ has already succeeded.
 
 - `with capability "<cap>"` records a capability-based compensation.
 - `with <activity-id>` records an activity-based compensation.
-- Compensation declarations are not part of `WorkflowDefinition`. The
+- Compensation declarations compile to `WorkflowDefinition.compensations`. The
   compensation planner (`internal/compensation`) consumes them and executes in
   reverse completion order.
 - Compensating an activity that never succeeded is a no-op; compensation MUST
@@ -148,7 +148,7 @@ has already succeeded.
 | `transition a -> b` | `transitions[] = {from:"a", to:"b"}` |
 | `when <condition>` | `transitions[].condition` |
 | `effect_key` / `timeout` | retained in IR AST; not in `WorkflowDefinition` v1 |
-| `compensate ...` | retained in IR AST; consumed by compensation planner |
+| `compensate ...` | `compensations[] = {for_activity, compensate_with/capability}` |
 
 The compiler MUST emit `inputs: []` and `outputs: []` for every stage.
 

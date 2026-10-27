@@ -108,9 +108,32 @@
           }
         }
       }
+    },
+    "compensations": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/compensation"
+      }
     }
   },
   "definitions": {
+    "compensation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["for_activity"],
+      "properties": {
+        "for_activity": {
+          "type": "string",
+          "minLength": 1
+        },
+        "compensate_with": {
+          "type": "string"
+        },
+        "capability": {
+          "type": "string"
+        }
+      }
+    },
     "gate": {
       "type": "object",
       "additionalProperties": false,
