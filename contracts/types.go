@@ -64,27 +64,28 @@ type WorkflowDefinition struct {
 // BPMN preserves non-executable BPMN structure so import/export can round-trip
 // subprocesses, boundary events and collaborations.
 type BPMN struct {
-	Nodes            []BPMNNode            `json:"nodes,omitempty"`
-	Flows            []BPMNFlow            `json:"flows,omitempty"`
-	InternalFlows    []BPMNFlow            `json:"internal_flows,omitempty"`
-	Processes        []BPMNProcess         `json:"processes,omitempty"`
-	Participants     []BPMNParticipant     `json:"participants,omitempty"`
-	MessageFlows     []BPMNMessageFlow     `json:"message_flows,omitempty"`
-	Lanes            []BPMNLane            `json:"lanes,omitempty"`
-	DataObjects      []BPMNDataObject      `json:"data_objects,omitempty"`
-	DataStores       []BPMNDataStore       `json:"data_stores,omitempty"`
-	DataStoreRefs    []BPMNDataStoreRef    `json:"data_store_refs,omitempty"`
-	Properties       []BPMNProperty        `json:"properties,omitempty"`
-	ItemDefinitions  []BPMNItemDefinition  `json:"item_definitions,omitempty"`
-	DataInputs       []BPMNDataInput       `json:"data_inputs,omitempty"`
-	DataOutputs      []BPMNDataOutput      `json:"data_outputs,omitempty"`
-	EventDefinitions []BPMNEventDefinition `json:"event_definitions,omitempty"`
-	Artifacts        []BPMNArtifact        `json:"artifacts,omitempty"`
-	Resources        []BPMNResource        `json:"resources,omitempty"`
-	Categories       []BPMNCategory        `json:"categories,omitempty"`
-	Choreographies   []BPMNChoreography    `json:"choreographies,omitempty"`
-	DataAssociations []BPMNDataAssociation `json:"data_associations,omitempty"`
-	Diagram          *BPMNDiagram          `json:"diagram,omitempty"`
+	Nodes                  []BPMNNode            `json:"nodes,omitempty"`
+	Flows                  []BPMNFlow            `json:"flows,omitempty"`
+	InternalFlows          []BPMNFlow            `json:"internal_flows,omitempty"`
+	Processes              []BPMNProcess         `json:"processes,omitempty"`
+	Participants           []BPMNParticipant     `json:"participants,omitempty"`
+	MessageFlows           []BPMNMessageFlow     `json:"message_flows,omitempty"`
+	Lanes                  []BPMNLane            `json:"lanes,omitempty"`
+	DataObjects            []BPMNDataObject      `json:"data_objects,omitempty"`
+	DataStores             []BPMNDataStore       `json:"data_stores,omitempty"`
+	DataStoreRefs          []BPMNDataStoreRef    `json:"data_store_refs,omitempty"`
+	Properties             []BPMNProperty        `json:"properties,omitempty"`
+	ItemDefinitions        []BPMNItemDefinition  `json:"item_definitions,omitempty"`
+	DataInputs             []BPMNDataInput       `json:"data_inputs,omitempty"`
+	DataOutputs            []BPMNDataOutput      `json:"data_outputs,omitempty"`
+	EventDefinitions       []BPMNEventDefinition `json:"event_definitions,omitempty"`
+	Artifacts              []BPMNArtifact        `json:"artifacts,omitempty"`
+	Resources              []BPMNResource        `json:"resources,omitempty"`
+	Categories             []BPMNCategory        `json:"categories,omitempty"`
+	ProcessIOSpecification *BPMNIOSpecification  `json:"process_io_specification,omitempty"`
+	Choreographies         []BPMNChoreography    `json:"choreographies,omitempty"`
+	DataAssociations       []BPMNDataAssociation `json:"data_associations,omitempty"`
+	Diagram                *BPMNDiagram          `json:"diagram,omitempty"`
 }
 
 // BPMNProcess preserves a process/pool declaration.
@@ -214,6 +215,7 @@ type BPMNDataObject struct {
 	Ref            string `json:"ref,omitempty"`
 	ItemSubjectRef string `json:"item_subject_ref,omitempty"`
 	IsCollection   *bool  `json:"is_collection,omitempty"`
+	DataState      string `json:"data_state,omitempty"`
 }
 
 type BPMNDataStore struct {
@@ -263,10 +265,38 @@ type BPMNResource struct {
 
 // BPMNResourceRole preserves performer/humanPerformer/potentialOwner/resourceRole.
 type BPMNResourceRole struct {
-	ID          string `json:"id"`
-	Element     string `json:"element"`
-	Name        string `json:"name,omitempty"`
-	ResourceRef string `json:"resource_ref,omitempty"`
+	ID                   string                         `json:"id"`
+	Element              string                         `json:"element"`
+	Name                 string                         `json:"name,omitempty"`
+	ResourceRef          string                         `json:"resource_ref,omitempty"`
+	ParameterBindings    []BPMNResourceParameterBinding `json:"parameter_bindings,omitempty"`
+	AssignmentExpression string                         `json:"assignment_expression,omitempty"`
+}
+
+type BPMNResourceParameterBinding struct {
+	ID           string `json:"id"`
+	ParameterRef string `json:"parameter_ref,omitempty"`
+	Expression   string `json:"expression,omitempty"`
+}
+
+type BPMNIOSpecification struct {
+	ID             string          `json:"id"`
+	DataInputRefs  []string        `json:"data_input_refs,omitempty"`
+	DataOutputRefs []string        `json:"data_output_refs,omitempty"`
+	InputSets      []BPMNInputSet  `json:"input_sets,omitempty"`
+	OutputSets     []BPMNOutputSet `json:"output_sets,omitempty"`
+}
+
+type BPMNInputSet struct {
+	ID            string   `json:"id"`
+	Name          string   `json:"name,omitempty"`
+	DataInputRefs []string `json:"data_input_refs,omitempty"`
+}
+
+type BPMNOutputSet struct {
+	ID             string   `json:"id"`
+	Name           string   `json:"name,omitempty"`
+	DataOutputRefs []string `json:"data_output_refs,omitempty"`
 }
 
 type BPMNCategory struct {
@@ -321,16 +351,17 @@ type BPMNNode struct {
 	EventDefinitionRefs []string              `json:"event_definition_refs,omitempty"`
 
 	// Activity/subprocess semantics.
-	CalledElement            string             `json:"called_element,omitempty"`
-	TriggeredByEvent         *bool              `json:"triggered_by_event,omitempty"`
-	IsForCompensation        *bool              `json:"is_for_compensation,omitempty"`
-	Ordering                 string             `json:"ordering,omitempty"`
-	CancelRemainingInstances *bool              `json:"cancel_remaining_instances,omitempty"`
-	Method                   string             `json:"method,omitempty"`
-	CompletionQuantity       string             `json:"completion_quantity,omitempty"`
-	StartQuantity            string             `json:"start_quantity,omitempty"`
-	Loop                     *BPMNLoop          `json:"loop,omitempty"`
-	ResourceRoles            []BPMNResourceRole `json:"resource_roles,omitempty"`
+	CalledElement            string               `json:"called_element,omitempty"`
+	TriggeredByEvent         *bool                `json:"triggered_by_event,omitempty"`
+	IsForCompensation        *bool                `json:"is_for_compensation,omitempty"`
+	Ordering                 string               `json:"ordering,omitempty"`
+	CancelRemainingInstances *bool                `json:"cancel_remaining_instances,omitempty"`
+	Method                   string               `json:"method,omitempty"`
+	CompletionQuantity       string               `json:"completion_quantity,omitempty"`
+	StartQuantity            string               `json:"start_quantity,omitempty"`
+	Loop                     *BPMNLoop            `json:"loop,omitempty"`
+	ResourceRoles            []BPMNResourceRole   `json:"resource_roles,omitempty"`
+	IOSpecification          *BPMNIOSpecification `json:"io_specification,omitempty"`
 }
 
 // BPMNLoop preserves standardLoopCharacteristics or
@@ -372,10 +403,12 @@ type BPMNFlow struct {
 }
 
 type BPMNParticipant struct {
-	ID           string                       `json:"id"`
-	Name         string                       `json:"name,omitempty"`
-	ProcessRef   string                       `json:"process_ref,omitempty"`
-	Multiplicity *BPMNParticipantMultiplicity `json:"multiplicity,omitempty"`
+	ID            string                       `json:"id"`
+	Name          string                       `json:"name,omitempty"`
+	ProcessRef    string                       `json:"process_ref,omitempty"`
+	Multiplicity  *BPMNParticipantMultiplicity `json:"multiplicity,omitempty"`
+	InterfaceRefs []string                     `json:"interface_refs,omitempty"`
+	EndPointRefs  []string                     `json:"end_point_refs,omitempty"`
 }
 
 // BPMNParticipantMultiplicity preserves participantMultiplicity.
