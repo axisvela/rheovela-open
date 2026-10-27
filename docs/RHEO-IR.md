@@ -308,7 +308,8 @@ RHEO IR and BPMN are separate formats:
   preserved. Resource parameter bindings and assignment expressions,
   participant `interfaceRef`/`endPointRef`, data-object `dataState`, and
   process/activity `ioSpecification`/`inputSet`/`outputSet` round-trip as
-  metadata.
+  metadata. Root `message`/`signal`/`error`/`escalation`/
+  `interface`/`operation`/`endPoint` declarations are also preserved.
 - BPMN export uses `WorkflowDefinition.bpmn` metadata to emit `subProcess`,
   boundary/intermediate events, gateway types, participants, message flows,
   `laneSet`/`lane`, `dataObject`/`dataObjectReference` and BPMN DI

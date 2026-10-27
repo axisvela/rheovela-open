@@ -235,6 +235,12 @@
           "items": { "$ref": "#/definitions/bpmnArtifact" }
         },
         "process_io_specification": { "$ref": "#/definitions/bpmnIOSpecification" },
+        "messages": { "type": "array", "items": { "$ref": "#/definitions/bpmnMessage" } },
+        "signals": { "type": "array", "items": { "$ref": "#/definitions/bpmnSignal" } },
+        "errors": { "type": "array", "items": { "$ref": "#/definitions/bpmnError" } },
+        "escalations": { "type": "array", "items": { "$ref": "#/definitions/bpmnEscalation" } },
+        "interfaces": { "type": "array", "items": { "$ref": "#/definitions/bpmnInterface" } },
+        "end_points": { "type": "array", "items": { "$ref": "#/definitions/bpmnEndPoint" } },
         "choreographies": {
           "type": "array",
           "items": { "$ref": "#/definitions/bpmnChoreography" }
@@ -631,6 +637,84 @@
       "properties": {
         "id": { "type": "string", "minLength": 1 },
         "value": { "type": "string" }
+      }
+    },
+    "bpmnMessage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "name": { "type": "string" },
+        "item_ref": { "type": "string" }
+      }
+    },
+    "bpmnSignal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "name": { "type": "string" },
+        "structure_ref": { "type": "string" }
+      }
+    },
+    "bpmnError": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "name": { "type": "string" },
+        "error_code": { "type": "string" },
+        "structure_ref": { "type": "string" }
+      }
+    },
+    "bpmnEscalation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "name": { "type": "string" },
+        "escalation_code": { "type": "string" },
+        "structure_ref": { "type": "string" }
+      }
+    },
+    "bpmnOperation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "name": { "type": "string" },
+        "implementation_ref": { "type": "string" },
+        "in_message_ref": { "type": "string" },
+        "out_message_ref": { "type": "string" },
+        "error_refs": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "bpmnInterface": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "name": { "type": "string" },
+        "implementation_ref": { "type": "string" },
+        "operations": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/bpmnOperation" }
+        }
+      }
+    },
+    "bpmnEndPoint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "name": { "type": "string" }
       }
     },
     "bpmnParticipantAssociation": {

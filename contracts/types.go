@@ -82,6 +82,12 @@ type BPMN struct {
 	Artifacts              []BPMNArtifact        `json:"artifacts,omitempty"`
 	Resources              []BPMNResource        `json:"resources,omitempty"`
 	Categories             []BPMNCategory        `json:"categories,omitempty"`
+	Messages               []BPMNMessage         `json:"messages,omitempty"`
+	Signals                []BPMNSignal          `json:"signals,omitempty"`
+	Errors                 []BPMNError           `json:"errors,omitempty"`
+	Escalations            []BPMNEscalation      `json:"escalations,omitempty"`
+	Interfaces             []BPMNInterface       `json:"interfaces,omitempty"`
+	EndPoints              []BPMNEndPoint        `json:"end_points,omitempty"`
 	ProcessIOSpecification *BPMNIOSpecification  `json:"process_io_specification,omitempty"`
 	Choreographies         []BPMNChoreography    `json:"choreographies,omitempty"`
 	DataAssociations       []BPMNDataAssociation `json:"data_associations,omitempty"`
@@ -308,6 +314,53 @@ type BPMNCategory struct {
 type BPMNCategoryValue struct {
 	ID    string `json:"id"`
 	Value string `json:"value,omitempty"`
+}
+
+type BPMNMessage struct {
+	ID      string `json:"id"`
+	Name    string `json:"name,omitempty"`
+	ItemRef string `json:"item_ref,omitempty"`
+}
+
+type BPMNSignal struct {
+	ID           string `json:"id"`
+	Name         string `json:"name,omitempty"`
+	StructureRef string `json:"structure_ref,omitempty"`
+}
+
+type BPMNError struct {
+	ID           string `json:"id"`
+	Name         string `json:"name,omitempty"`
+	ErrorCode    string `json:"error_code,omitempty"`
+	StructureRef string `json:"structure_ref,omitempty"`
+}
+
+type BPMNEscalation struct {
+	ID             string `json:"id"`
+	Name           string `json:"name,omitempty"`
+	EscalationCode string `json:"escalation_code,omitempty"`
+	StructureRef   string `json:"structure_ref,omitempty"`
+}
+
+type BPMNOperation struct {
+	ID                string   `json:"id"`
+	Name              string   `json:"name,omitempty"`
+	ImplementationRef string   `json:"implementation_ref,omitempty"`
+	InMessageRef      string   `json:"in_message_ref,omitempty"`
+	OutMessageRef     string   `json:"out_message_ref,omitempty"`
+	ErrorRefs         []string `json:"error_refs,omitempty"`
+}
+
+type BPMNInterface struct {
+	ID                string          `json:"id"`
+	Name              string          `json:"name,omitempty"`
+	ImplementationRef string          `json:"implementation_ref,omitempty"`
+	Operations        []BPMNOperation `json:"operations,omitempty"`
+}
+
+type BPMNEndPoint struct {
+	ID   string `json:"id"`
+	Name string `json:"name,omitempty"`
 }
 
 type BPMNParticipantAssociation struct {
