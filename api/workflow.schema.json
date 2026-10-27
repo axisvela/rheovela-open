@@ -210,6 +210,22 @@
           "type": "array",
           "items": { "$ref": "#/definitions/bpmnItemDefinition" }
         },
+        "data_inputs": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/bpmnDataInput" }
+        },
+        "data_outputs": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/bpmnDataOutput" }
+        },
+        "resources": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/bpmnResource" }
+        },
+        "categories": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/bpmnCategory" }
+        },
         "event_definitions": {
           "type": "array",
           "items": { "$ref": "#/definitions/bpmnEventDefinition" }
@@ -266,6 +282,10 @@
         "event_definition_refs": {
           "type": "array",
           "items": { "type": "string" }
+        },
+        "resource_roles": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/bpmnResourceRole" }
         }
       }
     },
@@ -376,6 +396,11 @@
         "message_flow_refs": { "type": "array", "items": { "type": "string" } },
         "loop_type": { "type": "string" },
         "parent_choreography": { "type": "string" },
+        "called_choreography_ref": { "type": "string" },
+        "participant_associations": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/bpmnParticipantAssociation" }
+        },
         "tasks": {
           "type": "array",
           "items": { "$ref": "#/definitions/bpmnChoreographyTask" }
@@ -484,6 +509,78 @@
         "id": { "type": "string", "minLength": 1 },
         "structure_ref": { "type": "string" },
         "is_collection": { "type": "boolean" }
+      }
+    },
+    "bpmnDataInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "name": { "type": "string" },
+        "item_subject_ref": { "type": "string" },
+        "is_collection": { "type": "boolean" }
+      }
+    },
+    "bpmnDataOutput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "name": { "type": "string" },
+        "item_subject_ref": { "type": "string" },
+        "is_collection": { "type": "boolean" }
+      }
+    },
+    "bpmnResource": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "name": { "type": "string" }
+      }
+    },
+    "bpmnResourceRole": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "element"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "element": { "type": "string", "minLength": 1 },
+        "name": { "type": "string" },
+        "resource_ref": { "type": "string" }
+      }
+    },
+    "bpmnCategory": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "name": { "type": "string" },
+        "values": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/bpmnCategoryValue" }
+        }
+      }
+    },
+    "bpmnCategoryValue": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "value": { "type": "string" }
+      }
+    },
+    "bpmnParticipantAssociation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "inner_participant_ref": { "type": "string" },
+        "outer_participant_ref": { "type": "string" }
       }
     },
     "bpmnArtifact": {

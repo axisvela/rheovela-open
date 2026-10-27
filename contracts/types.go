@@ -76,8 +76,12 @@ type BPMN struct {
 	DataStoreRefs    []BPMNDataStoreRef    `json:"data_store_refs,omitempty"`
 	Properties       []BPMNProperty        `json:"properties,omitempty"`
 	ItemDefinitions  []BPMNItemDefinition  `json:"item_definitions,omitempty"`
+	DataInputs       []BPMNDataInput       `json:"data_inputs,omitempty"`
+	DataOutputs      []BPMNDataOutput      `json:"data_outputs,omitempty"`
 	EventDefinitions []BPMNEventDefinition `json:"event_definitions,omitempty"`
 	Artifacts        []BPMNArtifact        `json:"artifacts,omitempty"`
+	Resources        []BPMNResource        `json:"resources,omitempty"`
+	Categories       []BPMNCategory        `json:"categories,omitempty"`
 	Choreographies   []BPMNChoreography    `json:"choreographies,omitempty"`
 	DataAssociations []BPMNDataAssociation `json:"data_associations,omitempty"`
 	Diagram          *BPMNDiagram          `json:"diagram,omitempty"`
@@ -103,15 +107,17 @@ type BPMNChoreography struct {
 // BPMNChoreographyTask preserves a choreographyTask, subChoreography or
 // callChoreography.
 type BPMNChoreographyTask struct {
-	ID                       string                 `json:"id"`
-	Name                     string                 `json:"name,omitempty"`
-	Element                  string                 `json:"element"`
-	InitiatingParticipantRef string                 `json:"initiating_participant_ref,omitempty"`
-	ParticipantRefs          []string               `json:"participant_refs,omitempty"`
-	MessageFlowRefs          []string               `json:"message_flow_refs,omitempty"`
-	LoopType                 string                 `json:"loop_type,omitempty"`
-	ParentChoreography       string                 `json:"parent_choreography,omitempty"`
-	Tasks                    []BPMNChoreographyTask `json:"tasks,omitempty"`
+	ID                       string                       `json:"id"`
+	Name                     string                       `json:"name,omitempty"`
+	Element                  string                       `json:"element"`
+	InitiatingParticipantRef string                       `json:"initiating_participant_ref,omitempty"`
+	ParticipantRefs          []string                     `json:"participant_refs,omitempty"`
+	MessageFlowRefs          []string                     `json:"message_flow_refs,omitempty"`
+	LoopType                 string                       `json:"loop_type,omitempty"`
+	ParentChoreography       string                       `json:"parent_choreography,omitempty"`
+	CalledChoreographyRef    string                       `json:"called_choreography_ref,omitempty"`
+	ParticipantAssociations  []BPMNParticipantAssociation `json:"participant_associations,omitempty"`
+	Tasks                    []BPMNChoreographyTask       `json:"tasks,omitempty"`
 }
 
 // BPMNDataAssociation preserves a dataInputAssociation or dataOutputAssociation.
@@ -236,6 +242,49 @@ type BPMNItemDefinition struct {
 	IsCollection *bool  `json:"is_collection,omitempty"`
 }
 
+type BPMNDataInput struct {
+	ID             string `json:"id"`
+	Name           string `json:"name,omitempty"`
+	ItemSubjectRef string `json:"item_subject_ref,omitempty"`
+	IsCollection   *bool  `json:"is_collection,omitempty"`
+}
+
+type BPMNDataOutput struct {
+	ID             string `json:"id"`
+	Name           string `json:"name,omitempty"`
+	ItemSubjectRef string `json:"item_subject_ref,omitempty"`
+	IsCollection   *bool  `json:"is_collection,omitempty"`
+}
+
+type BPMNResource struct {
+	ID   string `json:"id"`
+	Name string `json:"name,omitempty"`
+}
+
+// BPMNResourceRole preserves performer/humanPerformer/potentialOwner/resourceRole.
+type BPMNResourceRole struct {
+	ID          string `json:"id"`
+	Element     string `json:"element"`
+	Name        string `json:"name,omitempty"`
+	ResourceRef string `json:"resource_ref,omitempty"`
+}
+
+type BPMNCategory struct {
+	ID     string              `json:"id"`
+	Name   string              `json:"name,omitempty"`
+	Values []BPMNCategoryValue `json:"values,omitempty"`
+}
+
+type BPMNCategoryValue struct {
+	ID    string `json:"id"`
+	Value string `json:"value,omitempty"`
+}
+
+type BPMNParticipantAssociation struct {
+	InnerParticipantRef string `json:"inner_participant_ref,omitempty"`
+	OuterParticipantRef string `json:"outer_participant_ref,omitempty"`
+}
+
 // BPMNArtifact preserves textAnnotation, association or group.
 type BPMNArtifact struct {
 	ID                   string `json:"id"`
@@ -272,15 +321,16 @@ type BPMNNode struct {
 	EventDefinitionRefs []string              `json:"event_definition_refs,omitempty"`
 
 	// Activity/subprocess semantics.
-	CalledElement            string    `json:"called_element,omitempty"`
-	TriggeredByEvent         *bool     `json:"triggered_by_event,omitempty"`
-	IsForCompensation        *bool     `json:"is_for_compensation,omitempty"`
-	Ordering                 string    `json:"ordering,omitempty"`
-	CancelRemainingInstances *bool     `json:"cancel_remaining_instances,omitempty"`
-	Method                   string    `json:"method,omitempty"`
-	CompletionQuantity       string    `json:"completion_quantity,omitempty"`
-	StartQuantity            string    `json:"start_quantity,omitempty"`
-	Loop                     *BPMNLoop `json:"loop,omitempty"`
+	CalledElement            string             `json:"called_element,omitempty"`
+	TriggeredByEvent         *bool              `json:"triggered_by_event,omitempty"`
+	IsForCompensation        *bool              `json:"is_for_compensation,omitempty"`
+	Ordering                 string             `json:"ordering,omitempty"`
+	CancelRemainingInstances *bool              `json:"cancel_remaining_instances,omitempty"`
+	Method                   string             `json:"method,omitempty"`
+	CompletionQuantity       string             `json:"completion_quantity,omitempty"`
+	StartQuantity            string             `json:"start_quantity,omitempty"`
+	Loop                     *BPMNLoop          `json:"loop,omitempty"`
+	ResourceRoles            []BPMNResourceRole `json:"resource_roles,omitempty"`
 }
 
 // BPMNLoop preserves standardLoopCharacteristics or
