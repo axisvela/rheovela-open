@@ -4,6 +4,11 @@ RHEOVELA open（`github.com/axisvela/rheovela-open`，Apache-2.0）发布记录�
 
 ## [Unreleased]
 
+### Documentation
+
+- Added `docs/TESTING.md` with per-language test commands, CI job names, and
+  observed counts; added `tools/test-all.ps1`/`tools/test-all.sh`.
+
 ### Added
 
 - `WorkflowDefinition.bpmn.diagram` preserves BPMN DI shapes, bounds, edges and

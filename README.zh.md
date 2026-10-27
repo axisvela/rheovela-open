@@ -38,7 +38,7 @@ RHEOVELA 是一个 **Dynamic Process & Durable Workflow Platform（动态流程�
 | `api/` | HTTP API reference — [README（Ops API）](api/README.md) · [OpenAPI 3.0 规范](api/openapi.yaml) · [workflow.schema.json](api/workflow.schema.json) · [event.schema.json](api/event.schema.json) |
 | `examples/` | 示例流程（RHEO IR DSL）— [README](examples/README.md) |
 | `designer/` | 静态 Community Process Designer（`WorkflowDefinition` JSON）— [README](designer/README.md) |
-| `docs/` | **状态** — [STATUS.md](docs/STATUS.md) · **路线图** — [ROADMAP.md](docs/ROADMAP.md) · **RHEO IR 规范** — [RHEO-IR.md](docs/RHEO-IR.md) · **功能与特性** — [FEATURES.md](docs/FEATURES.md)（[English](docs/FEATURES.en.md)）· 产品介绍 — [product.md](docs/product.md)（[English](docs/product.en.md)）· **运维手册** — [OPERATIONS.zh.md](docs/OPERATIONS.zh.md)（[English](docs/OPERATIONS.md)）· **开发手册** — [DEVELOPMENT.zh.md](docs/DEVELOPMENT.zh.md)（[English](docs/DEVELOPMENT.md)） |
+| `docs/` | **状态** — [STATUS.md](docs/STATUS.md) · **路线图** — [ROADMAP.md](docs/ROADMAP.md) · **RHEO IR 规范** — [RHEO-IR.md](docs/RHEO-IR.md) · **功能与特性** — [FEATURES.md](docs/FEATURES.md)（[English](docs/FEATURES.en.md)）· 产品介绍 — [product.md](docs/product.md)（[English](docs/product.en.md)）· **运维手册** — [OPERATIONS.zh.md](docs/OPERATIONS.zh.md)（[English](docs/OPERATIONS.md)）· **开发手册** — [DEVELOPMENT.zh.md](docs/DEVELOPMENT.zh.md)（[English](docs/DEVELOPMENT.md)）· **测试** — [TESTING.md](docs/TESTING.md) |
 
 ## 快速开始（Worker SDK）
 
@@ -65,11 +65,16 @@ await w.processOnce(); // poll → claim → fn → complete/fail
 ## 验证
 
 ```sh
-go test ./...                      # Go SDK 测试
-python -m unittest discover -s sdk/python -v   # Python SDK 测试
-node --experimental-transform-types --test sdk/typescript/worker.test.ts   # TypeScript SDK 测试
-javac -d out sdk/java/worker/Worker.java sdk/java/example/Example.java && java -cp out example.Example   # Java SDK
-(cd sdk/rust && cargo build --offline && cargo run --offline)             # Rust SDK
+go test ./... -count=1                                      # 根 contracts/API
+(cd sdk/go && go test ./... -count=1)                       # Go SDK
+(cd sdk/go/harmovela && go test ./... -count=1)             # Harmovela adapter
+python -m py_compile sdk/python/worker.py
+python -m unittest discover -s sdk/python -v                # Python SDK
+node --test --experimental-strip-types sdk/typescript/worker.test.ts  # TypeScript SDK
+javac -d out sdk/java/worker/Worker.java sdk/java/example/Example.java && java -cp out example.Example  # Java SDK
+(cd sdk/rust && cargo test --offline && cargo run --offline) # Rust SDK
+node --test designer/model.test.mjs designer/core.test.mjs  # Designer
 ```
 
-CI（`.github/workflows/ci.yml`）跑 4 个 job：**go** / **python** / **java** / **rust**。
+全量运行：`tools/test-all.ps1`（PowerShell）或 `tools/test-all.sh`。完整命令、
+CI job 名与实测计数见 [docs/TESTING.md](docs/TESTING.md)。

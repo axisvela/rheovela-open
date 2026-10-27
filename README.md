@@ -61,7 +61,7 @@ in [rheovela-ee](https://github.com/axisvela/rheovela-ee). Full feature list in
 | `api/` | HTTP API reference — [README (Ops API)](api/README.md) · [OpenAPI 3.0 spec](api/openapi.yaml) · [workflow.schema.json](api/workflow.schema.json) · [event.schema.json](api/event.schema.json) |
 | `examples/` | Example workflows (RHEO IR DSL) — [README](examples/README.md) |
 | `designer/` | Static Community Process Designer for `WorkflowDefinition` JSON — [README](designer/README.md) |
-| `docs/` | **Status** — [STATUS.md](docs/STATUS.md) · **Roadmap** — [ROADMAP.md](docs/ROADMAP.md) · **RHEO IR spec** — [RHEO-IR.md](docs/RHEO-IR.md) · **Features** — [FEATURES.en.md](docs/FEATURES.en.md) ([中文](docs/FEATURES.md)) · Product intro — [product.en.md](docs/product.en.md) ([中文](docs/product.md)) · **Operations** — [OPERATIONS.md](docs/OPERATIONS.md) ([中文](docs/OPERATIONS.zh.md)) · **Development** — [DEVELOPMENT.md](docs/DEVELOPMENT.md) ([中文](docs/DEVELOPMENT.zh.md)) |
+| `docs/` | **Status** — [STATUS.md](docs/STATUS.md) · **Roadmap** — [ROADMAP.md](docs/ROADMAP.md) · **RHEO IR spec** — [RHEO-IR.md](docs/RHEO-IR.md) · **Features** — [FEATURES.en.md](docs/FEATURES.en.md) ([中文](docs/FEATURES.md)) · Product intro — [product.en.md](docs/product.en.md) ([中文](docs/product.md)) · **Operations** — [OPERATIONS.md](docs/OPERATIONS.md) ([中文](docs/OPERATIONS.zh.md)) · **Development** — [DEVELOPMENT.md](docs/DEVELOPMENT.md) ([中文](docs/DEVELOPMENT.zh.md)) · **Testing** — [TESTING.md](docs/TESTING.md) |
 
 ## Quick start (Worker SDK)
 
@@ -88,14 +88,20 @@ await w.processOnce(); // poll → claim → fn → complete/fail
 ## Verification
 
 ```sh
-go test ./...                      # Go SDK tests
-python -m unittest discover -s sdk/python -v   # Python SDK tests
-node --experimental-transform-types --test sdk/typescript/worker.test.ts   # TypeScript SDK tests
-javac -d out sdk/java/worker/Worker.java sdk/java/example/Example.java && java -cp out example.Example   # Java SDK
-(cd sdk/rust && cargo build --offline && cargo run --offline)             # Rust SDK
+go test ./... -count=1                                      # root contracts/API
+(cd sdk/go && go test ./... -count=1)                       # Go SDK
+(cd sdk/go/harmovela && go test ./... -count=1)             # Harmovela adapter
+python -m py_compile sdk/python/worker.py
+python -m unittest discover -s sdk/python -v                # Python SDK
+node --test --experimental-strip-types sdk/typescript/worker.test.ts  # TypeScript SDK
+javac -d out sdk/java/worker/Worker.java sdk/java/example/Example.java && java -cp out example.Example  # Java SDK
+(cd sdk/rust && cargo test --offline && cargo run --offline) # Rust SDK
+node --test designer/model.test.mjs designer/core.test.mjs  # Designer
 ```
 
-CI (`.github/workflows/ci.yml`) runs 4 jobs: **go** / **python** / **java** / **rust**.
+Run all language checks with `tools/test-all.ps1` (PowerShell) or
+`tools/test-all.sh`. Full commands, CI job names, and observed counts are in
+[docs/TESTING.md](docs/TESTING.md).
 
 ## Core status (recorded here; no external links)
 
