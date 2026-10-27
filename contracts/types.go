@@ -506,9 +506,12 @@ type BPMNEventDefinition struct {
 	TimeDate          string `json:"time_date,omitempty"`
 	TimeDuration      string `json:"time_duration,omitempty"`
 	TimeCycle         string `json:"time_cycle,omitempty"`
-	ActivityRef       string `json:"activity_ref,omitempty"`
-	WaitForCompletion *bool  `json:"wait_for_completion,omitempty"`
-	Condition         string `json:"condition,omitempty"`
+	ActivityRef       string   `json:"activity_ref,omitempty"`
+	WaitForCompletion *bool    `json:"wait_for_completion,omitempty"`
+	Condition         string   `json:"condition,omitempty"`
+	OperationRef      string   `json:"operation_ref,omitempty"`
+	Sources           []string `json:"sources,omitempty"`
+	Targets           []string `json:"targets,omitempty"`
 }
 
 // BPMNFlow is a sequenceFlow inside a subprocess.
@@ -518,6 +521,7 @@ type BPMNFlow struct {
 	To               string `json:"to"`
 	Name             string `json:"name,omitempty"`
 	Condition        string `json:"condition,omitempty"`
+	IsImmediate      *bool  `json:"is_immediate,omitempty"`
 	ParentSubprocess string `json:"parent_subprocess,omitempty"`
 }
 

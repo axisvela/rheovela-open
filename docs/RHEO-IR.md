@@ -315,7 +315,8 @@ RHEO IR and BPMN are separate formats:
 - BPMN collaboration conversations (`conversation`, `subConversation`,
   `callConversation`, `conversationLink`), complex-gateway activation
   conditions, multi-instance behavior references, and ad-hoc completion
-  conditions round-trip as metadata.
+  conditions round-trip as metadata. Message-event `operationRef`, link-event
+  `source`/`target` references, and `sequenceFlow.isImmediate` are preserved.
 - BPMN export uses `WorkflowDefinition.bpmn` metadata to emit `subProcess`,
   boundary/intermediate events, gateway types, participants, message flows,
   `laneSet`/`lane`, `dataObject`/`dataObjectReference` and BPMN DI

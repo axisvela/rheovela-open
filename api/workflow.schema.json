@@ -341,7 +341,10 @@
         "time_cycle": { "type": "string" },
         "activity_ref": { "type": "string" },
         "wait_for_completion": { "type": "boolean" },
-        "condition": { "type": "string" }
+        "condition": { "type": "string" },
+        "operation_ref": { "type": "string" },
+        "sources": { "type": "array", "items": { "type": "string" } },
+        "targets": { "type": "array", "items": { "type": "string" } }
       }
     },
     "bpmnFlow": {
@@ -354,6 +357,7 @@
         "to": { "type": "string", "minLength": 1 },
         "name": { "type": "string" },
         "condition": { "type": "string" },
+        "is_immediate": { "type": "boolean" },
         "parent_subprocess": { "type": "string" }
       }
     },
