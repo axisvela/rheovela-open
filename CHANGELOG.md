@@ -2,12 +2,18 @@
 
 RHEOVELA open（`github.com/axisvela/rheovela-open`，Apache-2.0）发布记录：对外发布层（版本化 contracts、SDK、examples、CI、OpenAPI）。格式：最新在前；每个版本对应一个 git tag（三仓库统一语义版本 tag）。
 
-## [Unreleased]
+## [v1.11.0] - 2026-10-27
 
 ### Added
 
 - Designer: render preserved BPMN DI shapes/edges, undo/redo with keyboard
   shortcuts, and import preview diffs before applying JSON/BPMN imports.
+
+### Changed
+
+- Coordinated ecosystem release with core `v1.11.0` and EE `v1.11.0`. The open
+  `/v3` module is tagged `v3.4.1`; the Go SDK and Harmovela adapter module tags
+  are unchanged.
 
 ## [v1.10.0] - 2026-10-27
 
