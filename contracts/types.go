@@ -126,25 +126,61 @@ type BPMNAssignment struct {
 }
 
 type BPMNDiagram struct {
-	ID      string      `json:"id,omitempty"`
-	PlaneID string      `json:"plane_id,omitempty"`
-	Shapes  []BPMNShape `json:"shapes,omitempty"`
-	Edges   []BPMNEdge  `json:"edges,omitempty"`
+	ID          string           `json:"id,omitempty"`
+	PlaneID     string           `json:"plane_id,omitempty"`
+	BPMNElement string           `json:"bpmn_element,omitempty"`
+	Resolution  float64          `json:"resolution,omitempty"`
+	Shapes      []BPMNShape      `json:"shapes,omitempty"`
+	Edges       []BPMNEdge       `json:"edges,omitempty"`
+	LabelStyles []BPMNLabelStyle `json:"label_styles,omitempty"`
 }
 
 type BPMNShape struct {
-	ID          string  `json:"id"`
-	BPMNElement string  `json:"bpmn_element,omitempty"`
-	X           float64 `json:"x"`
-	Y           float64 `json:"y"`
-	Width       float64 `json:"width"`
-	Height      float64 `json:"height"`
+	ID                  string     `json:"id"`
+	BPMNElement         string     `json:"bpmn_element,omitempty"`
+	X                   float64    `json:"x"`
+	Y                   float64    `json:"y"`
+	Width               float64    `json:"width"`
+	Height              float64    `json:"height"`
+	IsExpanded          *bool      `json:"is_expanded,omitempty"`
+	IsMarkerVisible     *bool      `json:"is_marker_visible,omitempty"`
+	IsHorizontal        *bool      `json:"is_horizontal,omitempty"`
+	IsMessageVisible    *bool      `json:"is_message_visible,omitempty"`
+	ParticipantBandKind string     `json:"participant_band_kind,omitempty"`
+	Label               *BPMNLabel `json:"label,omitempty"`
 }
 
 type BPMNEdge struct {
-	ID          string      `json:"id"`
-	BPMNElement string      `json:"bpmn_element,omitempty"`
-	Waypoints   []BPMNPoint `json:"waypoints,omitempty"`
+	ID                 string      `json:"id"`
+	BPMNElement        string      `json:"bpmn_element,omitempty"`
+	SourceElement      string      `json:"source_element,omitempty"`
+	TargetElement      string      `json:"target_element,omitempty"`
+	MessageVisibleKind string      `json:"message_visible_kind,omitempty"`
+	Waypoints          []BPMNPoint `json:"waypoints,omitempty"`
+	Label              *BPMNLabel  `json:"label,omitempty"`
+}
+
+// BPMNLabel preserves a DI label and its optional bounds/style reference.
+type BPMNLabel struct {
+	Bounds     *BPMNBounds `json:"bounds,omitempty"`
+	LabelStyle string      `json:"label_style,omitempty"`
+}
+
+// BPMNBounds is a dc:Bounds rectangle.
+type BPMNBounds struct {
+	X      float64 `json:"x"`
+	Y      float64 `json:"y"`
+	Width  float64 `json:"width"`
+	Height float64 `json:"height"`
+}
+
+// BPMNLabelStyle preserves a DI label style.
+type BPMNLabelStyle struct {
+	ID         string  `json:"id"`
+	FontName   string  `json:"font_name,omitempty"`
+	FontSize   float64 `json:"font_size,omitempty"`
+	FontBold   *bool   `json:"font_bold,omitempty"`
+	FontItalic *bool   `json:"font_italic,omitempty"`
 }
 
 type BPMNPoint struct {
@@ -188,6 +224,26 @@ type BPMNNode struct {
 	ParallelMultiple *bool                 `json:"parallel_multiple,omitempty"`
 	Direction        string                `json:"direction,omitempty"`
 	EventDefinitions []BPMNEventDefinition `json:"event_definitions,omitempty"`
+
+	// Activity/subprocess semantics.
+	CalledElement     string    `json:"called_element,omitempty"`
+	TriggeredByEvent  *bool     `json:"triggered_by_event,omitempty"`
+	IsForCompensation *bool     `json:"is_for_compensation,omitempty"`
+	Loop              *BPMNLoop `json:"loop,omitempty"`
+}
+
+// BPMNLoop preserves standardLoopCharacteristics or
+// multiInstanceLoopCharacteristics.
+type BPMNLoop struct {
+	Kind                string `json:"kind"`
+	IsSequential        *bool  `json:"is_sequential,omitempty"`
+	LoopCardinality     string `json:"loop_cardinality,omitempty"`
+	CompletionCondition string `json:"completion_condition,omitempty"`
+	Collection          string `json:"collection,omitempty"`
+	ElementVariable     string `json:"element_variable,omitempty"`
+	TestBefore          *bool  `json:"test_before,omitempty"`
+	LoopMaximum         string `json:"loop_maximum,omitempty"`
+	LoopCondition       string `json:"loop_condition,omitempty"`
 }
 
 // BPMNEventDefinition preserves one eventDefinition element and its attributes.
@@ -214,15 +270,24 @@ type BPMNFlow struct {
 }
 
 type BPMNParticipant struct {
-	ID         string `json:"id"`
-	Name       string `json:"name,omitempty"`
-	ProcessRef string `json:"process_ref,omitempty"`
+	ID           string                       `json:"id"`
+	Name         string                       `json:"name,omitempty"`
+	ProcessRef   string                       `json:"process_ref,omitempty"`
+	Multiplicity *BPMNParticipantMultiplicity `json:"multiplicity,omitempty"`
+}
+
+// BPMNParticipantMultiplicity preserves participantMultiplicity.
+type BPMNParticipantMultiplicity struct {
+	Minimum int    `json:"minimum,omitempty"`
+	Maximum string `json:"maximum,omitempty"`
 }
 
 type BPMNMessageFlow struct {
-	ID     string `json:"id"`
-	Source string `json:"source"`
-	Target string `json:"target"`
+	ID         string `json:"id"`
+	Source     string `json:"source"`
+	Target     string `json:"target"`
+	Name       string `json:"name,omitempty"`
+	MessageRef string `json:"message_ref,omitempty"`
 }
 
 type Stage struct {

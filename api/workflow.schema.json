@@ -229,7 +229,27 @@
         "event_definitions": {
           "type": "array",
           "items": { "$ref": "#/definitions/bpmnEventDefinition" }
-        }
+        },
+        "called_element": { "type": "string" },
+        "triggered_by_event": { "type": "boolean" },
+        "is_for_compensation": { "type": "boolean" },
+        "loop": { "$ref": "#/definitions/bpmnLoop" }
+      }
+    },
+    "bpmnLoop": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind"],
+      "properties": {
+        "kind": { "type": "string", "minLength": 1 },
+        "is_sequential": { "type": "boolean" },
+        "loop_cardinality": { "type": "string" },
+        "completion_condition": { "type": "string" },
+        "collection": { "type": "string" },
+        "element_variable": { "type": "string" },
+        "test_before": { "type": "boolean" },
+        "loop_maximum": { "type": "string" },
+        "loop_condition": { "type": "string" }
       }
     },
     "bpmnEventDefinition": {
@@ -279,7 +299,16 @@
       "properties": {
         "id": { "type": "string", "minLength": 1 },
         "name": { "type": "string" },
-        "process_ref": { "type": "string" }
+        "process_ref": { "type": "string" },
+        "multiplicity": { "$ref": "#/definitions/bpmnParticipantMultiplicity" }
+      }
+    },
+    "bpmnParticipantMultiplicity": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "minimum": { "type": "integer" },
+        "maximum": { "type": "string" }
       }
     },
     "bpmnChoreography": {
@@ -351,7 +380,9 @@
       "properties": {
         "id": { "type": "string", "minLength": 1 },
         "source": { "type": "string", "minLength": 1 },
-        "target": { "type": "string", "minLength": 1 }
+        "target": { "type": "string", "minLength": 1 },
+        "name": { "type": "string" },
+        "message_ref": { "type": "string" }
       }
     },
     "bpmnLane": {
@@ -383,6 +414,8 @@
       "properties": {
         "id": { "type": "string" },
         "plane_id": { "type": "string" },
+        "bpmn_element": { "type": "string" },
+        "resolution": { "type": "number" },
         "shapes": {
           "type": "array",
           "items": { "$ref": "#/definitions/bpmnShape" }
@@ -390,7 +423,42 @@
         "edges": {
           "type": "array",
           "items": { "$ref": "#/definitions/bpmnEdge" }
+        },
+        "label_styles": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/bpmnLabelStyle" }
         }
+      }
+    },
+    "bpmnLabel": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "bounds": { "$ref": "#/definitions/bpmnBounds" },
+        "label_style": { "type": "string" }
+      }
+    },
+    "bpmnBounds": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["x", "y", "width", "height"],
+      "properties": {
+        "x": { "type": "number" },
+        "y": { "type": "number" },
+        "width": { "type": "number" },
+        "height": { "type": "number" }
+      }
+    },
+    "bpmnLabelStyle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "font_name": { "type": "string" },
+        "font_size": { "type": "number" },
+        "font_bold": { "type": "boolean" },
+        "font_italic": { "type": "boolean" }
       }
     },
     "bpmnShape": {
@@ -403,7 +471,13 @@
         "x": { "type": "number" },
         "y": { "type": "number" },
         "width": { "type": "number" },
-        "height": { "type": "number" }
+        "height": { "type": "number" },
+        "is_expanded": { "type": "boolean" },
+        "is_marker_visible": { "type": "boolean" },
+        "is_horizontal": { "type": "boolean" },
+        "is_message_visible": { "type": "boolean" },
+        "participant_band_kind": { "type": "string" },
+        "label": { "$ref": "#/definitions/bpmnLabel" }
       }
     },
     "bpmnEdge": {
@@ -413,10 +487,14 @@
       "properties": {
         "id": { "type": "string", "minLength": 1 },
         "bpmn_element": { "type": "string" },
+        "source_element": { "type": "string" },
+        "target_element": { "type": "string" },
+        "message_visible_kind": { "type": "string" },
         "waypoints": {
           "type": "array",
           "items": { "$ref": "#/definitions/bpmnPoint" }
-        }
+        },
+        "label": { "$ref": "#/definitions/bpmnLabel" }
       }
     },
     "bpmnPoint": {

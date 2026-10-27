@@ -291,6 +291,12 @@ RHEO IR and BPMN are separate formats:
   `bpmn.choreographies`; choreography is not executable.
 - `dataInputAssociation`/`dataOutputAssociation`, `sourceRef`/`targetRef`,
   `assignment` and `transformation` are preserved in `bpmn.data_associations`.
+- `callActivity` (`calledElement`), `transaction`, `eventSubProcess`
+  (`triggeredByEvent`), `adHocSubProcess`, send/receive/manual tasks,
+  `isForCompensation`, and standard/multi-instance loop characteristics are
+  preserved as stage metadata.
+- BPMN DI preserves the plane `bpmnElement`/resolution, shape and edge
+  attributes, label bounds, and `BPMNLabelStyle` font metadata.
 - BPMN export uses `WorkflowDefinition.bpmn` metadata to emit `subProcess`,
   boundary/intermediate events, gateway types, participants, message flows,
   `laneSet`/`lane`, `dataObject`/`dataObjectReference` and BPMN DI

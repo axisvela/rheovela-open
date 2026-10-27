@@ -2,6 +2,19 @@
 
 RHEOVELA open（`github.com/axisvela/rheovela-open`，Apache-2.0）发布记录：对外发布层（版本化 contracts、SDK、examples、CI、OpenAPI）。格式：最新在前；每个版本对应一个 git tag（三仓库统一语义版本 tag）。
 
+## [Unreleased]
+
+### Added
+
+- BPMN DI completeness: plane `bpmnElement`/`resolution`, label bounds and
+  `BPMNLabelStyle`, shape attributes (`isExpanded`, `isMarkerVisible`,
+  `isHorizontal`, `isMessageVisible`, `participantBandKind`) and edge attributes
+  (`sourceElement`, `targetElement`, `messageVisibleKind`).
+- BPMN participant multiplicity; `messageFlow` `name`/`messageRef`.
+- BPMN `callActivity`, `transaction`, `adHocSubProcess`, `eventSubProcess`,
+  `sendTask`/`receiveTask`/`manualTask`, `calledElement`, `triggeredByEvent`,
+  `isForCompensation`, and standard/multi-instance loop characteristics.
+
 ## [v1.11.0] - 2026-10-27
 
 ### Added
