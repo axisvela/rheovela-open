@@ -101,6 +101,17 @@ func TestWorkflowDefinitionJSONRoundTrip(t *testing.T) {
 			{From: "draft", To: "review"},
 			{From: "review", To: "submit"},
 		},
+		Compensations: []contracts.Compensation{
+			{ForActivity: "submit", Capability: "revoke.submission"},
+		},
+		BPMN: &contracts.BPMN{
+			Nodes: []contracts.BPMNNode{
+				{ID: "review", Element: "userTask"},
+				{ID: "boundary", Element: "boundaryEvent", EventKind: "timer", AttachedTo: "review"},
+			},
+			Participants: []contracts.BPMNParticipant{{ID: "p1", Name: "author"}},
+			MessageFlows: []contracts.BPMNMessageFlow{{ID: "mf1", Source: "p1", Target: "p2"}},
+		},
 	}
 
 	b, err := json.Marshal(wf)
@@ -112,4 +123,9 @@ func TestWorkflowDefinitionJSONRoundTrip(t *testing.T) {
 
 	assert.Len(t, decoded.Stages, 4)
 	assert.Len(t, decoded.Transitions, 3)
+	assert.Len(t, decoded.Compensations, 1)
+	require.NotNil(t, decoded.BPMN)
+	assert.Len(t, decoded.BPMN.Nodes, 2)
+	assert.Len(t, decoded.BPMN.Participants, 1)
+	assert.Len(t, decoded.BPMN.MessageFlows, 1)
 }

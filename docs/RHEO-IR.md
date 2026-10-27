@@ -207,13 +207,14 @@ RHEO IR and BPMN are separate formats:
 
 - BPMN import maps `task`/`userTask`/`serviceTask`/gateways/events/`subProcess`
   to stages and `sequenceFlow` to transitions.
-- Embedded `subProcess` elements become a single stage; internal nodes are
-  reported in `ImportReport.Subprocesses`.
-- `collaboration` `messageFlow` elements are reported in
-  `ImportReport.MessageFlows` and are not executable transitions.
-- BPMN export emits a flat `startEvent`/`task`/`endEvent`/`sequenceFlow` subset.
-  It does not round-trip subprocess internals, boundary-event semantics or
-  message flows.
+- Embedded `subProcess` elements become a single stage; internal nodes and
+  sequence flows are preserved in `WorkflowDefinition.bpmn`.
+- `collaboration` participants and `messageFlow` elements are preserved in
+  `WorkflowDefinition.bpmn` and are not executable transitions.
+- BPMN export uses `WorkflowDefinition.bpmn` metadata to emit `subProcess`,
+  boundary/intermediate events, gateway types, participants and message flows.
+  Without metadata it falls back to the flat `startEvent`/`task`/`endEvent`
+  subset.
 
 ## 10. Versioning and Reserved Extensions
 

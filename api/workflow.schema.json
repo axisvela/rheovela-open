@@ -114,9 +114,78 @@
       "items": {
         "$ref": "#/definitions/compensation"
       }
+    },
+    "bpmn": {
+      "$ref": "#/definitions/bpmn"
     }
   },
   "definitions": {
+    "bpmn": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "nodes": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/bpmnNode" }
+        },
+        "internal_flows": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/bpmnFlow" }
+        },
+        "participants": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/bpmnParticipant" }
+        },
+        "message_flows": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/bpmnMessageFlow" }
+        }
+      }
+    },
+    "bpmnNode": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "element"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "element": { "type": "string", "minLength": 1 },
+        "name": { "type": "string" },
+        "event_kind": { "type": "string" },
+        "attached_to": { "type": "string" },
+        "parent_subprocess": { "type": "string" }
+      }
+    },
+    "bpmnFlow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "from", "to"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "from": { "type": "string", "minLength": 1 },
+        "to": { "type": "string", "minLength": 1 },
+        "condition": { "type": "string" },
+        "parent_subprocess": { "type": "string" }
+      }
+    },
+    "bpmnParticipant": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "name": { "type": "string" }
+      }
+    },
+    "bpmnMessageFlow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "source", "target"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "source": { "type": "string", "minLength": 1 },
+        "target": { "type": "string", "minLength": 1 }
+      }
+    },
     "compensation": {
       "type": "object",
       "additionalProperties": false,

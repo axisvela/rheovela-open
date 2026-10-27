@@ -58,6 +58,47 @@ type WorkflowDefinition struct {
 	Stages        []Stage        `json:"stages"`
 	Transitions   []Transition   `json:"transitions"`
 	Compensations []Compensation `json:"compensations,omitempty"`
+	BPMN          *BPMN          `json:"bpmn,omitempty"`
+}
+
+// BPMN preserves non-executable BPMN structure so import/export can round-trip
+// subprocesses, boundary events and collaborations.
+type BPMN struct {
+	Nodes         []BPMNNode         `json:"nodes,omitempty"`
+	InternalFlows []BPMNFlow         `json:"internal_flows,omitempty"`
+	Participants  []BPMNParticipant  `json:"participants,omitempty"`
+	MessageFlows  []BPMNMessageFlow  `json:"message_flows,omitempty"`
+}
+
+// BPMNNode maps a workflow stage (or a subprocess-internal node) back to its
+// BPMN element type and event semantics.
+type BPMNNode struct {
+	ID               string `json:"id"`
+	Element          string `json:"element"`
+	Name             string `json:"name,omitempty"`
+	EventKind        string `json:"event_kind,omitempty"`
+	AttachedTo       string `json:"attached_to,omitempty"`
+	ParentSubprocess string `json:"parent_subprocess,omitempty"`
+}
+
+// BPMNFlow is a sequenceFlow inside a subprocess.
+type BPMNFlow struct {
+	ID               string `json:"id"`
+	From             string `json:"from"`
+	To               string `json:"to"`
+	Condition        string `json:"condition,omitempty"`
+	ParentSubprocess string `json:"parent_subprocess,omitempty"`
+}
+
+type BPMNParticipant struct {
+	ID   string `json:"id"`
+	Name string `json:"name,omitempty"`
+}
+
+type BPMNMessageFlow struct {
+	ID     string `json:"id"`
+	Source string `json:"source"`
+	Target string `json:"target"`
 }
 
 type Stage struct {
