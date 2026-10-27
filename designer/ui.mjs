@@ -133,6 +133,8 @@ function openStageEditor(id) {
   $("edit-assignee-kind").value = assignee.kind || "open";
   $("edit-assignee-value").value = assignee.role || assignee.actor_id || (assignee.required || [])[0] || "";
   $("edit-evidence").value = (stage.evidence || []).join(", ");
+  $("edit-effect-key").value = stage.effect_key || "";
+  $("edit-timeout").value = stage.timeout || "";
   $("edit-migration-policy").value = stage.migration_policy || "";
   const delegation = stage.delegation;
   $("edit-delegation-kind").value = delegation?.kind || "";
@@ -354,6 +356,8 @@ $("stage-editor-form").addEventListener("submit", (e) => {
       title: $("edit-stage-title").value,
       assignee,
       evidence: splitCSV($("edit-evidence").value),
+      effectKey: $("edit-effect-key").value.trim(),
+      timeout: $("edit-timeout").value.trim(),
       migrationPolicy: $("edit-migration-policy").value,
       delegation,
     });

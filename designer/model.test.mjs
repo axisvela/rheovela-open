@@ -88,6 +88,8 @@ test("updateStage edits title, assignee, evidence, and delegation", () => {
     evidence: ["receipt"],
     delegation: { kind: "role", delegatee: "lead", scopes: ["approve"], budget: 10, evidence: ["delegation"] },
     migrationPolicy: "preserve",
+    effectKey: "approve/${id}",
+    timeout: "30m",
   });
   const stage = wf.stages[0];
   assert.equal(stage.title, "Approve");
@@ -95,11 +97,15 @@ test("updateStage edits title, assignee, evidence, and delegation", () => {
   assert.deepEqual(stage.evidence, ["receipt"]);
   assert.equal(stage.delegation.delegatee, "lead");
   assert.equal(stage.migration_policy, "preserve");
+  assert.equal(stage.effect_key, "approve/${id}");
+  assert.equal(stage.timeout, "30m");
 
-  wf = updateStage(wf, "a", { delegation: null, evidence: [], migrationPolicy: "" });
+  wf = updateStage(wf, "a", { delegation: null, evidence: [], migrationPolicy: "", effectKey: "", timeout: "" });
   assert.equal(wf.stages[0].delegation, undefined);
   assert.deepEqual(wf.stages[0].evidence, []);
   assert.equal(wf.stages[0].migration_policy, undefined);
+  assert.equal(wf.stages[0].effect_key, undefined);
+  assert.equal(wf.stages[0].timeout, undefined);
 });
 
 test("updateStage rejects an unknown stage", () => {

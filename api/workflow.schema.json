@@ -115,6 +115,12 @@
           "migration_policy": {
             "type": "string",
             "enum": ["preserve", "ignore", "compensate"]
+          },
+          "effect_key": {
+            "type": "string"
+          },
+          "timeout": {
+            "type": "string"
           }
         }
       }

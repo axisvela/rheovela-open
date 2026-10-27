@@ -10,6 +10,8 @@ RHEOVELA open（`github.com/axisvela/rheovela-open`，Apache-2.0）发布记录�
   waypoints for import/export round-trips.
 - RHEO IR `migration <activity> policy "preserve|ignore|compensate"` compiles to
   `Stage.migration_policy`; migration analysis honors the per-stage policy.
+- RHEO IR `effect_key` and `timeout` now compile to `Stage.effect_key` and
+  `Stage.timeout`.
 
 ## [v1.8.0] - 2026-10-27
 

@@ -111,9 +111,8 @@ process PurchaseApproval v1 {
 - `role "<role>"` sets `AssigneeSpec.kind = "role"` and `AssigneeSpec.role`.
 - When both `capability` and `role` are present, `role` takes precedence.
 - When neither is present, `AssigneeSpec.kind = "open"`.
-- `effect_key "<template>"` and `timeout <duration>` are retained in the IR AST
-  for effect-ledger and timeout integrations. They are not fields of
-  `WorkflowDefinition.Stage` in `schema_version=1`.
+- `effect_key "<template>"` and `timeout <duration>` compile to
+  `Stage.effect_key` and `Stage.timeout`.
 - `inputs` and `outputs` are emitted as empty arrays by the compiler.
 
 ### 5.3 Transition
@@ -177,7 +176,7 @@ may be removed by a live migration.
 | no capability/role | `stages[].assignee_spec = {kind:"open"}` |
 | `transition a -> b` | `transitions[] = {from:"a", to:"b"}` |
 | `when <condition>` | `transitions[].condition` |
-| `effect_key` / `timeout` | retained in IR AST; not in `WorkflowDefinition` v1 |
+| `effect_key` / `timeout` | `stages[].effect_key`, `stages[].timeout` |
 | `compensate ...` | `compensations[] = {for_activity, compensate_with/capability}` |
 | `delegate ...` | `stages[].delegation = {kind, delegatee, scopes, budget, evidence}` |
 | `evidence ... require` | `stages[].evidence[]` |

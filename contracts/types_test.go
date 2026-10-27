@@ -95,6 +95,8 @@ func TestWorkflowDefinitionJSONRoundTrip(t *testing.T) {
 				ID: "research", Title: "调研", Inputs: []string{"topic"}, Outputs: []string{"lit_review"},
 				Evidence:        []string{"source_log"},
 				MigrationPolicy: "preserve",
+				EffectKey:       "research/${id}",
+				Timeout:         "30m",
 				Delegation: &contracts.Delegation{
 					Kind: "role", Delegatee: "research-lead", Scopes: []string{"research"}, Budget: 100,
 				},
@@ -142,6 +144,8 @@ func TestWorkflowDefinitionJSONRoundTrip(t *testing.T) {
 	assert.Equal(t, "research-lead", decoded.Stages[0].Delegation.Delegatee)
 	assert.Equal(t, []string{"source_log"}, decoded.Stages[0].Evidence)
 	assert.Equal(t, "preserve", decoded.Stages[0].MigrationPolicy)
+	assert.Equal(t, "research/${id}", decoded.Stages[0].EffectKey)
+	assert.Equal(t, "30m", decoded.Stages[0].Timeout)
 	require.NotNil(t, decoded.BPMN)
 	assert.Len(t, decoded.BPMN.Nodes, 2)
 	assert.Len(t, decoded.BPMN.Participants, 1)

@@ -139,6 +139,14 @@ export function updateStage(wf, id, patch = {}) {
   if (patch.title !== undefined) stage.title = String(patch.title);
   if (patch.assignee !== undefined) stage.assignee_spec = patch.assignee;
   if (patch.evidence !== undefined) stage.evidence = [...patch.evidence];
+  if (patch.effectKey !== undefined) {
+    if (patch.effectKey) stage.effect_key = patch.effectKey;
+    else delete stage.effect_key;
+  }
+  if (patch.timeout !== undefined) {
+    if (patch.timeout) stage.timeout = patch.timeout;
+    else delete stage.timeout;
+  }
   if (patch.migrationPolicy !== undefined) {
     if (patch.migrationPolicy) {
       stage.migration_policy = patch.migrationPolicy;
