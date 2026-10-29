@@ -619,6 +619,7 @@ type RunContext struct {
 	CurrentStage    string            `json:"current_stage"`
 	Assignee        string            `json:"assignee,omitempty"`
 	CompletedStages []string          `json:"completed_stages"`
+	SuspendedStages []string          `json:"suspended_stages,omitempty"`
 	Variables       map[string]string `json:"variables,omitempty"`
 	Status          string            `json:"status"`
 	OpenedBy        string            `json:"opened_by"`
