@@ -29,7 +29,8 @@ RHEOVELA open（`github.com/axisvela/rheovela-open`，Apache-2.0）发布记录�
   completion mode, completions, and approval decisions; claim accepts
   actor/tools/credential; complete/fail accept cost; handoff/takeover endpoints.
 - OpenAPI: notification list/ack and approval-delegation create/list/revoke
-  endpoints for handoff/escalation delivery and delegated approvals.
+  endpoints for handoff/escalation delivery and delegated approvals. Claim
+  `actor` matches `role:<name>` targets by role membership.
 
 ### Changed
 

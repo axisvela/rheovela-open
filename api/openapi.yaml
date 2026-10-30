@@ -2162,7 +2162,7 @@ components:
           example: 30s
         actor:
           type: string
-          description: Required when the work item is assigned to a specific actor.
+          description: Required for assigned items; matches the actor or, for `role:<name>` targets, the actor's role.
         tools:
           type: array
           items:
