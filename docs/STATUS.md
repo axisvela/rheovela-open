@@ -24,7 +24,7 @@
 | Python worker + events | `sdk/python/` | 完整：`Result`、`CheckpointRef`、`EffectCursor`、approval、retry、cancel、claimable polling；`events.py` 提供 WS + 持久化离线队列 |
 | TypeScript worker + events | `sdk/typescript/` | 完整：`Result`、`CheckpointRef`、`EffectCursor`、approval、retry、cancel、claimable polling；`events.ts` 使用 Node 内置 WebSocket + 持久化队列 |
 | Java worker + events | `sdk/java/` | 完整：`Result`、`CheckpointRef`、`EffectCursor`、approval、retry、cancel、claimable polling；`Events.java` 使用 JDK WebSocket + 持久化队列 |
-| Rust worker | `sdk/rust/` | 完整：`Result`、`CheckpointRef`、`EffectCursor`、approval、retry、cancel、claimable polling |
+| Rust worker + events | `sdk/rust/` | 完整：`Result`、`CheckpointRef`、`EffectCursor`、approval、retry、cancel、claimable polling；`events` 模块提供 std-only WS + 持久化队列 |
 
 Go SDK 的 work-item 客户端方法包括 `GetWorkItem`、`CompleteWorkItemWithResult`、
 `RequestWorkItemApproval`、`ApproveWorkItem`、`RejectWorkItem`、`CancelWorkItem`。

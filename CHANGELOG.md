@@ -8,6 +8,8 @@ RHEOVELA open（`github.com/axisvela/rheovela-open`，Apache-2.0）发布记录�
 
 - Java SDK `sdk/java/worker/Events.java`: durable WebSocket event client using
   the JDK built-in `java.net.http.WebSocket` and a file-backed pending queue.
+- Rust SDK `sdk/rust/src/events.rs`: std-only durable WebSocket event client
+  (ws://) with the same cursor/pending-queue semantics.
 
 ## [v1.40.0] - 2026-10-30
 
