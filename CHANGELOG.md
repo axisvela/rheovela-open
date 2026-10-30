@@ -9,6 +9,8 @@ RHEOVELA open（`github.com/axisvela/rheovela-open`，Apache-2.0）发布记录�
 - OpenAPI: complete BPMN execution coverage (start/get/complete/fail/events/
   advance/compensate/choreography) plus BPMN state and request schemas; spec
   version moved to `v1.41.0`.
+- OpenAPI: health/status/metrics, workflow definitions + BPMN import preview,
+  and sync delta/pending/ack endpoints.
 
 ## [v1.41.0] - 2026-10-30
 

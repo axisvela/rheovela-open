@@ -1046,6 +1046,217 @@ paths:
         "501":
           description: Transport not configured.
 
+  /api/v1/health:
+    get:
+      tags: [Ops]
+      summary: Health check
+      operationId: health
+      responses:
+        "200":
+          description: Store reachable.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "503":
+          description: Store degraded.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+
+  /api/v1/status:
+    get:
+      tags: [Ops]
+      summary: Runtime status summary
+      operationId: status
+      responses:
+        "200":
+          description: Instance/outbox/partition overview.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StatusSummary"
+
+  /api/v1/metrics:
+    get:
+      tags: [Ops]
+      summary: Runtime counters
+      operationId: metrics
+      responses:
+        "200":
+          description: Engine counters.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Metrics"
+
+  /api/v1/workflows:
+    get:
+      tags: [Workflows]
+      summary: List latest workflow definitions
+      operationId: listWorkflows
+      responses:
+        "200":
+          description: Latest definition per workflow.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/WorkflowDefinition"
+    post:
+      tags: [Workflows]
+      summary: Publish a workflow definition version
+      operationId: publishWorkflow
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WorkflowDefinition"
+      responses:
+        "201":
+          description: Published version.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  workflow_id:
+                    type: string
+                  version:
+                    type: integer
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /api/v1/workflows/{id}:
+    get:
+      tags: [Workflows]
+      summary: Get the latest workflow definition
+      operationId: getWorkflow
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Workflow definition.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WorkflowDefinition"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /api/v1/workflows/import-bpmn:
+    post:
+      tags: [Workflows, BPMN]
+      summary: Import a BPMN document as a workflow preview
+      description: Does not persist the definition; returns workflow, import report, and validation.
+      operationId: importBPMN
+      requestBody:
+        required: true
+        content:
+          application/xml:
+            schema:
+              type: string
+      responses:
+        "200":
+          description: Import preview.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "413":
+          description: BPMN body exceeds 5 MiB.
+
+  /api/v1/sync/delta:
+    get:
+      tags: [Sync]
+      summary: Pull a stream event delta
+      operationId: syncDelta
+      parameters:
+        - name: stream
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: after_seq
+          in: query
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: Snapshot with cursor and events.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /api/v1/sync/pending:
+    get:
+      tags: [Sync]
+      summary: List unsent outbox records
+      operationId: syncPending
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 100
+            maximum: 1000
+            minimum: 1
+      responses:
+        "200":
+          description: Unsent outbox records.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/OutboxRecord"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /api/v1/sync/ack:
+    post:
+      tags: [Sync]
+      summary: Mark an outbox record as sent
+      operationId: syncAck
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [outbox_id]
+              properties:
+                outbox_id:
+                  type: string
+      responses:
+        "200":
+          description: Acknowledged.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OkResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
   /mcp:
     post:
       tags: [MCP]
@@ -1142,6 +1353,92 @@ components:
           maxItems: 1000
           items:
             $ref: "#/components/schemas/SyncPushEvent"
+
+    WorkflowDefinition:
+      type: object
+      required: [workflow_id, stages, transitions]
+      properties:
+        workflow_id:
+          type: string
+        title:
+          type: string
+        source:
+          type: string
+        execution_mode:
+          type: string
+        stages:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        transitions:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+      additionalProperties: true
+
+    StatusSummary:
+      type: object
+      properties:
+        instances:
+          type: integer
+        active:
+          type: integer
+        done:
+          type: integer
+        failed:
+          type: integer
+        unsent_outbox:
+          type: integer
+        partitions:
+          type: integer
+        legal_holds:
+          type: integer
+      additionalProperties: true
+
+    Metrics:
+      type: object
+      properties:
+        events:
+          type: integer
+        instances:
+          type: integer
+        active:
+          type: integer
+        done:
+          type: integer
+        failed:
+          type: integer
+        due_timers:
+          type: integer
+        ready_work_items:
+          type: integer
+        unknown_effects:
+          type: integer
+      additionalProperties: true
+
+    OutboxRecord:
+      type: object
+      properties:
+        id:
+          type: string
+        stream_id:
+          type: string
+        event_id:
+          type: string
+        payload:
+          type: object
+          additionalProperties: true
+        event_seq:
+          type: integer
+          format: int64
+        created_at:
+          type: string
+          format: date-time
+        sent:
+          type: boolean
+      additionalProperties: true
 
     BPMNStartRequest:
       type: object
