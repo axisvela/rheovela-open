@@ -535,6 +535,16 @@ paths:
           required: true
           schema:
             type: string
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                actor:
+                  type: string
+                  description: Required with `process.admin` when identity is enabled.
       responses:
         "200":
           description: Cancelled.
@@ -542,6 +552,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/OkResponse"
+        "403":
+          $ref: "#/components/responses/Forbidden"
         "404":
           $ref: "#/components/responses/NotFound"
         "409":
