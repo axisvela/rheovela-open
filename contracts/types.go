@@ -566,6 +566,7 @@ type Stage struct {
 	TaskKind         string          `json:"task_kind,omitempty"`
 	Payload          json.RawMessage `json:"payload,omitempty"`
 	RequiredEvidence []string        `json:"required_evidence,omitempty"`
+	ApprovalRoles    []string        `json:"approval_roles,omitempty"`
 }
 
 // Delegation describes an authority delegation attached to a stage.

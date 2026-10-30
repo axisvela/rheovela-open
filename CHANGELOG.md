@@ -13,11 +13,11 @@ RHEOVELA open（`github.com/axisvela/rheovela-open`，Apache-2.0）发布记录�
   and sync delta/pending/ack endpoints.
 - Contracts: `AssigneeSpec` gains `candidates`, `sla`, `budget`,
   `claim_policy`, and `escalation` for the work assignment contract extension.
-- Contracts: `Stage` gains `task_kind`, `payload`, and `required_evidence` for
-  Wave 2 participant contracts.
+- Contracts: `Stage` gains `task_kind`, `payload`, `required_evidence`, and
+  `approval_roles` for Wave 2 participant contracts.
 - OpenAPI: work items expose `kind`/`payload`/`required_evidence`/`evidence`;
   the complete endpoint accepts `evidence`.
-- OpenAPI: work items expose `deadline`/`escalation`, and
+- OpenAPI: work items expose `deadline`/`escalation`/`approval_roles`, and
   `GET /api/v1/work-items` accepts `overdue=true` for SLA breach queries.
 
 ### Changed

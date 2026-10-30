@@ -10,7 +10,7 @@
 | Item | State |
 |------|-------|
 | Release tag | `v1.37.0`（feature release；功能基线 `v1.4.0`） |
-| Contracts | `AssigneeSpec` candidates/SLA/budget/claim_policy/escalation；`Stage` task_kind/payload/required_evidence； `schema_version=1`；16 种事件（含 `WorkItemApprovalRequested` / `WorkItemApproved` / `WorkItemRejected`） |
+| Contracts | `AssigneeSpec` candidates/SLA/budget/claim_policy/escalation；`Stage` task_kind/payload/required_evidence/approval_roles； `schema_version=1`；16 种事件（含 `WorkItemApprovalRequested` / `WorkItemApproved` / `WorkItemRejected`） |
 | OpenAPI | `api/openapi.yaml`；覆盖 instances、steps、work-items、suspend/resume、approval、retry/cancel、audit、sync、events、health/status/metrics |
 | JSON Schema | `api/workflow.schema.json`、`api/event.schema.json` |
 | Worker SDKs | Go / Python / TypeScript / Java / Rust |
