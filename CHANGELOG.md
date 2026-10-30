@@ -17,6 +17,8 @@ RHEOVELA open（`github.com/axisvela/rheovela-open`，Apache-2.0）发布记录�
   Wave 2 participant contracts.
 - OpenAPI: work items expose `kind`/`payload`/`required_evidence`/`evidence`;
   the complete endpoint accepts `evidence`.
+- OpenAPI: work items expose `deadline`/`escalation`, and
+  `GET /api/v1/work-items` accepts `overdue=true` for SLA breach queries.
 
 ### Changed
 
