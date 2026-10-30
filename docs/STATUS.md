@@ -23,7 +23,7 @@
 | Go client + worker + events | `sdk/go/` | 完整：`Result`、`CheckpointRef`、`EffectCursor`、approval、retry、cancel、claimable polling；`events` 包提供 WebSocket + 持久化离线队列 |
 | Python worker + events | `sdk/python/` | 完整：`Result`、`CheckpointRef`、`EffectCursor`、approval、retry、cancel、claimable polling；`events.py` 提供 WS + 持久化离线队列 |
 | TypeScript worker + events | `sdk/typescript/` | 完整：`Result`、`CheckpointRef`、`EffectCursor`、approval、retry、cancel、claimable polling；`events.ts` 使用 Node 内置 WebSocket + 持久化队列 |
-| Java worker | `sdk/java/` | 完整：`Result`、`CheckpointRef`、`EffectCursor`、approval、retry、cancel、claimable polling |
+| Java worker + events | `sdk/java/` | 完整：`Result`、`CheckpointRef`、`EffectCursor`、approval、retry、cancel、claimable polling；`Events.java` 使用 JDK WebSocket + 持久化队列 |
 | Rust worker | `sdk/rust/` | 完整：`Result`、`CheckpointRef`、`EffectCursor`、approval、retry、cancel、claimable polling |
 
 Go SDK 的 work-item 客户端方法包括 `GetWorkItem`、`CompleteWorkItemWithResult`、
