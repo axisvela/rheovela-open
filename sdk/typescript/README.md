@@ -2,7 +2,7 @@
 
 # TypeScript Worker SDK — `sdk/typescript`
 
-依赖为零的 core Worker HTTP API 客户端，由 `rheo serve` 暴露（路由见下，契约见
+依赖为零的 core Worker HTTP API 客户端；`events.ts` 使用 Node 22+ 内置 WebSocket 提供持久化事件订阅与离线队列。由 `rheo serve` 暴露（路由见下，契约见
 `api/README.md` 与 `api/openapi.yaml`）。仅使用 Node 18+ 内置的 `fetch`，无运行时
 依赖、无构建步骤，直接引入源文件即可。
 
@@ -128,3 +128,9 @@ parameter properties、enum 等不可擦除语法，无需 `--experimental-trans
 
 源文件使用 `.ts` 扩展名且无构建步骤。Node 18+ 不能直接运行 `.ts`；可转译
 （`tsc`、`esbuild`、`deno`）或重命名为 `.js` 后擦除类型。SDK 本身零依赖。
+
+## 事件客户端测试
+
+```sh
+node --test --experimental-strip-types events.test.ts
+```n
