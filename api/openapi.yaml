@@ -745,6 +745,8 @@ paths:
                 $ref: "#/components/schemas/ApprovalDelegation"
         "400":
           $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
     get:
       tags: [Worker]
       summary: List active delegations for a delegatee
@@ -778,6 +780,12 @@ paths:
           required: true
           schema:
             type: string
+        - name: actor
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Required with `process.admin` when identity is enabled.
       responses:
         "200":
           description: Revoked.
@@ -785,6 +793,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/OkResponse"
+        "403":
+          $ref: "#/components/responses/Forbidden"
         "404":
           $ref: "#/components/responses/NotFound"
 
