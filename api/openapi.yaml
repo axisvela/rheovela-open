@@ -7,7 +7,7 @@ info:
     ops/integration surface — no TLS/auth shim. Multi-tenant auth lives in
     `rheovela-ee` (X-Tenant-ID middleware). The `/mcp` route is a JSON-RPC
     2.0 MCP gateway (protocol version 2024-11-05).
-  version: v1.9-core
+  version: v1.41.0
   license:
     name: Apache-2.0
 
@@ -21,6 +21,12 @@ tags:
     description: Evidence chain with optional signature verification.
   - name: Worker
     description: Work-item queue consumed by workers (claim/heartbeat/complete/fail).
+  - name: BPMN
+    description: BPMN execution mode (runs, tasks, events, timers, scopes).
+  - name: Events
+    description: Filtered SSE and WebSocket event streams with cursor replay.
+  - name: Sync
+    description: Edge-to-central event push and outbox delta pull.
   - name: MCP
     description: Model Context Protocol gateway (JSON-RPC 2.0).
 
@@ -811,6 +817,235 @@ paths:
         "400":
           $ref: "#/components/responses/BadRequest"
 
+  /api/v1/bpmn/runs:
+    post:
+      tags: [BPMN]
+      summary: Start a BPMN run
+      operationId: startBPMNRun
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BPMNStartRequest"
+      responses:
+        "201":
+          description: Started BPMN run state.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BPMNState"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /api/v1/bpmn/runs/{id}:
+    get:
+      tags: [BPMN]
+      summary: Get BPMN run state
+      operationId: getBPMNRun
+      parameters:
+        - $ref: "#/components/parameters/InstanceId"
+        - name: definition_id
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: BPMN run state.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BPMNState"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /api/v1/bpmn/runs/{id}/tasks/{node}/complete:
+    post:
+      tags: [BPMN]
+      summary: Complete a BPMN task
+      operationId: completeBPMNTask
+      parameters:
+        - $ref: "#/components/parameters/InstanceId"
+        - name: node
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: definition_id
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: scope
+          in: query
+          schema:
+            type: string
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BPMNCompleteRequest"
+      responses:
+        "200":
+          description: Updated BPMN state.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BPMNState"
+        "409":
+          $ref: "#/components/responses/Conflict"
+
+  /api/v1/bpmn/runs/{id}/tasks/{node}/fail:
+    post:
+      tags: [BPMN]
+      summary: Fail a BPMN task
+      operationId: failBPMNTask
+      parameters:
+        - $ref: "#/components/parameters/InstanceId"
+        - name: node
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: definition_id
+          in: query
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BPMNFailRequest"
+      responses:
+        "200":
+          description: Updated BPMN state.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BPMNState"
+        "409":
+          $ref: "#/components/responses/Conflict"
+
+  /api/v1/bpmn/runs/{id}/events:
+    post:
+      tags: [BPMN]
+      summary: Fire a BPMN message/signal event
+      operationId: fireBPMNEvent
+      parameters:
+        - $ref: "#/components/parameters/InstanceId"
+        - name: definition_id
+          in: query
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BPMNEventRequest"
+      responses:
+        "200":
+          description: Updated BPMN state.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BPMNState"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /api/v1/bpmn/runs/{id}/advance:
+    post:
+      tags: [BPMN]
+      summary: Advance BPMN timers to a point in time
+      operationId: advanceBPMNRun
+      parameters:
+        - $ref: "#/components/parameters/InstanceId"
+        - name: definition_id
+          in: query
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BPMNAdvanceRequest"
+      responses:
+        "200":
+          description: Updated BPMN state.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BPMNState"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /api/v1/bpmn/runs/{id}/compensate:
+    post:
+      tags: [BPMN]
+      summary: Compensate a BPMN run
+      operationId: compensateBPMNRun
+      parameters:
+        - $ref: "#/components/parameters/InstanceId"
+        - name: definition_id
+          in: query
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BPMNCompleteRequest"
+      responses:
+        "200":
+          description: Updated BPMN state.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BPMNState"
+        "409":
+          $ref: "#/components/responses/Conflict"
+
+  /api/v1/bpmn/choreographies/{id}/execute:
+    post:
+      tags: [BPMN]
+      summary: Execute a BPMN choreography
+      operationId: executeBPMNChoreography
+      parameters:
+        - $ref: "#/components/parameters/InstanceId"
+        - name: definition_id
+          in: query
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+      responses:
+        "200":
+          description: Choreography execution state.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "501":
+          description: Transport not configured.
+
   /mcp:
     post:
       tags: [MCP]
@@ -907,6 +1142,98 @@ components:
           maxItems: 1000
           items:
             $ref: "#/components/schemas/SyncPushEvent"
+
+    BPMNStartRequest:
+      type: object
+      required: [definition_id]
+      properties:
+        definition_id:
+          type: string
+        project_id:
+          type: string
+        actor:
+          type: string
+        instance_id:
+          type: string
+        variables:
+          type: object
+          additionalProperties:
+            type: string
+
+    BPMNCompleteRequest:
+      type: object
+      properties:
+        actor:
+          type: string
+
+    BPMNFailRequest:
+      type: object
+      properties:
+        kind:
+          type: string
+          enum: [error, escalation]
+        code:
+          type: string
+        scope:
+          type: string
+        message:
+          type: string
+        actor:
+          type: string
+
+    BPMNEventRequest:
+      type: object
+      required: [kind]
+      properties:
+        kind:
+          type: string
+          enum: [message, signal]
+        correlation_key:
+          type: string
+        actor:
+          type: string
+
+    BPMNAdvanceRequest:
+      type: object
+      properties:
+        now:
+          type: string
+          format: date-time
+        actor:
+          type: string
+
+    BPMNState:
+      type: object
+      properties:
+        instance_id:
+          type: string
+        ready:
+          type: array
+          items:
+            type: string
+        ended:
+          type: boolean
+        completed:
+          type: array
+          items:
+            type: string
+        compensated:
+          type: object
+          additionalProperties: true
+        variables:
+          type: object
+          additionalProperties:
+            type: string
+        tokens:
+          type: object
+          additionalProperties: true
+        subscriptions:
+          type: object
+          additionalProperties: true
+        suspended_scopes:
+          type: object
+          additionalProperties:
+            type: boolean
 
     SyncPushResponse:
       type: object
