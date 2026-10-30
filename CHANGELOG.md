@@ -2,24 +2,11 @@
 
 RHEOVELA open（`github.com/axisvela/rheovela-open`，Apache-2.0）发布记录：对外发布层（版本化 contracts、SDK、examples、CI、OpenAPI）。格式：最新在前；每个版本对应一个 git tag（三仓库统一语义版本 tag）。
 
-## [v1.42.0] - 2026-10-30
-
-### Added
-
-- OpenAPI: complete BPMN execution coverage (start/get/complete/fail/events/
-  advance/compensate/choreography) plus BPMN state and request schemas; spec
-  version moved to `v1.41.0`.
-- OpenAPI: health/status/metrics, workflow definitions + BPMN import preview,
-  and sync delta/pending/ack endpoints.
-- Contracts: `AssigneeSpec` gains `candidates`, `sla`, `budget`,
-  `claim_policy`, and `escalation` for the work assignment contract extension.
-### Changed
-
-- Coordinated ecosystem release with core `v1.42.0` and EE `v1.42.0`. The open `/v3` module remains `v3.12.0`.
-
 ## [Unreleased]
 
 ### Fixed
+
+- Notifications expose retry/dead-letter metadata and a requeue endpoint.
 
 - `api/workflow.schema.json` now includes the participant/completion Stage
   fields (`task_kind`, `payload`, `required_evidence`, `approval_roles`,
@@ -57,6 +44,22 @@ RHEOVELA open（`github.com/axisvela/rheovela-open`，Apache-2.0）发布记录�
 
 - Coordinated ecosystem release with core `v1.43.0` and EE `v1.43.0`. The open
   `/v3` module is tagged `v3.13.0`; the Go SDK module is tagged `v3.2.0`.
+
+## [v1.42.0] - 2026-10-30
+
+### Added
+
+- OpenAPI: complete BPMN execution coverage (start/get/complete/fail/events/
+  advance/compensate/choreography) plus BPMN state and request schemas; spec
+  version moved to `v1.41.0`.
+- OpenAPI: health/status/metrics, workflow definitions + BPMN import preview,
+  and sync delta/pending/ack endpoints.
+- Contracts: `AssigneeSpec` gains `candidates`, `sla`, `budget`,
+  `claim_policy`, and `escalation` for the work assignment contract extension.
+
+### Changed
+
+- Coordinated ecosystem release with core `v1.42.0` and EE `v1.42.0`. The open `/v3` module remains `v3.12.0`.
 
 ## [v1.41.0] - 2026-10-30
 
@@ -468,6 +471,8 @@ RHEOVELA open（`github.com/axisvela/rheovela-open`，Apache-2.0）发布记录�
 - Coordinated ecosystem patch release with core and Rheovela-ee `v1.7.3`.
 
 ### Fixed
+
+- Notifications expose retry/dead-letter metadata and a requeue endpoint.
 
 - Release workflow now requires `CORE_REPO_TOKEN` to check out the private core
   repository and fails with a clear preflight error when the secret is missing.

@@ -681,6 +681,27 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
 
+  /api/v1/notifications/{id}/requeue:
+    post:
+      tags: [Worker]
+      summary: Requeue a dead-lettered notification
+      operationId: requeueNotification
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Requeued.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OkResponse"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
   /api/v1/approval-delegations:
     post:
       tags: [Worker]
@@ -2128,6 +2149,16 @@ components:
           type: string
           format: date-time
         delivered_at:
+          type: string
+          format: date-time
+        attempts:
+          type: integer
+        next_attempt_at:
+          type: string
+          format: date-time
+        last_error:
+          type: string
+        dead_lettered_at:
           type: string
           format: date-time
 
