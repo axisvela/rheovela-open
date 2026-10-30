@@ -217,7 +217,7 @@ paths:
           required: false
           schema:
             type: string
-            enum: [ready, claimed, awaiting_approval, done, failed, cancelled]
+            enum: [ready, held, claimed, awaiting_approval, done, failed, cancelled]
           description: Work-item state filter.
       responses:
         "200":
@@ -573,6 +573,244 @@ paths:
         "409":
           $ref: "#/components/responses/Conflict"
 
+  /api/v1/instances/{id}/suspend:
+    post:
+      tags: [Instances]
+      summary: Suspend a run or a stage region
+      description: >
+        Empty `stages` suspends the whole instance; non-empty `stages` pauses
+        those stages and their downstream DAG region while the instance stays
+        active. Region work items move to `held`.
+      operationId: suspendInstance
+      parameters:
+        - $ref: "#/components/parameters/InstanceId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StagePauseRequest"
+      responses:
+        "200":
+          description: Suspended.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  stages:
+                    type: array
+                    items:
+                      type: string
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /api/v1/instances/{id}/resume:
+    post:
+      tags: [Instances]
+      summary: Resume a run or a stage region
+      operationId: resumeInstance
+      parameters:
+        - $ref: "#/components/parameters/InstanceId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StagePauseRequest"
+      responses:
+        "200":
+          description: Resumed.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  stages:
+                    type: array
+                    items:
+                      type: string
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /api/v1/bpmn/runs/{id}/suspend:
+    post:
+      tags: [BPMN]
+      summary: Suspend a BPMN scope
+      description: >
+        Suspends the scope and its descendants. Task completion/failure in the
+        scope returns 409; timers and message/signal subscriptions are deferred.
+      operationId: suspendBPMNScope
+      parameters:
+        - $ref: "#/components/parameters/InstanceId"
+        - name: definition_id
+          in: query
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ScopePauseRequest"
+      responses:
+        "200":
+          description: BPMN state with `suspended_scopes`.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "409":
+          $ref: "#/components/responses/Conflict"
+
+  /api/v1/bpmn/runs/{id}/resume:
+    post:
+      tags: [BPMN]
+      summary: Resume a BPMN scope
+      operationId: resumeBPMNScope
+      parameters:
+        - $ref: "#/components/parameters/InstanceId"
+        - name: definition_id
+          in: query
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ScopePauseRequest"
+      responses:
+        "200":
+          description: BPMN state with `suspended_scopes`.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "409":
+          $ref: "#/components/responses/Conflict"
+
+  /api/v1/sync/push:
+    post:
+      tags: [Sync]
+      summary: Push edge events to central
+      description: >
+        Idempotent batch ingest using `consumer_inbox`. Events are appended in
+        one transaction; replays return duplicate ids instead of re-appending.
+      operationId: syncPush
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SyncPushRequest"
+      responses:
+        "200":
+          description: Ingest result.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SyncPushResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /api/v1/events:
+    get:
+      tags: [Events]
+      summary: Filtered SSE event stream
+      description: >
+        Streams events after `after_seq`. Optional `types` globs,
+        `correlation_key`, and `predicate` filter deliveries. Reconnect with the
+        last delivered `after_seq` to replay.
+      operationId: streamEvents
+      parameters:
+        - name: stream
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: after_seq
+          in: query
+          schema:
+            type: integer
+            format: int64
+        - name: types
+          in: query
+          description: Comma-separated glob list (for example `task.*,run.*`).
+          schema:
+            type: string
+        - name: correlation_key
+          in: query
+          schema:
+            type: string
+        - name: predicate
+          in: query
+          description: Kernel condition over flattened payload fields.
+          schema:
+            type: string
+      responses:
+        "200":
+          description: "SSE frames (`event: event`, `data: <json>`)."
+          content:
+            text/event-stream:
+              schema:
+                type: string
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /api/v1/events/ws:
+    get:
+      tags: [Events]
+      summary: Filtered WebSocket event stream
+      description: >
+        WebSocket upgrade. Same query filters and `after_seq` replay as SSE;
+        clients may send `{"type":"ack","seq":N}` frames.
+      operationId: streamEventsWS
+      parameters:
+        - name: stream
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: after_seq
+          in: query
+          schema:
+            type: integer
+            format: int64
+        - name: types
+          in: query
+          schema:
+            type: string
+        - name: correlation_key
+          in: query
+          schema:
+            type: string
+        - name: predicate
+          in: query
+          schema:
+            type: string
+      responses:
+        "101":
+          description: Switching protocols.
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
   /mcp:
     post:
       tags: [MCP]
@@ -605,7 +843,87 @@ paths:
           $ref: "#/components/responses/ServerError"
 
 components:
+  parameters:
+    InstanceId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
   schemas:
+    StagePauseRequest:
+      type: object
+      required: [actor]
+      properties:
+        actor:
+          type: string
+        reason:
+          type: string
+        stages:
+          type: array
+          items:
+            type: string
+
+    ScopePauseRequest:
+      type: object
+      properties:
+        actor:
+          type: string
+        scope:
+          type: string
+          description: Scope path (default `root`).
+
+    SyncPushEvent:
+      type: object
+      required: [id, stream_id, type]
+      properties:
+        id:
+          type: string
+        stream_id:
+          type: string
+        actor_id:
+          type: string
+        type:
+          type: string
+        payload:
+          type: object
+          additionalProperties: true
+        wall_time:
+          type: string
+          format: date-time
+        schema_version:
+          type: string
+        signature:
+          type: string
+
+    SyncPushRequest:
+      type: object
+      required: [events]
+      properties:
+        consumer_id:
+          type: string
+        events:
+          type: array
+          maxItems: 1000
+          items:
+            $ref: "#/components/schemas/SyncPushEvent"
+
+    SyncPushResponse:
+      type: object
+      properties:
+        accepted:
+          type: array
+          items:
+            type: string
+        duplicates:
+          type: array
+          items:
+            type: string
+        accepted_count:
+          type: integer
+        duplicate_count:
+          type: integer
+
     ProcessInstance:
       type: object
       required: [instance_id, project_id, definition_id, definition_version, status, opened_by, variables, depth, started_at]
@@ -772,7 +1090,7 @@ components:
           type: string
         state:
           type: string
-          enum: [ready, claimed, awaiting_approval, done, failed, cancelled]
+          enum: [ready, held, claimed, awaiting_approval, done, failed, cancelled]
         assignee:
           type: string
         lease_until:
@@ -856,7 +1174,7 @@ components:
       properties:
         ok:
           type: boolean
-          const: true
+          enum: [true]
         work_item:
           $ref: "#/components/schemas/WorkItem"
 
@@ -901,7 +1219,7 @@ components:
       properties:
         ok:
           type: boolean
-          const: true
+          enum: [true]
 
     Error:
       type: object
@@ -917,12 +1235,12 @@ components:
       properties:
         jsonrpc:
           type: string
-          const: "2.0"
+          enum: ["2.0"]
         id:
+          nullable: true
           oneOf:
             - type: string
             - type: integer
-            - type: "null"
           description: Echoed back verbatim; may be null.
         method:
           type: string
@@ -936,12 +1254,12 @@ components:
       properties:
         jsonrpc:
           type: string
-          const: "2.0"
+          enum: ["2.0"]
         id:
+          nullable: true
           oneOf:
             - type: string
             - type: integer
-            - type: "null"
         result:
           type: object
           additionalProperties: true
@@ -951,12 +1269,12 @@ components:
       properties:
         jsonrpc:
           type: string
-          const: "2.0"
+          enum: ["2.0"]
         id:
+          nullable: true
           oneOf:
             - type: string
             - type: integer
-            - type: "null"
         error:
           type: object
           required: [code, message]
