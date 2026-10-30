@@ -28,6 +28,8 @@ RHEOVELA open（`github.com/axisvela/rheovela-open`，Apache-2.0）发布记录�
 - OpenAPI: work items expose budget/spent/tool scope/credential binding,
   completion mode, completions, and approval decisions; claim accepts
   actor/tools/credential; complete/fail accept cost; handoff/takeover endpoints.
+- OpenAPI: notification list/ack and approval-delegation create/list/revoke
+  endpoints for handoff/escalation delivery and delegated approvals.
 
 ### Changed
 

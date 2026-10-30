@@ -629,6 +629,132 @@ paths:
         "409":
           $ref: "#/components/responses/Conflict"
 
+  /api/v1/notifications:
+    get:
+      tags: [Worker]
+      summary: List actor notifications
+      operationId: listNotifications
+      parameters:
+        - name: actor
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: pending
+          in: query
+          schema:
+            type: boolean
+        - name: limit
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Notifications.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Notification"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /api/v1/notifications/{id}/ack:
+    post:
+      tags: [Worker]
+      summary: Acknowledge a notification
+      operationId: ackNotification
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Acknowledged.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OkResponse"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /api/v1/approval-delegations:
+    post:
+      tags: [Worker]
+      summary: Create an approval delegation
+      operationId: createApprovalDelegation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [from_actor, to_actor, role]
+              properties:
+                from_actor:
+                  type: string
+                to_actor:
+                  type: string
+                role:
+                  type: string
+                expires_at:
+                  type: string
+                  format: date-time
+      responses:
+        "201":
+          description: Created.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApprovalDelegation"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+    get:
+      tags: [Worker]
+      summary: List active delegations for a delegatee
+      operationId: listApprovalDelegations
+      parameters:
+        - name: actor
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Delegations.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ApprovalDelegation"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /api/v1/approval-delegations/{id}:
+    delete:
+      tags: [Worker]
+      summary: Revoke an approval delegation
+      operationId: revokeApprovalDelegation
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Revoked.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OkResponse"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
   /api/v1/work-items/{id}/fail:
     post:
       tags: [Worker]
@@ -1847,7 +1973,65 @@ components:
           type: object
           additionalProperties: true
           description: Completion evidence supplied by the worker.
+        approval_roles:
+          type: array
+          items:
+            type: string
+        budget:
+          type: integer
+          format: int64
+        spent:
+          type: integer
+          format: int64
+        tool_scope:
+          type: array
+          items:
+            type: string
+        credential_ref:
+          type: string
+        completion_mode:
+          type: string
+          enum: [single, quorum, all_actors]
+        required_approvals:
+          type: integer
+        required_completions:
+          type: integer
+        completions:
+          type: array
+          items:
+            $ref: "#/components/schemas/WorkItemCompletion"
+        deadline:
+          type: string
+          format: date-time
+        escalation:
+          type: string
+        escalated_at:
+          type: string
+          format: date-time
         created_at:
+          type: string
+          format: date-time
+
+    WorkItemCompletion:
+      type: object
+      required: [actor, at]
+      properties:
+        actor:
+          type: string
+        result:
+          type: object
+          additionalProperties: true
+        checkpoint_ref:
+          type: string
+        effect_cursor:
+          type: string
+        evidence:
+          type: object
+          additionalProperties: true
+        cost:
+          type: integer
+          format: int64
+        at:
           type: string
           format: date-time
 
@@ -1858,6 +2042,21 @@ components:
         state:
           type: string
           enum: [pending, approved, rejected]
+        approvals:
+          type: array
+          items:
+            type: object
+            properties:
+              actor:
+                type: string
+              comment:
+                type: string
+              final_args:
+                type: object
+                additionalProperties: true
+              at:
+                type: string
+                format: date-time
         pending_stage:
           type: string
         final_args:
@@ -1910,6 +2109,68 @@ components:
           enum: [true]
         work_item:
           $ref: "#/components/schemas/WorkItem"
+
+    Notification:
+      type: object
+      required: [id, actor, kind, created_at]
+      properties:
+        id:
+          type: string
+        actor:
+          type: string
+        kind:
+          type: string
+        work_item_id:
+          type: string
+        payload:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        delivered_at:
+          type: string
+          format: date-time
+
+    ApprovalDelegation:
+      type: object
+      required: [id, from_actor, to_actor, role, created_at]
+      properties:
+        id:
+          type: string
+        from_actor:
+          type: string
+        to_actor:
+          type: string
+        role:
+          type: string
+        expires_at:
+          type: string
+          format: date-time
+        created_at:
+          type: string
+          format: date-time
+        revoked_at:
+          type: string
+          format: date-time
+
+    ClaimRequest:
+      type: object
+      properties:
+        lease:
+          type: string
+          description: Lease duration (Go duration), default `30s`.
+          example: 30s
+        actor:
+          type: string
+          description: Required when the work item is assigned to a specific actor.
+        tools:
+          type: array
+          items:
+            type: string
+          description: Tools requested by the worker; must be within tool_scope.
+        credential:
+          type: string
+          description: Credential presented for work items with credential_ref.
 
     LeaseRequest:
       type: object
