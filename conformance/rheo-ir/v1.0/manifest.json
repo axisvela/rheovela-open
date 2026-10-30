@@ -7,6 +7,7 @@
       { "name": "purchase-approval", "source": "valid/purchase-approval.rheo", "expected": "valid/purchase-approval.json" },
       { "name": "delegation-evidence", "source": "valid/delegation-evidence.rheo", "expected": "valid/delegation-evidence.json" },
       { "name": "migration-policies", "source": "valid/migration-policies.rheo", "expected": "valid/migration-policies.json" },
+      { "name": "participant-completion", "source": "valid/participant-completion.rheo", "expected": "valid/participant-completion.json" },
       { "name": "comments-quotes", "source": "valid/comments-quotes.rheo", "expected": "valid/comments-quotes.json" },
       { "name": "durations", "source": "valid/durations.rheo", "expected": "valid/durations.json" }
     ],

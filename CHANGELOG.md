@@ -4,6 +4,11 @@ RHEOVELA open（`github.com/axisvela/rheovela-open`，Apache-2.0）发布记录�
 
 ## [Unreleased]
 
+### Added
+
+- RHEO IR supports `approval_roles`, `tools`, `credential`, `completion`,
+  `approvals`, and `completions` activity attributes with a conformance fixture.
+
 ### Fixed
 
 - Notifications expose retry/dead-letter metadata and a requeue endpoint.
@@ -469,6 +474,11 @@ RHEOVELA open（`github.com/axisvela/rheovela-open`，Apache-2.0）发布记录�
 ### Documentation
 
 - Coordinated ecosystem patch release with core and Rheovela-ee `v1.7.3`.
+
+### Added
+
+- RHEO IR supports `approval_roles`, `tools`, `credential`, `completion`,
+  `approvals`, and `completions` activity attributes with a conformance fixture.
 
 ### Fixed
 

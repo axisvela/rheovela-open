@@ -60,6 +60,12 @@ attribute     = "capability" WS value
               / "role" WS value
               / "effect_key" WS value
               / "timeout" WS duration
+              / "approval_roles" WS value
+              / "tools" WS value
+              / "credential" WS value
+              / "completion" WS value
+              / "approvals" WS integer
+              / "completions" WS integer
 transition    = "transition" WS ident WS "->" WS ident [ WS "when" WS condition ]
 compensate    = "compensate" WS ident WS "with" WS ( "capability" WS value / ident )
 delegate      = "delegate" WS ident WS "to" WS ("actor"/"role"/"capability") WS value
@@ -119,6 +125,12 @@ process PurchaseApproval v1 {
 - When neither is present, `AssigneeSpec.kind = "open"`.
 - `effect_key "<template>"` and `timeout <duration>` compile to
   `Stage.effect_key` and `Stage.timeout`.
+- `approval_roles "<csv>"` and `tools "<csv>"` compile to comma-split
+  `Stage.approval_roles` and `Stage.tool_scope`.
+- `credential "<ref>"` compiles to `Stage.credential_ref`.
+- `completion "<mode>"` (`single`/`quorum`/`all_actors`) compiles to
+  `Stage.completion_mode`; `approvals <n>` and `completions <n>` compile to
+  `Stage.required_approvals` and `Stage.required_completions`.
 - `inputs` and `outputs` are emitted as empty arrays by the compiler.
 
 ### 5.3 Transition
@@ -183,6 +195,9 @@ may be removed by a live migration.
 | `transition a -> b` | `transitions[] = {from:"a", to:"b"}` |
 | `when <condition>` | `transitions[].condition` |
 | `effect_key` / `timeout` | `stages[].effect_key`, `stages[].timeout` |
+| `approval_roles` / `tools` | `stages[].approval_roles`, `stages[].tool_scope` |
+| `credential` / `completion` | `stages[].credential_ref`, `stages[].completion_mode` |
+| `approvals` / `completions` | `stages[].required_approvals`, `stages[].required_completions` |
 | `compensate ...` | `compensations[] = {for_activity, compensate_with/capability}` |
 | `delegate ...` | `stages[].delegation = {kind, delegatee, scopes, budget, evidence}` |
 | `evidence ... require` | `stages[].evidence[]` |

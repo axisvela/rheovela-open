@@ -23,7 +23,7 @@ var codePattern = regexp.MustCompile(`^RHEOIR[0-9]{3}$`)
 func TestManifestAndCorpus(t *testing.T) {
 	m, err := LoadManifest(RHEOIRv1)
 	require.NoError(t, err)
-	require.Len(t, m.Cases.Valid, 6)
+	require.Len(t, m.Cases.Valid, 7)
 	require.Len(t, m.Cases.Invalid, 22)
 
 	referenced := map[string]bool{}

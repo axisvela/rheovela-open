@@ -1,0 +1,5 @@
+process ParticipantCompletion {
+  activity review : HumanTask role "manager" approval_roles "manager,auditor" tools "erp,shell" credential "cred-1" completion "quorum" approvals 2
+  activity approve : HumanTask role "manager"
+  transition review -> approve
+}

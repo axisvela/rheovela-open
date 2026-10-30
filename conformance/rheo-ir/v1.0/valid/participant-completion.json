@@ -1,0 +1,46 @@
+{
+  "workflow_id": "ParticipantCompletion",
+  "title": "ParticipantCompletion",
+  "source": "rheo-ir",
+  "stages": [
+    {
+      "id": "review",
+      "title": "review",
+      "assignee_spec": {
+        "kind": "role",
+        "role": "manager"
+      },
+      "inputs": [],
+      "outputs": [],
+      "task_kind": "HumanTask",
+      "approval_roles": [
+        "manager",
+        "auditor"
+      ],
+      "tool_scope": [
+        "erp",
+        "shell"
+      ],
+      "credential_ref": "cred-1",
+      "completion_mode": "quorum",
+      "required_approvals": 2
+    },
+    {
+      "id": "approve",
+      "title": "approve",
+      "assignee_spec": {
+        "kind": "role",
+        "role": "manager"
+      },
+      "inputs": [],
+      "outputs": [],
+      "task_kind": "HumanTask"
+    }
+  ],
+  "transitions": [
+    {
+      "from": "review",
+      "to": "approve"
+    }
+  ]
+}
