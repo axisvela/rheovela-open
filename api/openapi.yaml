@@ -371,6 +371,10 @@ paths:
                 effect_cursor:
                   type: string
                   description: Reference to the worker's effect-ledger cursor.
+                evidence:
+                  type: object
+                  additionalProperties: true
+                  description: Participant completion evidence (validated against required_evidence).
       responses:
         "200":
           description: Completed; response includes the updated work item.
@@ -1738,6 +1742,21 @@ components:
           type: string
         approval:
           $ref: "#/components/schemas/WorkItemApproval"
+        kind:
+          type: string
+          description: Participant kind (human/agent/service).
+        payload:
+          type: object
+          additionalProperties: true
+          description: Participant payload supplied by the workflow definition.
+        required_evidence:
+          type: array
+          items:
+            type: string
+        evidence:
+          type: object
+          additionalProperties: true
+          description: Completion evidence supplied by the worker.
         created_at:
           type: string
           format: date-time
