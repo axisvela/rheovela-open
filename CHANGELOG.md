@@ -31,7 +31,7 @@ RHEOVELA open（`github.com/axisvela/rheovela-open`，Apache-2.0）发布记录�
 - OpenAPI: notification list/ack and approval-delegation create/list/revoke
   endpoints for handoff/escalation delivery and delegated approvals. Claim
   `actor` matches `role:<name>` targets by role membership.
-- Go/Python/TypeScript SDKs: workers support claim guards
+- Go/Python/TypeScript/Java/Rust SDKs: workers support claim guards
   (actor/tools/credential), completion `evidence`/`cost`, and the expanded
   work-item contract; HTTP clients forward both.
 

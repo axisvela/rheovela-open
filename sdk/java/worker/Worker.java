@@ -60,6 +60,17 @@ public class Worker {
 
     private final String baseUrl;
     private final HttpClient http;
+    private String claimActor;
+    private String claimToolsJson;
+    private String claimCredential;
+
+    /** Configure optional claim guards used by {@link #processOnce}. */
+    public Worker withClaimOptions(String actor, String toolsJson, String credential) {
+        this.claimActor = actor;
+        this.claimToolsJson = toolsJson;
+        this.claimCredential = credential;
+        return this;
+    }
 
     public Worker(String baseUrl) {
         this.baseUrl = baseUrl.endsWith("/")
@@ -84,9 +95,26 @@ public class Worker {
 
     /** POST /api/v1/work-items/{id}/claim — returns the lease token. */
     public String claim(String id, String lease) throws Exception {
-        String body = post("/api/v1/work-items/" + id + "/claim",
-                "{\"lease\":\"" + jsonEscape(lease) + "\"}");
-        return jsonStr(body, "token");
+        return claim(id, lease, null, null, null);
+    }
+
+    /** POST claim with optional actor/tools/credential guards. */
+    public String claim(String id, String lease, String actor, String toolsJson,
+            String credential) throws Exception {
+        StringBuilder body = new StringBuilder();
+        body.append("{\"lease\":\"").append(jsonEscape(lease)).append('"');
+        if (actor != null && !actor.isEmpty()) {
+            body.append(",\"actor\":\"").append(jsonEscape(actor)).append('"');
+        }
+        if (toolsJson != null && !toolsJson.isEmpty()) {
+            body.append(",\"tools\":").append(toolsJson);
+        }
+        if (credential != null && !credential.isEmpty()) {
+            body.append(",\"credential\":\"").append(jsonEscape(credential)).append('"');
+        }
+        body.append('}');
+        String resp = post("/api/v1/work-items/" + id + "/claim", body.toString());
+        return jsonStr(resp, "token");
     }
 
     /** POST /api/v1/work-items/{id}/complete. */
@@ -97,10 +125,22 @@ public class Worker {
     /** POST /api/v1/work-items/{id}/complete with optional result and cursors. */
     public void complete(String id, String token, String resultJson,
             String checkpointRef, String effectCursor) throws Exception {
+        complete(id, token, resultJson, null, 0, checkpointRef, effectCursor);
+    }
+
+    /** Complete with optional result/evidence JSON, cost, and cursors. */
+    public void complete(String id, String token, String resultJson, String evidenceJson,
+            long cost, String checkpointRef, String effectCursor) throws Exception {
         StringBuilder body = new StringBuilder();
         body.append("{\"token\":\"").append(jsonEscape(token)).append('"');
         if (resultJson != null && !resultJson.isEmpty()) {
             body.append(",\"result\":").append(resultJson);
+        }
+        if (evidenceJson != null && !evidenceJson.isEmpty()) {
+            body.append(",\"evidence\":").append(evidenceJson);
+        }
+        if (cost != 0) {
+            body.append(",\"cost\":").append(cost);
         }
         if (checkpointRef != null && !checkpointRef.isEmpty()) {
             body.append(",\"checkpoint_ref\":\"").append(jsonEscape(checkpointRef)).append('"');
@@ -173,7 +213,7 @@ public class Worker {
         for (WorkItem item : poll(null)) {
             String token;
             try {
-                token = claim(item.id(), lease);
+                token = claim(item.id(), lease, claimActor, claimToolsJson, claimCredential);
             } catch (WorkerException e) {
                 continue; // claimed by another worker
             }

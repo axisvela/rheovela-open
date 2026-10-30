@@ -313,7 +313,34 @@ impl Worker {
 
     /// POST `/api/v1/work-items/{id}/claim` — claim and return the fencing token.
     pub fn claim(&self, id: &str, lease: &str) -> Result<String, WorkerError> {
-        let body = format!("{{\"lease\":\"{}\"}}", json_escape(lease));
+        self.claim_with_options(id, lease, None, None, None)
+    }
+
+    /// POST claim with optional actor/tools/credential guards.
+    pub fn claim_with_options(
+        &self,
+        id: &str,
+        lease: &str,
+        actor: Option<&str>,
+        tools_json: Option<&str>,
+        credential: Option<&str>,
+    ) -> Result<String, WorkerError> {
+        let mut body = format!("{{\"lease\":\"{}\"", json_escape(lease));
+        if let Some(actor) = actor.filter(|v| !v.is_empty()) {
+            body.push_str(",\"actor\":\"");
+            body.push_str(&json_escape(actor));
+            body.push('"');
+        }
+        if let Some(tools) = tools_json.filter(|v| !v.is_empty()) {
+            body.push_str(",\"tools\":");
+            body.push_str(tools);
+        }
+        if let Some(credential) = credential.filter(|v| !v.is_empty()) {
+            body.push_str(",\"credential\":\"");
+            body.push_str(&json_escape(credential));
+            body.push('"');
+        }
+        body.push('}');
         let resp = self.client.request(
             "POST",
             &format!("/api/v1/work-items/{}/claim", id),
@@ -341,10 +368,31 @@ impl Worker {
         checkpoint: Option<&str>,
         effect: Option<&str>,
     ) -> Result<(), WorkerError> {
+        self.complete_with_evidence(id, token, result, None, 0, checkpoint, effect)
+    }
+
+    /// Complete with optional result/evidence JSON, cost, and cursors.
+    pub fn complete_with_evidence(
+        &self,
+        id: &str,
+        token: &str,
+        result: Option<&str>,
+        evidence: Option<&str>,
+        cost: u64,
+        checkpoint: Option<&str>,
+        effect: Option<&str>,
+    ) -> Result<(), WorkerError> {
         let mut body = format!("{{\"token\":\"{}\"", json_escape(token));
         if let Some(result) = result.filter(|v| !v.is_empty()) {
             body.push_str(",\"result\":");
             body.push_str(result);
+        }
+        if let Some(evidence) = evidence.filter(|v| !v.is_empty()) {
+            body.push_str(",\"evidence\":");
+            body.push_str(evidence);
+        }
+        if cost != 0 {
+            body.push_str(&format!(",\"cost\":{}", cost));
         }
         if let Some(checkpoint) = checkpoint.filter(|v| !v.is_empty()) {
             body.push_str(",\"checkpoint_ref\":\"");
