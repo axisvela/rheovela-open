@@ -13,6 +13,14 @@ RHEOVELA open（`github.com/axisvela/rheovela-open`，Apache-2.0）发布记录�
   and sync delta/pending/ack endpoints.
 - Contracts: `AssigneeSpec` gains `candidates`, `sla`, `budget`,
   `claim_policy`, and `escalation` for the work assignment contract extension.
+### Changed
+
+- Coordinated ecosystem release with core `v1.42.0` and EE `v1.42.0`. The open `/v3` module remains `v3.12.0`.
+
+## [v1.43.0] - 2026-10-30
+
+### Added
+
 - Contracts: `Stage` gains `task_kind`, `payload`, `required_evidence`, and
   `approval_roles` for Wave 2 participant contracts.
 - OpenAPI: work items expose `kind`/`payload`/`required_evidence`/`evidence`;
@@ -37,7 +45,8 @@ RHEOVELA open（`github.com/axisvela/rheovela-open`，Apache-2.0）发布记录�
 
 ### Changed
 
-- Coordinated ecosystem release with core `v1.42.0` and EE `v1.42.0`. The open `/v3` module remains `v3.12.0`.
+- Coordinated ecosystem release with core `v1.43.0` and EE `v1.43.0`. The open
+  `/v3` module is tagged `v3.13.0`; the Go SDK module is tagged `v3.2.0`.
 
 ## [v1.41.0] - 2026-10-30
 
