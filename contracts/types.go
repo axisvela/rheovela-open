@@ -569,6 +569,9 @@ type Stage struct {
 	ApprovalRoles    []string        `json:"approval_roles,omitempty"`
 	ToolScope        []string        `json:"tool_scope,omitempty"`
 	CredentialRef    string          `json:"credential_ref,omitempty"`
+	CompletionMode   string          `json:"completion_mode,omitempty"`
+	RequiredApprovals int            `json:"required_approvals,omitempty"`
+	RequiredCompletions int          `json:"required_completions,omitempty"`
 }
 
 // Delegation describes an authority delegation attached to a stage.
