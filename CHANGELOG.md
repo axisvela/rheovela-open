@@ -17,8 +17,10 @@ RHEOVELA open（`github.com/axisvela/rheovela-open`，Apache-2.0）发布记录�
   `approval_roles` for Wave 2 participant contracts.
 - OpenAPI: work items expose `kind`/`payload`/`required_evidence`/`evidence`;
   the complete endpoint accepts `evidence`.
-- OpenAPI: work items expose `deadline`/`escalation`/`approval_roles`, and
-  `GET /api/v1/work-items` accepts `overdue=true` for SLA breach queries.
+- OpenAPI: work items expose `deadline`/`escalation`/`escalated_at`/`approval_roles`,
+  and `GET /api/v1/work-items` accepts `overdue=true` for SLA breach queries.
+- Contracts: `WorkItemEscalated` is a known audit event emitted by automatic
+  SLA escalation.
 
 ### Changed
 

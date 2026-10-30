@@ -37,7 +37,8 @@
         "ProcessResumed",
         "WorkItemApprovalRequested",
         "WorkItemApproved",
-        "WorkItemRejected"
+        "WorkItemRejected",
+        "WorkItemEscalated"
       ]
     },
     "payload": {

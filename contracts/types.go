@@ -13,7 +13,7 @@ var KnownEventTypes = []string{
 	"RunOpened", "StepEntered", "StepCompleted", "StepFailed", "StepSkipped",
 	"RunClosed", "StageAssigned", "TimerFired", "Migrated", "CompensationExecuted",
 	"SubprocessStarted", "ProcessSuspended", "ProcessResumed",
-	"WorkItemApprovalRequested", "WorkItemApproved", "WorkItemRejected",
+	"WorkItemApprovalRequested", "WorkItemApproved", "WorkItemRejected", "WorkItemEscalated",
 }
 
 type ActorType string
