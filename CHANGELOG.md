@@ -10,6 +10,9 @@ RHEOVELA open（`github.com/axisvela/rheovela-open`，Apache-2.0）发布记录�
   `types`/`correlation_key`/`predicate` subscription, `after_seq` reconnect,
   exponential backoff, and a file-backed at-least-once pending queue that
   persists acks across restarts.
+- Python SDK `sdk/python/events.py`: durable WebSocket event client with the
+  same cursor/pending-queue semantics (`websockets` optional dependency, see
+  `requirements-events.txt`).
 
 ## [v1.39.0] - 2026-10-29
 
