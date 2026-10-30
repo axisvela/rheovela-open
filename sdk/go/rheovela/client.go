@@ -40,21 +40,35 @@ type Instance struct {
 
 // WorkItem is a claimable unit of work with lease/fencing semantics.
 type WorkItem struct {
-	ID            string            `json:"id"`
-	InstanceID    string            `json:"instance_id"`
-	ActivityID    string            `json:"activity_id"`
-	State         string            `json:"state"`
-	Assignee      string            `json:"assignee,omitempty"`
-	LeaseUntil    *time.Time        `json:"lease_until,omitempty"`
-	FencingToken  string            `json:"fencing_token,omitempty"`
-	CreatedAt     time.Time         `json:"created_at"`
-	Result        json.RawMessage   `json:"result,omitempty"`
-	CheckpointRef string            `json:"checkpoint_ref,omitempty"`
-	EffectCursor  string            `json:"effect_cursor,omitempty"`
-	Attempts      int               `json:"attempts"`
-	MaxAttempts   int               `json:"max_attempts"`
-	LastError     string            `json:"last_error,omitempty"`
-	Approval      *WorkItemApproval `json:"approval,omitempty"`
+	ID                  string            `json:"id"`
+	InstanceID          string            `json:"instance_id"`
+	ActivityID          string            `json:"activity_id"`
+	State               string            `json:"state"`
+	Assignee            string            `json:"assignee,omitempty"`
+	LeaseUntil          *time.Time        `json:"lease_until,omitempty"`
+	FencingToken        string            `json:"fencing_token,omitempty"`
+	CreatedAt           time.Time         `json:"created_at"`
+	Result              json.RawMessage   `json:"result,omitempty"`
+	CheckpointRef       string            `json:"checkpoint_ref,omitempty"`
+	EffectCursor        string            `json:"effect_cursor,omitempty"`
+	Attempts            int               `json:"attempts"`
+	MaxAttempts         int               `json:"max_attempts"`
+	LastError           string            `json:"last_error,omitempty"`
+	Approval            *WorkItemApproval `json:"approval,omitempty"`
+	Kind                string            `json:"kind,omitempty"`
+	Payload             json.RawMessage   `json:"payload,omitempty"`
+	RequiredEvidence    []string          `json:"required_evidence,omitempty"`
+	Evidence            json.RawMessage   `json:"evidence,omitempty"`
+	Budget              int64             `json:"budget,omitempty"`
+	Spent               int64             `json:"spent,omitempty"`
+	ToolScope           []string          `json:"tool_scope,omitempty"`
+	CredentialRef       string            `json:"credential_ref,omitempty"`
+	ApprovalRoles       []string          `json:"approval_roles,omitempty"`
+	CompletionMode      string            `json:"completion_mode,omitempty"`
+	RequiredApprovals   int               `json:"required_approvals,omitempty"`
+	RequiredCompletions int               `json:"required_completions,omitempty"`
+	Deadline            *time.Time        `json:"deadline,omitempty"`
+	Escalation          string            `json:"escalation,omitempty"`
 }
 
 // WorkItemApproval is the approval state attached to a work item.
@@ -76,8 +90,17 @@ type WorkItemApproval struct {
 type WorkResult struct {
 	Actor         string          `json:"actor,omitempty"`
 	Result        json.RawMessage `json:"result,omitempty"`
+	Evidence      json.RawMessage `json:"evidence,omitempty"`
+	Cost          int64           `json:"cost,omitempty"`
 	CheckpointRef string          `json:"checkpoint_ref,omitempty"`
 	EffectCursor  string          `json:"effect_cursor,omitempty"`
+}
+
+// ClaimOptions carries optional claim-time guards.
+type ClaimOptions struct {
+	Actor      string   `json:"actor,omitempty"`
+	Tools      []string `json:"tools,omitempty"`
+	Credential string   `json:"credential,omitempty"`
 }
 
 // ApprovalRequest asks for human approval before a work item advances.
@@ -267,6 +290,28 @@ func (c *Client) ClaimWorkItem(ctx context.Context, id, lease string) (*Claim, e
 	return &out, nil
 }
 
+// ClaimWorkItemWithOptions claims with actor/tools/credential guards.
+func (c *Client) ClaimWorkItemWithOptions(ctx context.Context, id, lease string, opts ClaimOptions) (*Claim, error) {
+	if lease == "" {
+		lease = defaultLease
+	}
+	body := map[string]interface{}{"lease": lease}
+	if opts.Actor != "" {
+		body["actor"] = opts.Actor
+	}
+	if len(opts.Tools) > 0 {
+		body["tools"] = opts.Tools
+	}
+	if opts.Credential != "" {
+		body["credential"] = opts.Credential
+	}
+	var out Claim
+	if err := c.doJSON(ctx, http.MethodPost, "/api/v1/work-items/"+url.PathEscape(id)+"/claim", body, &out); err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
 // HeartbeatWorkItem renews a claim.
 func (c *Client) HeartbeatWorkItem(ctx context.Context, id, token, lease string) error {
 	if lease == "" {
@@ -289,6 +334,12 @@ func (c *Client) CompleteWorkItemWithResult(ctx context.Context, id, token strin
 	}
 	if len(res.Result) > 0 {
 		body["result"] = res.Result
+	}
+	if len(res.Evidence) > 0 {
+		body["evidence"] = res.Evidence
+	}
+	if res.Cost != 0 {
+		body["cost"] = res.Cost
 	}
 	if res.CheckpointRef != "" {
 		body["checkpoint_ref"] = res.CheckpointRef

@@ -31,14 +31,29 @@ type ApprovalRequest struct {
 }
 
 type WorkItem struct {
-	ID            string
-	InstanceID    string
-	ActivityID    string
-	State         string
-	Result        json.RawMessage
-	CheckpointRef string
-	EffectCursor  string
-	Approval      *Approval
+	ID                  string
+	InstanceID          string
+	ActivityID          string
+	State               string
+	Assignee            string
+	Kind                string
+	Payload             json.RawMessage
+	RequiredEvidence    []string
+	Evidence            json.RawMessage
+	Budget              int64
+	Spent               int64
+	ToolScope           []string
+	CredentialRef       string
+	ApprovalRoles       []string
+	CompletionMode      string
+	RequiredApprovals   int
+	RequiredCompletions int
+	Deadline            *time.Time
+	Escalation          string
+	Result              json.RawMessage
+	CheckpointRef       string
+	EffectCursor        string
+	Approval            *Approval
 }
 
 type WorkResult struct {
@@ -46,9 +61,18 @@ type WorkResult struct {
 	Error         string
 	Outcome       string
 	Result        json.RawMessage
+	Evidence      json.RawMessage
+	Cost          int64
 	CheckpointRef string
 	EffectCursor  string
 	Approval      *ApprovalRequest
+}
+
+// ClaimOptions carries optional claim-time guards.
+type ClaimOptions struct {
+	Actor      string
+	Tools      []string
+	Credential string
 }
 
 type WorkFn func(ctx context.Context, item WorkItem) WorkResult
@@ -57,6 +81,12 @@ type WorkFn func(ctx context.Context, item WorkItem) WorkResult
 // results are committed together with their result payload and cursors.
 type ResultStore interface {
 	CompleteWithResult(id, token string, res WorkResult) error
+}
+
+// ClaimGuardStore is an optional WorkStore extension: when implemented, the
+// worker forwards actor/tools/credential guards during claims.
+type ClaimGuardStore interface {
+	ClaimWithOptions(id string, leaseDuration time.Duration, opts ClaimOptions) (token string, err error)
 }
 
 // ApprovalStore is an optional WorkStore extension: when implemented, a worker
@@ -80,6 +110,7 @@ type Worker struct {
 	fn                WorkFn
 	logf              func(format string, args ...any)
 	heartbeatInterval time.Duration
+	claimOptions      ClaimOptions
 }
 
 type Option func(*Worker)
@@ -90,6 +121,12 @@ func WithLogger(logf func(format string, args ...any)) Option {
 
 func WithHeartbeatInterval(d time.Duration) Option {
 	return func(w *Worker) { w.heartbeatInterval = d }
+}
+
+// WithClaimOptions forwards actor/tools/credential guards to ClaimGuardStore
+// implementations; plain WorkStore implementations ignore them.
+func WithClaimOptions(opts ClaimOptions) Option {
+	return func(w *Worker) { w.claimOptions = opts }
 }
 
 func New(store WorkStore, fn WorkFn, lease time.Duration, opts ...Option) *Worker {
@@ -120,7 +157,12 @@ func (w *Worker) ProcessOnce(ctx context.Context) (int, error) {
 		if ctx.Err() != nil {
 			return processed, ctx.Err()
 		}
-		token, err := w.store.Claim(it.ID, w.lease)
+		var token string
+		if guarded, ok := w.store.(ClaimGuardStore); ok {
+			token, err = guarded.ClaimWithOptions(it.ID, w.lease, w.claimOptions)
+		} else {
+			token, err = w.store.Claim(it.ID, w.lease)
+		}
 		if err != nil {
 			w.logf("claim %s: %v", it.ID, err) // 并发失败/不可领取 → 跳过
 			continue

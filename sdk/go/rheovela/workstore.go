@@ -15,9 +15,10 @@ type HTTPWorkStore struct {
 }
 
 var (
-	_ worker.WorkStore     = (*HTTPWorkStore)(nil)
-	_ worker.ResultStore   = (*HTTPWorkStore)(nil)
-	_ worker.ApprovalStore = (*HTTPWorkStore)(nil)
+	_ worker.WorkStore       = (*HTTPWorkStore)(nil)
+	_ worker.ClaimGuardStore = (*HTTPWorkStore)(nil)
+	_ worker.ResultStore     = (*HTTPWorkStore)(nil)
+	_ worker.ApprovalStore   = (*HTTPWorkStore)(nil)
 )
 
 // NewHTTPWorkStore builds a worker WorkStore over the given client.
@@ -53,7 +54,14 @@ func (s *HTTPWorkStore) PollReady() ([]worker.WorkItem, error) {
 func toWorkerItem(it WorkItem) worker.WorkItem {
 	w := worker.WorkItem{
 		ID: it.ID, InstanceID: it.InstanceID, ActivityID: it.ActivityID, State: it.State,
-		Result: it.Result, CheckpointRef: it.CheckpointRef, EffectCursor: it.EffectCursor,
+		Assignee: it.Assignee, Kind: it.Kind, Payload: it.Payload,
+		RequiredEvidence: it.RequiredEvidence, Evidence: it.Evidence,
+		Budget: it.Budget, Spent: it.Spent, ToolScope: it.ToolScope,
+		CredentialRef: it.CredentialRef, ApprovalRoles: it.ApprovalRoles,
+		CompletionMode: it.CompletionMode, RequiredApprovals: it.RequiredApprovals,
+		RequiredCompletions: it.RequiredCompletions, Deadline: it.Deadline,
+		Escalation: it.Escalation,
+		Result:     it.Result, CheckpointRef: it.CheckpointRef, EffectCursor: it.EffectCursor,
 	}
 	if it.Approval != nil {
 		w.Approval = &worker.Approval{
@@ -77,6 +85,17 @@ func (s *HTTPWorkStore) Claim(id string, lease time.Duration) (string, error) {
 	return claim.Token, nil
 }
 
+// ClaimWithOptions claims with actor/tools/credential guards.
+func (s *HTTPWorkStore) ClaimWithOptions(id string, lease time.Duration, opts worker.ClaimOptions) (string, error) {
+	claim, err := s.c.ClaimWorkItemWithOptions(s.ctx, id, lease.String(), ClaimOptions{
+		Actor: opts.Actor, Tools: opts.Tools, Credential: opts.Credential,
+	})
+	if err != nil {
+		return "", err
+	}
+	return claim.Token, nil
+}
+
 // Heartbeat renews a claim.
 func (s *HTTPWorkStore) Heartbeat(id, token string, lease time.Duration) error {
 	return s.c.HeartbeatWorkItem(s.ctx, id, token, lease.String())
@@ -91,7 +110,8 @@ func (s *HTTPWorkStore) Complete(id, token string) error {
 // checkpoint/effect references.
 func (s *HTTPWorkStore) CompleteWithResult(id, token string, res worker.WorkResult) error {
 	return s.c.CompleteWorkItemWithResult(s.ctx, id, token, WorkResult{
-		Result: res.Result, CheckpointRef: res.CheckpointRef, EffectCursor: res.EffectCursor,
+		Result: res.Result, Evidence: res.Evidence, Cost: res.Cost,
+		CheckpointRef: res.CheckpointRef, EffectCursor: res.EffectCursor,
 	})
 }
 

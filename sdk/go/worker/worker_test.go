@@ -26,6 +26,7 @@ type fakeStore struct {
 	// requeueOnFail models the durable runtime's retry behavior: a failed
 	// work item returns to the ready queue and can be claimed again.
 	requeueOnFail bool
+	lastOpts      ClaimOptions
 }
 
 func newFakeStore(items ...WorkItem) *fakeStore {
@@ -65,6 +66,13 @@ func (s *fakeStore) Claim(id string, lease time.Duration) (string, error) {
 	token := "tok-" + id
 	s.tokens[id] = token
 	return token, nil
+}
+
+func (s *fakeStore) ClaimWithOptions(id string, lease time.Duration, opts ClaimOptions) (string, error) {
+	s.mu.Lock()
+	s.lastOpts = opts
+	s.mu.Unlock()
+	return s.Claim(id, lease)
 }
 
 func (s *fakeStore) Heartbeat(id, token string, lease time.Duration) error {
@@ -418,4 +426,18 @@ func TestProcessOnceApprovalMergesRefs(t *testing.T) {
 	require.Len(t, store.requests, 1)
 	assert.Equal(t, "ckpt-top", store.requests[0].CheckpointRef)
 	assert.Equal(t, "cur-top", store.requests[0].EffectCursor)
+}
+
+func TestProcessOnceForwardsClaimOptions(t *testing.T) {
+	store := newFakeStore(WorkItem{ID: "w1", State: "ready"})
+	w := New(store, func(ctx context.Context, item WorkItem) WorkResult {
+		return WorkResult{Status: "success"}
+	}, time.Minute, WithClaimOptions(ClaimOptions{
+		Actor: "alice", Tools: []string{"erp"}, Credential: "cred-1",
+	}))
+
+	n, err := w.ProcessOnce(context.Background())
+	require.NoError(t, err)
+	assert.Equal(t, 1, n)
+	assert.Equal(t, ClaimOptions{Actor: "alice", Tools: []string{"erp"}, Credential: "cred-1"}, store.lastOpts)
 }
