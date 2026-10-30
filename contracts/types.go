@@ -575,10 +575,15 @@ type Delegation struct {
 }
 
 type AssigneeSpec struct {
-	Kind     string   `json:"kind"`
-	ActorID  string   `json:"actor_id,omitempty"`
-	Role     string   `json:"role,omitempty"`
-	Required []string `json:"required,omitempty"`
+	Kind       string   `json:"kind"`
+	ActorID    string   `json:"actor_id,omitempty"`
+	Role       string   `json:"role,omitempty"`
+	Required   []string `json:"required,omitempty"`
+	Candidates []string `json:"candidates,omitempty"`
+	SLA        string   `json:"sla,omitempty"`
+	Budget     int64    `json:"budget,omitempty"`
+	ClaimPolicy string  `json:"claim_policy,omitempty"`
+	Escalation string   `json:"escalation,omitempty"`
 }
 
 type StageExecution struct {
