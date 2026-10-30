@@ -1655,11 +1655,15 @@ components:
           type: integer
         failed:
           type: integer
-        due_timers:
+        timers_pending:
           type: integer
-        ready_work_items:
+        work_items_ready:
           type: integer
-        unknown_effects:
+        effects_unknown:
+          type: integer
+        notifications_pending:
+          type: integer
+        notifications_dead_lettered:
           type: integer
       additionalProperties: true
 

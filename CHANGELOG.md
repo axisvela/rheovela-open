@@ -11,6 +11,9 @@ RHEOVELA open（`github.com/axisvela/rheovela-open`，Apache-2.0）发布记录�
 
 ### Fixed
 
+- `/api/v1/metrics` exposes notification counts and its field names now match
+  the response (`timers_pending`, `work_items_ready`, `effects_unknown`).
+
 - `/api/v1/status` exposes pending/dead-lettered notification counts.
 
 - Notifications expose retry/dead-letter metadata and a requeue endpoint.
@@ -483,6 +486,9 @@ RHEOVELA open（`github.com/axisvela/rheovela-open`，Apache-2.0）发布记录�
   `approvals`, and `completions` activity attributes with a conformance fixture.
 
 ### Fixed
+
+- `/api/v1/metrics` exposes notification counts and its field names now match
+  the response (`timers_pending`, `work_items_ready`, `effects_unknown`).
 
 - `/api/v1/status` exposes pending/dead-lettered notification counts.
 
