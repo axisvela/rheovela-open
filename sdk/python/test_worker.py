@@ -172,6 +172,7 @@ class WorkerTest(unittest.TestCase):
         self.assertEqual(n, 1)
         self.assertEqual(self.srv.complete_records, [{
             "token": "tok-1",
+            "actor": "alice",
             "result": {"ok": True},
             "evidence": {"receipt": "r-1"},
             "cost": 12,

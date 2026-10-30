@@ -60,6 +60,7 @@ type WorkResult struct {
 	Status        string // "success" | "failure" | "approval"
 	Error         string
 	Outcome       string
+	Actor         string
 	Result        json.RawMessage
 	Evidence      json.RawMessage
 	Cost          int64
@@ -258,6 +259,9 @@ func (w *Worker) runWithHeartbeat(ctx context.Context, item WorkItem, token stri
 
 	res := w.fn(hctx, item)
 	close(stop)
+	if res.Actor == "" {
+		res.Actor = w.claimOptions.Actor
+	}
 	<-done
 	if leaseLost.Load() {
 		return WorkResult{Status: "failure", Error: "lease lost"}

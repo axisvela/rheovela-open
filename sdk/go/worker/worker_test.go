@@ -429,7 +429,8 @@ func TestProcessOnceApprovalMergesRefs(t *testing.T) {
 }
 
 func TestProcessOnceForwardsClaimOptions(t *testing.T) {
-	store := newFakeStore(WorkItem{ID: "w1", State: "ready"})
+	base := newFakeStore(WorkItem{ID: "w1", State: "ready"})
+	store := &resultStore{fakeStore: base}
 	w := New(store, func(ctx context.Context, item WorkItem) WorkResult {
 		return WorkResult{Status: "success"}
 	}, time.Minute, WithClaimOptions(ClaimOptions{
@@ -439,5 +440,7 @@ func TestProcessOnceForwardsClaimOptions(t *testing.T) {
 	n, err := w.ProcessOnce(context.Background())
 	require.NoError(t, err)
 	assert.Equal(t, 1, n)
-	assert.Equal(t, ClaimOptions{Actor: "alice", Tools: []string{"erp"}, Credential: "cred-1"}, store.lastOpts)
+	assert.Equal(t, ClaimOptions{Actor: "alice", Tools: []string{"erp"}, Credential: "cred-1"}, base.lastOpts)
+	require.Len(t, store.completed, 1)
+	assert.Equal(t, "alice", store.completed[0].Actor)
 }

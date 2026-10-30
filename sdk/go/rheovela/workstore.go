@@ -110,7 +110,7 @@ func (s *HTTPWorkStore) Complete(id, token string) error {
 // checkpoint/effect references.
 func (s *HTTPWorkStore) CompleteWithResult(id, token string, res worker.WorkResult) error {
 	return s.c.CompleteWorkItemWithResult(s.ctx, id, token, WorkResult{
-		Result: res.Result, Evidence: res.Evidence, Cost: res.Cost,
+		Actor: res.Actor, Result: res.Result, Evidence: res.Evidence, Cost: res.Cost,
 		CheckpointRef: res.CheckpointRef, EffectCursor: res.EffectCursor,
 	})
 }

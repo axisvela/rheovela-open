@@ -28,22 +28,39 @@ public class Worker {
     public record ApprovalRequest(String actor, String reason, String final_args,
             String checkpoint_ref, String effect_cursor) {}
 
-    public record Result(String status, String error, String outcome, String result,
-            String checkpoint_ref, String effect_cursor, ApprovalRequest approval) {
+    public record Result(String status, String error, String outcome, String actor,
+            String result, String evidence, long cost, String checkpoint_ref,
+            String effect_cursor, ApprovalRequest approval) {
+        public Result(String status, String error, String outcome, String result,
+                String checkpoint_ref, String effect_cursor, ApprovalRequest approval) {
+            this(status, error, outcome, null, result, null, 0, checkpoint_ref, effect_cursor, approval);
+        }
+
         public static Result ok() {
-            return new Result("success", null, null, null, null, null, null);
+            return new Result("success", null, null, null, null, null, 0, null, null, null);
         }
 
         public static Result success(String result, String checkpoint_ref, String effect_cursor) {
-            return new Result("success", null, null, result, checkpoint_ref, effect_cursor, null);
+            return success(null, result, null, 0, checkpoint_ref, effect_cursor);
+        }
+
+        public static Result success(String result, String evidence, long cost,
+                String checkpoint_ref, String effect_cursor) {
+            return success(null, result, evidence, cost, checkpoint_ref, effect_cursor);
+        }
+
+        public static Result success(String actor, String result, String evidence, long cost,
+                String checkpoint_ref, String effect_cursor) {
+            return new Result("success", null, null, actor, result, evidence, cost,
+                    checkpoint_ref, effect_cursor, null);
         }
 
         public static Result fail(String error) {
-            return new Result("failure", error, null, null, null, null, null);
+            return new Result("failure", error, null, null, null, null, 0, null, null, null);
         }
 
         public static Result approval(ApprovalRequest req) {
-            return new Result("approval", null, null, null, null, null, req);
+            return new Result("approval", null, null, null, null, null, 0, null, null, req);
         }
     }
 
@@ -131,8 +148,18 @@ public class Worker {
     /** Complete with optional result/evidence JSON, cost, and cursors. */
     public void complete(String id, String token, String resultJson, String evidenceJson,
             long cost, String checkpointRef, String effectCursor) throws Exception {
+        complete(id, token, null, resultJson, evidenceJson, cost, checkpointRef, effectCursor);
+    }
+
+    /** Complete with actor and optional result/evidence JSON, cost, and cursors. */
+    public void complete(String id, String token, String actor, String resultJson,
+            String evidenceJson, long cost, String checkpointRef, String effectCursor)
+            throws Exception {
         StringBuilder body = new StringBuilder();
         body.append("{\"token\":\"").append(jsonEscape(token)).append('"');
+        if (actor != null && !actor.isEmpty()) {
+            body.append(",\"actor\":\"").append(jsonEscape(actor)).append('"');
+        }
         if (resultJson != null && !resultJson.isEmpty()) {
             body.append(",\"result\":").append(resultJson);
         }
@@ -220,8 +247,9 @@ public class Worker {
             Result res = fn.apply(item, token);
             try {
                 if ("success".equals(res.status())) {
-                    complete(item.id(), token, res.result(),
-                            res.checkpoint_ref(), res.effect_cursor());
+                    String actor = res.actor() != null ? res.actor() : claimActor;
+                    complete(item.id(), token, actor, res.result(), res.evidence(),
+                            res.cost(), res.checkpoint_ref(), res.effect_cursor());
                 } else if ("approval".equals(res.status())) {
                     ApprovalRequest req = res.approval();
                     if (req == null) {

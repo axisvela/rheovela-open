@@ -139,6 +139,7 @@ class WorkResult:
     status: str = "success"
     error: str = ""
     outcome: str = ""
+    actor: str = ""
     result: Any = None
     evidence: Any = None
     cost: int = 0
@@ -148,9 +149,10 @@ class WorkResult:
 
     @classmethod
     def success(cls, result=None, checkpoint_ref="", effect_cursor="",
-                evidence=None, cost=0):
+                evidence=None, cost=0, actor=""):
         return cls(
             status="success",
+            actor=actor,
             result=result,
             evidence=evidence,
             cost=cost,
@@ -214,8 +216,11 @@ class Client:
                              {"token": token, "lease": lease})
 
     def complete(self, work_item_id, token, result=None,
-                 checkpoint_ref="", effect_cursor="", evidence=None, cost=0):
+                 checkpoint_ref="", effect_cursor="", evidence=None, cost=0,
+                 actor=""):
         body = {"token": token}
+        if actor:
+            body["actor"] = actor
         if _nonempty(result):
             body["result"] = result
         if _nonempty(evidence):
@@ -281,11 +286,13 @@ class Worker:
             except WorkerError:
                 continue  # claimed by another worker
             res = self.fn(item)
+            actor = res.actor or self.claim_options.get("actor", "")
             try:
                 if res.status == "success":
                     self.client.complete(item.id, token, res.result,
                                          res.checkpoint_ref, res.effect_cursor,
-                                         evidence=res.evidence, cost=res.cost)
+                                         evidence=res.evidence, cost=res.cost,
+                                         actor=actor)
                 elif res.status == "approval":
                     req = res.approval
                     if req is None:

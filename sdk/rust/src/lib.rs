@@ -121,8 +121,11 @@ pub struct WorkResult {
     pub status: WorkStatus,
     pub error: Option<String>,
     pub outcome: Option<String>,
+    pub actor: Option<String>,
     /// Raw JSON value embedded verbatim in the completion body.
     pub result: Option<String>,
+    pub evidence: Option<String>,
+    pub cost: u64,
     pub checkpoint_ref: Option<String>,
     pub effect_cursor: Option<String>,
     pub approval: Option<ApprovalRequest>,
@@ -135,7 +138,10 @@ impl WorkResult {
             status: WorkStatus::Success,
             error: None,
             outcome: None,
+            actor: None,
             result: None,
+            evidence: None,
+            cost: 0,
             checkpoint_ref: None,
             effect_cursor: None,
             approval: None,
@@ -382,7 +388,27 @@ impl Worker {
         checkpoint: Option<&str>,
         effect: Option<&str>,
     ) -> Result<(), WorkerError> {
+        self.complete_with_evidence_and_actor(id, token, None, result, evidence, cost, checkpoint, effect)
+    }
+
+    /// Complete with an explicit actor plus result/evidence/cost/cursors.
+    pub fn complete_with_evidence_and_actor(
+        &self,
+        id: &str,
+        token: &str,
+        actor: Option<&str>,
+        result: Option<&str>,
+        evidence: Option<&str>,
+        cost: u64,
+        checkpoint: Option<&str>,
+        effect: Option<&str>,
+    ) -> Result<(), WorkerError> {
         let mut body = format!("{{\"token\":\"{}\"", json_escape(token));
+        if let Some(actor) = actor.filter(|v| !v.is_empty()) {
+            body.push_str(",\"actor\":\"");
+            body.push_str(&json_escape(actor));
+            body.push('"');
+        }
         if let Some(result) = result.filter(|v| !v.is_empty()) {
             body.push_str(",\"result\":");
             body.push_str(result);
@@ -530,13 +556,19 @@ impl Worker {
             let settled = match res.status {
                 WorkStatus::Success => {
                     if is_nonempty(&res.result)
+                        || is_nonempty(&res.evidence)
+                        || res.cost != 0
+                        || is_nonempty(&res.actor)
                         || is_nonempty(&res.checkpoint_ref)
                         || is_nonempty(&res.effect_cursor)
                     {
-                        self.complete_with_result(
+                        self.complete_with_evidence_and_actor(
                             &item.id,
                             &token,
+                            res.actor.as_deref(),
                             res.result.as_deref(),
+                            res.evidence.as_deref(),
+                            res.cost,
                             res.checkpoint_ref.as_deref(),
                             res.effect_cursor.as_deref(),
                         )

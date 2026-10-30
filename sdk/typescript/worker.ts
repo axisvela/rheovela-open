@@ -55,6 +55,7 @@ export interface WorkResult {
   status: "success" | "failure" | "approval";
   error?: string;
   outcome?: string;
+  actor?: string;
   result?: unknown;
   evidence?: unknown;
   cost?: number;
@@ -64,6 +65,7 @@ export interface WorkResult {
 }
 
 export interface CompleteOptions {
+  actor?: string;
   result?: unknown;
   evidence?: unknown;
   cost?: number;
@@ -243,6 +245,7 @@ export class Worker {
       try {
         if (res.status === "success") {
           await this.client.complete(item.id, token, {
+            actor: res.actor ?? this.claimOptions.actor,
             result: res.result,
             evidence: res.evidence,
             cost: res.cost,

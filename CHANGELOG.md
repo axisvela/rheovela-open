@@ -11,6 +11,9 @@ RHEOVELA open（`github.com/axisvela/rheovela-open`，Apache-2.0）发布记录�
 
 ### Fixed
 
+- SDK workers pass the claim actor on completion, so role-targeted work items
+  satisfy completion-time authorization.
+
 - `/api/v1/metrics` exposes notification counts and its field names now match
   the response (`timers_pending`, `work_items_ready`, `effects_unknown`).
 
@@ -486,6 +489,9 @@ RHEOVELA open（`github.com/axisvela/rheovela-open`，Apache-2.0）发布记录�
   `approvals`, and `completions` activity attributes with a conformance fixture.
 
 ### Fixed
+
+- SDK workers pass the claim actor on completion, so role-targeted work items
+  satisfy completion-time authorization.
 
 - `/api/v1/metrics` exposes notification counts and its field names now match
   the response (`timers_pending`, `work_items_ready`, `effects_unknown`).
