@@ -2,6 +2,15 @@
 
 RHEOVELA open（`github.com/axisvela/rheovela-open`，Apache-2.0）发布记录：对外发布层（版本化 contracts、SDK、examples、CI、OpenAPI）。格式：最新在前；每个版本对应一个 git tag（三仓库统一语义版本 tag）。
 
+## [Unreleased]
+
+### Added
+
+- Go SDK `sdk/go/events`: durable WebSocket event client with filtered
+  `types`/`correlation_key`/`predicate` subscription, `after_seq` reconnect,
+  exponential backoff, and a file-backed at-least-once pending queue that
+  persists acks across restarts.
+
 ## [v1.39.0] - 2026-10-29
 
 ### Changed

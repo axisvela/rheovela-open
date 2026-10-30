@@ -20,7 +20,7 @@
 
 | SDK | Path | Work-item v1.4.0 features |
 |-----|------|---------------------------|
-| Go client + worker | `sdk/go/` | 完整：`Result`、`CheckpointRef`、`EffectCursor`、approval、retry、cancel、claimable polling |
+| Go client + worker + events | `sdk/go/` | 完整：`Result`、`CheckpointRef`、`EffectCursor`、approval、retry、cancel、claimable polling；`events` 包提供 WebSocket + 持久化离线队列 |
 | Python worker | `sdk/python/` | 完整：`Result`、`CheckpointRef`、`EffectCursor`、approval、retry、cancel、claimable polling |
 | TypeScript worker | `sdk/typescript/` | 完整：`Result`、`CheckpointRef`、`EffectCursor`、approval、retry、cancel、claimable polling |
 | Java worker | `sdk/java/` | 完整：`Result`、`CheckpointRef`、`EffectCursor`、approval、retry、cancel、claimable polling |
