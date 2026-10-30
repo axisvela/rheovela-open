@@ -11,7 +11,7 @@
 |------|-------|
 | Release tag | `v1.37.0`（feature release；功能基线 `v1.4.0`） |
 | Contracts | `AssigneeSpec` candidates/SLA/budget/claim_policy/escalation；`Stage` task_kind/payload/required_evidence/approval_roles/tool_scope/credential_ref/completion_mode/required_approvals/required_completions； `schema_version=1`；事件含 `WorkItemApprovalRequested`/`WorkItemApproved`/`WorkItemRejected`/`WorkItemEscalated`/`WorkItemHandedOff`/`WorkItemTakenOver`/`WorkItemCoCompleted` |
-| OpenAPI | `api/openapi.yaml`；覆盖 instances、steps、work-items、suspend/resume、approval、retry/cancel、audit、sync、events、health/status/metrics |
+| OpenAPI | `api/openapi.yaml`；覆盖 instances、steps、work-items、handoff/takeover、notifications、approval-delegations、suspend/resume、approval、retry/cancel、audit、sync、events、health/status/metrics |
 | JSON Schema | `api/workflow.schema.json`、`api/event.schema.json` |
 | Worker SDKs | Go / Python / TypeScript / Java / Rust |
 | Examples | Go / Python / TypeScript worker examples；expense/purchase RHEO IR samples |
