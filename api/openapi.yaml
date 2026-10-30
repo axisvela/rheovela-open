@@ -284,7 +284,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/LeaseRequest"
+              $ref: "#/components/schemas/ClaimRequest"
       responses:
         "200":
           description: Claimed; fencing token and lease details.
@@ -375,6 +375,10 @@ paths:
                   type: object
                   additionalProperties: true
                   description: Participant completion evidence (validated against required_evidence).
+                cost:
+                  type: integer
+                  format: int64
+                  description: Cost reported for cumulative budget enforcement.
       responses:
         "200":
           description: Completed; response includes the updated work item.
@@ -543,6 +547,88 @@ paths:
         "409":
           $ref: "#/components/responses/Conflict"
 
+  /api/v1/work-items/{id}/handoff:
+    post:
+      tags: [Worker]
+      summary: Hand off a claimed work item
+      description: >
+        Releases the lease and returns the item to `ready` with a target
+        assignee. Requires the current fencing token.
+      operationId: handoffWorkItem
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [token, actor, to]
+              properties:
+                token:
+                  type: string
+                actor:
+                  type: string
+                to:
+                  type: string
+                reason:
+                  type: string
+      responses:
+        "200":
+          description: Handed off.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "409":
+          $ref: "#/components/responses/Conflict"
+
+  /api/v1/work-items/{id}/takeover:
+    post:
+      tags: [Worker]
+      summary: Take over a claimed work item
+      description: >
+        Admin-only force release: clears the lease and fencing token, returning
+        the item to `ready` with the actor as assignee.
+      operationId: takeoverWorkItem
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [actor]
+              properties:
+                actor:
+                  type: string
+                reason:
+                  type: string
+      responses:
+        "200":
+          description: Taken over.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "409":
+          $ref: "#/components/responses/Conflict"
+
   /api/v1/work-items/{id}/fail:
     post:
       tags: [Worker]
@@ -569,6 +655,10 @@ paths:
                 error:
                   type: string
                   description: Failure reason.
+                cost:
+                  type: integer
+                  format: int64
+                  description: Cost reported against the cumulative budget.
       responses:
         "200":
           description: Failed.

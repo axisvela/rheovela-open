@@ -21,6 +21,13 @@ RHEOVELA open（`github.com/axisvela/rheovela-open`，Apache-2.0）发布记录�
   and `GET /api/v1/work-items` accepts `overdue=true` for SLA breach queries.
 - Contracts: `WorkItemEscalated` is a known audit event emitted by automatic
   SLA escalation.
+- Contracts: `Stage` gains `tool_scope`, `credential_ref`, `completion_mode`,
+  `required_approvals`, and `required_completions`; `WorkItemEscalated`,
+  `WorkItemHandedOff`, `WorkItemTakenOver`, and `WorkItemCoCompleted` are known
+  audit events.
+- OpenAPI: work items expose budget/spent/tool scope/credential binding,
+  completion mode, completions, and approval decisions; claim accepts
+  actor/tools/credential; complete/fail accept cost; handoff/takeover endpoints.
 
 ### Changed
 

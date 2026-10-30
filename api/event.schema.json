@@ -40,7 +40,8 @@
         "WorkItemRejected",
         "WorkItemEscalated",
         "WorkItemHandedOff",
-        "WorkItemTakenOver"
+        "WorkItemTakenOver",
+        "WorkItemCoCompleted"
       ]
     },
     "payload": {
