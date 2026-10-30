@@ -2,7 +2,7 @@
 
 RHEOVELA open（`github.com/axisvela/rheovela-open`，Apache-2.0）发布记录：对外发布层（版本化 contracts、SDK、examples、CI、OpenAPI）。格式：最新在前；每个版本对应一个 git tag（三仓库统一语义版本 tag）。
 
-## [Unreleased]
+## [v1.41.0] - 2026-10-30
 
 ### Added
 
@@ -13,6 +13,10 @@ RHEOVELA open（`github.com/axisvela/rheovela-open`，Apache-2.0）发布记录�
   is now OpenAPI 3.0.3-valid.
 - Rust SDK `sdk/rust/src/events.rs`: std-only durable WebSocket event client
   (ws://) with the same cursor/pending-queue semantics.
+
+### Changed
+
+- Coordinated ecosystem release with core `v1.41.0` and EE `v1.41.0`. The open `/v3` module remains `v3.12.0`.
 
 ## [v1.40.0] - 2026-10-30
 
