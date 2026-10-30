@@ -11,6 +11,8 @@ RHEOVELA open（`github.com/axisvela/rheovela-open`，Apache-2.0）发布记录�
   version moved to `v1.41.0`.
 - OpenAPI: health/status/metrics, workflow definitions + BPMN import preview,
   and sync delta/pending/ack endpoints.
+- Contracts: `AssigneeSpec` gains `candidates`, `sla`, `budget`,
+  `claim_policy`, and `escalation` for the work assignment contract extension.
 
 ## [v1.41.0] - 2026-10-30
 
