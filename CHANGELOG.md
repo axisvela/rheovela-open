@@ -13,6 +13,8 @@ RHEOVELA open（`github.com/axisvela/rheovela-open`，Apache-2.0）发布记录�
 - Python SDK `sdk/python/events.py`: durable WebSocket event client with the
   same cursor/pending-queue semantics (`websockets` optional dependency, see
   `requirements-events.txt`).
+- TypeScript SDK `sdk/typescript/events.ts`: durable WebSocket event client
+  using the Node 22+ built-in WebSocket and a file-backed pending queue.
 
 ## [v1.39.0] - 2026-10-29
 
