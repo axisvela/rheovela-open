@@ -6,50 +6,68 @@
     {
       "id": "days",
       "title": "days",
-      "assignee_spec": { "kind": "open" },
+      "assignee_spec": {
+        "kind": "open"
+      },
       "inputs": [],
       "outputs": [],
-      "timeout": "2d"
+      "timeout": "2d",
+      "task_kind": "AgentTask"
     },
     {
       "id": "hours",
       "title": "hours",
-      "assignee_spec": { "kind": "open" },
+      "assignee_spec": {
+        "kind": "open"
+      },
       "inputs": [],
       "outputs": [],
-      "timeout": "1.5h"
+      "timeout": "1.5h",
+      "task_kind": "AgentTask"
     },
     {
       "id": "millis",
       "title": "millis",
-      "assignee_spec": { "kind": "open" },
+      "assignee_spec": {
+        "kind": "open"
+      },
       "inputs": [],
       "outputs": [],
-      "timeout": "500ms"
+      "timeout": "500ms",
+      "task_kind": "AgentTask"
     },
     {
       "id": "micros",
       "title": "micros",
-      "assignee_spec": { "kind": "open" },
+      "assignee_spec": {
+        "kind": "open"
+      },
       "inputs": [],
       "outputs": [],
-      "timeout": "10us"
+      "timeout": "10us",
+      "task_kind": "AgentTask"
     },
     {
       "id": "nanos",
       "title": "nanos",
-      "assignee_spec": { "kind": "open" },
+      "assignee_spec": {
+        "kind": "open"
+      },
       "inputs": [],
       "outputs": [],
-      "timeout": "250ns"
+      "timeout": "250ns",
+      "task_kind": "AgentTask"
     },
     {
       "id": "zero",
       "title": "zero",
-      "assignee_spec": { "kind": "open" },
+      "assignee_spec": {
+        "kind": "open"
+      },
       "inputs": [],
       "outputs": [],
-      "timeout": "0s"
+      "timeout": "0s",
+      "task_kind": "AgentTask"
     }
   ],
   "transitions": []

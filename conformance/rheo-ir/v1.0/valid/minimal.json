@@ -6,9 +6,12 @@
     {
       "id": "start",
       "title": "start",
-      "assignee_spec": { "kind": "open" },
+      "assignee_spec": {
+        "kind": "open"
+      },
       "inputs": [],
-      "outputs": []
+      "outputs": [],
+      "task_kind": "AgentTask"
     }
   ],
   "transitions": []

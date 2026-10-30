@@ -6,32 +6,59 @@
     {
       "id": "validate",
       "title": "validate",
-      "assignee_spec": { "kind": "capability", "required": ["invoice.validate"] },
+      "assignee_spec": {
+        "kind": "capability",
+        "required": [
+          "invoice.validate"
+        ]
+      },
       "inputs": [],
       "outputs": [],
-      "timeout": "30m"
+      "timeout": "30m",
+      "task_kind": "AgentTask"
     },
     {
       "id": "approve",
       "title": "approve",
-      "assignee_spec": { "kind": "role", "role": "cost-center-owner" },
+      "assignee_spec": {
+        "kind": "role",
+        "role": "cost-center-owner"
+      },
       "inputs": [],
-      "outputs": []
+      "outputs": [],
+      "task_kind": "HumanTask"
     },
     {
       "id": "post",
       "title": "post",
-      "assignee_spec": { "kind": "capability", "required": ["erp.invoice.post"] },
+      "assignee_spec": {
+        "kind": "capability",
+        "required": [
+          "erp.invoice.post"
+        ]
+      },
       "inputs": [],
       "outputs": [],
-      "effect_key": "invoice/${id}"
+      "effect_key": "invoice/${id}",
+      "task_kind": "ServiceTask"
     }
   ],
   "transitions": [
-    { "from": "validate", "to": "approve", "condition": "amount >= 1000" },
-    { "from": "validate", "to": "post", "condition": "amount < 1000" }
+    {
+      "from": "validate",
+      "to": "approve",
+      "condition": "amount >= 1000"
+    },
+    {
+      "from": "validate",
+      "to": "post",
+      "condition": "amount < 1000"
+    }
   ],
   "compensations": [
-    { "for_activity": "post", "capability": "erp.invoice.reverse" }
+    {
+      "for_activity": "post",
+      "capability": "erp.invoice.reverse"
+    }
   ]
 }

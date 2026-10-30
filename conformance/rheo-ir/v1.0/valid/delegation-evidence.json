@@ -6,17 +6,29 @@
     {
       "id": "review",
       "title": "review",
-      "assignee_spec": { "kind": "role", "role": "reviewer" },
+      "assignee_spec": {
+        "kind": "role",
+        "role": "reviewer"
+      },
       "inputs": [],
       "outputs": [],
       "delegation": {
         "kind": "role",
         "delegatee": "approver",
-        "scopes": ["approve", "reject"],
+        "scopes": [
+          "approve",
+          "reject"
+        ],
         "budget": 500,
-        "evidence": ["approval_receipt"]
+        "evidence": [
+          "approval_receipt"
+        ]
       },
-      "evidence": ["decision_reason", "second_signature"]
+      "evidence": [
+        "decision_reason",
+        "second_signature"
+      ],
+      "task_kind": "HumanTask"
     }
   ],
   "transitions": []

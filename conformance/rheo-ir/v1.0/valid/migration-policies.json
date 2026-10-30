@@ -6,37 +6,61 @@
     {
       "id": "keep",
       "title": "keep",
-      "assignee_spec": { "kind": "capability", "required": ["keep"] },
+      "assignee_spec": {
+        "kind": "capability",
+        "required": [
+          "keep"
+        ]
+      },
       "inputs": [],
       "outputs": [],
-      "migration_policy": "preserve"
+      "migration_policy": "preserve",
+      "task_kind": "ServiceTask"
     },
     {
       "id": "drop",
       "title": "drop",
-      "assignee_spec": { "kind": "capability", "required": ["drop"] },
+      "assignee_spec": {
+        "kind": "capability",
+        "required": [
+          "drop"
+        ]
+      },
       "inputs": [],
       "outputs": [],
-      "migration_policy": "ignore"
+      "migration_policy": "ignore",
+      "task_kind": "ServiceTask"
     },
     {
       "id": "undo",
       "title": "undo",
-      "assignee_spec": { "kind": "capability", "required": ["undo"] },
+      "assignee_spec": {
+        "kind": "capability",
+        "required": [
+          "undo"
+        ]
+      },
       "inputs": [],
       "outputs": [],
-      "migration_policy": "compensate"
+      "migration_policy": "compensate",
+      "task_kind": "ServiceTask"
     },
     {
       "id": "other",
       "title": "other",
-      "assignee_spec": { "kind": "open" },
+      "assignee_spec": {
+        "kind": "open"
+      },
       "inputs": [],
-      "outputs": []
+      "outputs": [],
+      "task_kind": "ServiceTask"
     }
   ],
   "transitions": [],
   "compensations": [
-    { "for_activity": "undo", "capability": "undo.cap" }
+    {
+      "for_activity": "undo",
+      "capability": "undo.cap"
+    }
   ]
 }

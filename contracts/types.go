@@ -561,8 +561,11 @@ type Stage struct {
 	Delegation      *Delegation    `json:"delegation,omitempty"`
 	Evidence        []string       `json:"evidence,omitempty"`
 	MigrationPolicy string         `json:"migration_policy,omitempty"`
-	EffectKey       string         `json:"effect_key,omitempty"`
-	Timeout         string         `json:"timeout,omitempty"`
+	EffectKey        string          `json:"effect_key,omitempty"`
+	Timeout          string          `json:"timeout,omitempty"`
+	TaskKind         string          `json:"task_kind,omitempty"`
+	Payload          json.RawMessage `json:"payload,omitempty"`
+	RequiredEvidence []string        `json:"required_evidence,omitempty"`
 }
 
 // Delegation describes an authority delegation attached to a stage.

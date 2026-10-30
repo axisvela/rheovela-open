@@ -6,20 +6,33 @@
     {
       "id": "a",
       "title": "a",
-      "assignee_spec": { "kind": "capability", "required": ["https://example.com/a"] },
+      "assignee_spec": {
+        "kind": "capability",
+        "required": [
+          "https://example.com/a"
+        ]
+      },
       "inputs": [],
-      "outputs": []
+      "outputs": [],
+      "task_kind": "AgentTask"
     },
     {
       "id": "b",
       "title": "b",
-      "assignee_spec": { "kind": "open" },
+      "assignee_spec": {
+        "kind": "open"
+      },
       "inputs": [],
       "outputs": [],
-      "effect_key": "'literal-${id}'"
+      "effect_key": "'literal-${id}'",
+      "task_kind": "AgentTask"
     }
   ],
   "transitions": [
-    { "from": "a", "to": "b", "condition": "x >= 1" }
+    {
+      "from": "a",
+      "to": "b",
+      "condition": "x >= 1"
+    }
   ]
 }
