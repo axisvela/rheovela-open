@@ -38,7 +38,9 @@
         "WorkItemApprovalRequested",
         "WorkItemApproved",
         "WorkItemRejected",
-        "WorkItemEscalated"
+        "WorkItemEscalated",
+        "WorkItemHandedOff",
+        "WorkItemTakenOver"
       ]
     },
     "payload": {
