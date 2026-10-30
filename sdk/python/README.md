@@ -2,7 +2,7 @@
 
 # Python Worker SDK — `sdk/python`
 
-仅依赖标准库（`urllib` / `json`）的 core Worker HTTP API 客户端，由 `rheo serve`
+仅依赖标准库（`urllib` / `json`）的 core Worker HTTP API 客户端；`events.py` 额外使用 `websockets`（`pip install -r requirements-events.txt`）提供持久化 WebSocket 事件订阅。由 `rheo serve`
 暴露（路由见下，契约见 `api/README.md`）。无第三方依赖，支持 Python 3.9+。
 
 ## Worker API 路由
