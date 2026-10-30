@@ -117,3 +117,10 @@ ok
 `Example` 在进程内启动 fake Worker API，覆盖 success-with-result、
 request-approval、approve/reject/cancel 与单条 `get`，并把实际请求端点与请求体
 和预期序列比较；不一致时抛错（CI 直接运行）。
+
+## 事件客户端
+
+```sh
+javac -d out sdk/java/worker/Worker.java sdk/java/worker/Events.java sdk/java/example/EventsExample.java
+java -cp out example.EventsExample
+```n
