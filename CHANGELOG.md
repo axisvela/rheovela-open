@@ -11,6 +11,8 @@ RHEOVELA open（`github.com/axisvela/rheovela-open`，Apache-2.0）发布记录�
 
 ### Fixed
 
+- `/api/v1/status` exposes pending/dead-lettered notification counts.
+
 - Notifications expose retry/dead-letter metadata and a requeue endpoint.
 
 - `api/workflow.schema.json` now includes the participant/completion Stage
@@ -481,6 +483,8 @@ RHEOVELA open（`github.com/axisvela/rheovela-open`，Apache-2.0）发布记录�
   `approvals`, and `completions` activity attributes with a conformance fixture.
 
 ### Fixed
+
+- `/api/v1/status` exposes pending/dead-lettered notification counts.
 
 - Notifications expose retry/dead-letter metadata and a requeue endpoint.
 

@@ -1636,6 +1636,10 @@ components:
           type: integer
         legal_holds:
           type: integer
+        pending_notifications:
+          type: integer
+        dead_lettered_notifications:
+          type: integer
       additionalProperties: true
 
     Metrics:
