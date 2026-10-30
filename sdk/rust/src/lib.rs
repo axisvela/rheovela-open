@@ -22,6 +22,8 @@ use std::io::{Read, Write};
 use std::net::TcpStream;
 use std::time::Duration;
 
+pub mod events;
+
 /// Approval state attached to a work item.
 #[derive(Debug, Clone, PartialEq)]
 pub struct Approval {

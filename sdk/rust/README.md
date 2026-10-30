@@ -150,3 +150,12 @@ ok
 `main.rs` 在进程内启动 fake Worker API，覆盖 success-with-result、
 request-approval、approve/reject/cancel 与单条 `get`，并把实际请求端点与请求体
 和预期序列比较；不一致时 panic（CI 直接运行即失败）。
+
+## 事件客户端
+
+`src/events.rs` 提供 std-only 的持久化 WebSocket 事件订阅（仅 `ws://`）：
+文件游标 + pending 队列、`after_seq` 重连、指数退避、at-least-once 投递。
+
+```sh
+cargo test
+```
