@@ -255,3 +255,30 @@ func containsAny(xs []any, want string) bool {
 	}
 	return false
 }
+
+func TestWorkflowSchemaParticipantFields(t *testing.T) {
+	root := loadSchema(t)
+	stages := root["properties"].(map[string]any)["stages"].(map[string]any)
+	stageProps := stages["items"].(map[string]any)["properties"].(map[string]any)
+	for _, key := range []string{
+		"task_kind", "payload", "required_evidence", "approval_roles",
+		"tool_scope", "credential_ref", "completion_mode",
+		"required_approvals", "required_completions",
+	} {
+		if _, ok := stageProps[key].(map[string]any); !ok {
+			t.Errorf("stages.items.properties missing %q", key)
+		}
+	}
+	modeEnum := stageProps["completion_mode"].(map[string]any)["enum"].([]any)
+	for _, want := range []string{"single", "quorum", "all_actors"} {
+		if !containsAny(modeEnum, want) {
+			t.Errorf("completion_mode enum missing %q", want)
+		}
+	}
+	specProps := stageProps["assignee_spec"].(map[string]any)["properties"].(map[string]any)
+	for _, key := range []string{"candidates", "sla", "budget", "claim_policy", "escalation"} {
+		if _, ok := specProps[key].(map[string]any); !ok {
+			t.Errorf("assignee_spec.properties missing %q", key)
+		}
+	}
+}

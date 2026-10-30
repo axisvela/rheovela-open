@@ -17,6 +17,16 @@ RHEOVELA open（`github.com/axisvela/rheovela-open`，Apache-2.0）发布记录�
 
 - Coordinated ecosystem release with core `v1.42.0` and EE `v1.42.0`. The open `/v3` module remains `v3.12.0`.
 
+## [Unreleased]
+
+### Fixed
+
+- `api/workflow.schema.json` now includes the participant/completion Stage
+  fields (`task_kind`, `payload`, `required_evidence`, `approval_roles`,
+  `tool_scope`, `credential_ref`, `completion_mode`, counts) and assignment
+  fields (`candidates`, `sla`, `budget`, `claim_policy`, `escalation`), and
+  fixes the malformed stage `delegation` fragment.
+
 ## [v1.43.0] - 2026-10-30
 
 ### Added

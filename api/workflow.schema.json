@@ -66,6 +66,25 @@
                 "items": {
                   "type": "string"
                 }
+              },
+              "candidates": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "sla": {
+                "type": "string"
+              },
+              "budget": {
+                "type": "integer"
+              },
+              "claim_policy": {
+                "type": "string",
+                "enum": ["exclusive", "shared"]
+              },
+              "escalation": {
+                "type": "string"
               }
             }
           },
@@ -84,36 +103,17 @@
               "type": "string"
             }
           },
-    "delegation": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["kind", "delegatee"],
-      "properties": {
-        "kind": {
-          "type": "string",
-          "enum": ["actor", "role", "capability"]
-        },
-        "delegatee": { "type": "string", "minLength": 1 },
-        "scopes": {
-          "type": "array",
-          "items": { "type": "string" }
-        },
-        "budget": { "type": "integer" },
-        "evidence": {
-          "type": "array",
-          "items": { "type": "string" }
-        }
-      }
-    },
-    "gate": {
-            "$ref": "#/definitions/gate"
-          },
           "delegation": {
             "$ref": "#/definitions/delegation"
           },
+          "gate": {
+            "$ref": "#/definitions/gate"
+          },
           "evidence": {
             "type": "array",
-            "items": { "type": "string" }
+            "items": {
+              "type": "string"
+            }
           },
           "migration_policy": {
             "type": "string",
@@ -124,6 +124,46 @@
           },
           "timeout": {
             "type": "string"
+          },
+          "task_kind": {
+            "type": "string"
+          },
+          "payload": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "required_evidence": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "approval_roles": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "tool_scope": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "credential_ref": {
+            "type": "string"
+          },
+          "completion_mode": {
+            "type": "string",
+            "enum": ["single", "quorum", "all_actors"]
+          },
+          "required_approvals": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "required_completions": {
+            "type": "integer",
+            "minimum": 0
           }
         }
       }
