@@ -318,6 +318,20 @@ describe("Client", () => {
     ]);
   });
 
+  test("complete sends evidence and cost", async () => {
+    const api = mockWorkerApi();
+    const client = new Client("http://fake");
+
+    await client.complete("wi1", "tok-1", {
+      evidence: { receipt: "r-1" },
+      cost: 12,
+    });
+
+    assert.deepEqual(api.completeRecords, [
+      { token: "tok-1", evidence: { receipt: "r-1" }, cost: 12 },
+    ]);
+  });
+
   test("complete token-only remains compatible", async () => {
     const api = mockWorkerApi();
     const client = new Client("http://fake");

@@ -157,6 +157,26 @@ class WorkerTest(unittest.TestCase):
                           "/api/v1/work-items/wi1/complete"])
         self.assertEqual(self.srv.complete_records, [{"token": "tok-1"}])
 
+    def test_complete_sends_evidence_and_cost(self):
+        self.srv.poll_items = [{"id": "wi1"}]
+        client = worker.Client(self.srv.base_url)
+        n = worker.Worker(
+            client,
+            lambda item: worker.WorkResult.success(
+                result={"ok": True}, evidence={"receipt": "r-1"}, cost=12
+            ),
+            claim_options={"actor": "alice", "tools": ["erp"],
+                           "credential": "cred-1"},
+        ).process_once()
+
+        self.assertEqual(n, 1)
+        self.assertEqual(self.srv.complete_records, [{
+            "token": "tok-1",
+            "result": {"ok": True},
+            "evidence": {"receipt": "r-1"},
+            "cost": 12,
+        }])
+
     def test_claim_conflict_skipped(self):
         self.srv.poll_items = [{"id": "wi1"}]
         self.srv.conflict_ids = {"wi1"}

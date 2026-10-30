@@ -6,7 +6,7 @@ import json
 import urllib.error
 import urllib.parse
 import urllib.request
-from dataclasses import dataclass, replace
+from dataclasses import dataclass, field, replace
 from typing import Any, List, Optional
 
 
@@ -72,6 +72,21 @@ class WorkItem:
     max_attempts: int = 0
     last_error: str = ""
     approval: Optional[Approval] = None
+    assignee: str = ""
+    kind: str = ""
+    payload: Any = None
+    required_evidence: list = field(default_factory=list)
+    evidence: Any = None
+    budget: int = 0
+    spent: int = 0
+    tool_scope: list = field(default_factory=list)
+    credential_ref: str = ""
+    approval_roles: list = field(default_factory=list)
+    completion_mode: str = ""
+    required_approvals: int = 0
+    required_completions: int = 0
+    deadline: str = ""
+    escalation: str = ""
 
     @classmethod
     def from_dict(cls, data):
@@ -88,6 +103,21 @@ class WorkItem:
             max_attempts=data.get("max_attempts", 0) or 0,
             last_error=data.get("last_error", "") or "",
             approval=Approval.from_dict(data.get("approval")),
+            assignee=data.get("assignee", "") or "",
+            kind=data.get("kind", "") or "",
+            payload=data.get("payload"),
+            required_evidence=list(data.get("required_evidence") or []),
+            evidence=data.get("evidence"),
+            budget=data.get("budget", 0) or 0,
+            spent=data.get("spent", 0) or 0,
+            tool_scope=list(data.get("tool_scope") or []),
+            credential_ref=data.get("credential_ref", "") or "",
+            approval_roles=list(data.get("approval_roles") or []),
+            completion_mode=data.get("completion_mode", "") or "",
+            required_approvals=data.get("required_approvals", 0) or 0,
+            required_completions=data.get("required_completions", 0) or 0,
+            deadline=data.get("deadline", "") or "",
+            escalation=data.get("escalation", "") or "",
         )
 
 
@@ -110,15 +140,20 @@ class WorkResult:
     error: str = ""
     outcome: str = ""
     result: Any = None
+    evidence: Any = None
+    cost: int = 0
     checkpoint_ref: str = ""
     effect_cursor: str = ""
     approval: Optional[ApprovalRequest] = None
 
     @classmethod
-    def success(cls, result=None, checkpoint_ref="", effect_cursor=""):
+    def success(cls, result=None, checkpoint_ref="", effect_cursor="",
+                evidence=None, cost=0):
         return cls(
             status="success",
             result=result,
+            evidence=evidence,
+            cost=cost,
             checkpoint_ref=checkpoint_ref,
             effect_cursor=effect_cursor,
         )
@@ -163,19 +198,30 @@ class Client:
         path = f"/api/v1/work-items/{_escape(work_item_id)}"
         return WorkItem.from_dict(self._request("GET", path))
 
-    def claim(self, work_item_id, lease="30s"):
+    def claim(self, work_item_id, lease="30s", actor="", tools=None, credential=""):
+        body = {"lease": lease}
+        if actor:
+            body["actor"] = actor
+        if tools:
+            body["tools"] = tools
+        if credential:
+            body["credential"] = credential
         return self._request("POST", f"/api/v1/work-items/{_escape(work_item_id)}/claim",
-                             {"lease": lease})
+                             body)
 
     def heartbeat(self, work_item_id, token, lease="30s"):
         return self._request("POST", f"/api/v1/work-items/{_escape(work_item_id)}/heartbeat",
                              {"token": token, "lease": lease})
 
     def complete(self, work_item_id, token, result=None,
-                 checkpoint_ref="", effect_cursor=""):
+                 checkpoint_ref="", effect_cursor="", evidence=None, cost=0):
         body = {"token": token}
         if _nonempty(result):
             body["result"] = result
+        if _nonempty(evidence):
+            body["evidence"] = evidence
+        if cost:
+            body["cost"] = cost
         if checkpoint_ref:
             body["checkpoint_ref"] = checkpoint_ref
         if effect_cursor:
@@ -220,16 +266,17 @@ class Client:
 
 
 class Worker:
-    def __init__(self, client, fn, lease="30s"):
+    def __init__(self, client, fn, lease="30s", claim_options=None):
         self.client = client
         self.fn = fn  # fn(item) -> WorkResult
         self.lease = lease
+        self.claim_options = claim_options or {}
 
     def process_once(self, instance_id=None):
         processed = 0
         for item in self.client.poll(instance_id):
             try:
-                claim = self.client.claim(item.id, self.lease)
+                claim = self.client.claim(item.id, self.lease, **self.claim_options)
                 token = claim["token"]
             except WorkerError:
                 continue  # claimed by another worker
@@ -237,7 +284,8 @@ class Worker:
             try:
                 if res.status == "success":
                     self.client.complete(item.id, token, res.result,
-                                         res.checkpoint_ref, res.effect_cursor)
+                                         res.checkpoint_ref, res.effect_cursor,
+                                         evidence=res.evidence, cost=res.cost)
                 elif res.status == "approval":
                     req = res.approval
                     if req is None:

@@ -26,6 +26,21 @@ export interface WorkItem {
   max_attempts?: number;
   last_error?: string;
   approval?: Approval;
+  assignee?: string;
+  kind?: string;
+  payload?: unknown;
+  required_evidence?: string[];
+  evidence?: unknown;
+  budget?: number;
+  spent?: number;
+  tool_scope?: string[];
+  credential_ref?: string;
+  approval_roles?: string[];
+  completion_mode?: "single" | "quorum" | "all_actors" | string;
+  required_approvals?: number;
+  required_completions?: number;
+  deadline?: string;
+  escalation?: string;
 }
 
 export interface ApprovalRequest {
@@ -41,6 +56,8 @@ export interface WorkResult {
   error?: string;
   outcome?: string;
   result?: unknown;
+  evidence?: unknown;
+  cost?: number;
   checkpoint_ref?: string;
   effect_cursor?: string;
   approval?: ApprovalRequest;
@@ -48,8 +65,16 @@ export interface WorkResult {
 
 export interface CompleteOptions {
   result?: unknown;
+  evidence?: unknown;
+  cost?: number;
   checkpoint_ref?: string;
   effect_cursor?: string;
+}
+
+export interface ClaimOptions {
+  actor?: string;
+  tools?: string[];
+  credential?: string;
 }
 
 export type WorkFn = (item: WorkItem) => Promise<WorkResult>;
@@ -117,8 +142,16 @@ export class Client {
     return this.req("GET", this.itemPath(id));
   }
 
-  claim(id: string, lease?: string): Promise<{ token: string; lease: string }> {
-    return this.req("POST", `${this.itemPath(id)}/claim`, { lease });
+  claim(
+    id: string,
+    lease?: string,
+    options: ClaimOptions = {},
+  ): Promise<{ token: string; lease: string }> {
+    const body: Record<string, unknown> = { lease };
+    if (options.actor) body.actor = options.actor;
+    if (options.tools?.length) body.tools = options.tools;
+    if (options.credential) body.credential = options.credential;
+    return this.req("POST", `${this.itemPath(id)}/claim`, body);
   }
 
   heartbeat(id: string, token: string, lease?: string): Promise<{ ok: boolean }> {
@@ -132,6 +165,8 @@ export class Client {
   ): Promise<{ ok: boolean }> {
     const body: Record<string, unknown> = { token };
     if (nonempty(options.result)) body.result = options.result;
+    if (nonempty(options.evidence)) body.evidence = options.evidence;
+    if (options.cost) body.cost = options.cost;
     if (options.checkpoint_ref) body.checkpoint_ref = options.checkpoint_ref;
     if (options.effect_cursor) body.effect_cursor = options.effect_cursor;
     return this.req("POST", `${this.itemPath(id)}/complete`, body);
@@ -181,11 +216,18 @@ export class Worker {
   private client: Client;
   private fn: WorkFn;
   private lease: string;
+  private claimOptions: ClaimOptions;
 
-  constructor(client: Client, fn: WorkFn, lease = "30s") {
+  constructor(
+    client: Client,
+    fn: WorkFn,
+    lease = "30s",
+    claimOptions: ClaimOptions = {},
+  ) {
     this.client = client;
     this.fn = fn;
     this.lease = lease;
+    this.claimOptions = claimOptions;
   }
 
   async processOnce(instanceId?: string): Promise<number> {
@@ -193,7 +235,7 @@ export class Worker {
     for (const item of await this.client.poll(instanceId)) {
       let token: string;
       try {
-        token = (await this.client.claim(item.id, this.lease)).token;
+        token = (await this.client.claim(item.id, this.lease, this.claimOptions)).token;
       } catch {
         continue; // claimed by another worker
       }
@@ -202,6 +244,8 @@ export class Worker {
         if (res.status === "success") {
           await this.client.complete(item.id, token, {
             result: res.result,
+            evidence: res.evidence,
+            cost: res.cost,
             checkpoint_ref: res.checkpoint_ref,
             effect_cursor: res.effect_cursor,
           });
