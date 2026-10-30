@@ -704,6 +704,12 @@ paths:
           required: true
           schema:
             type: string
+        - name: actor
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Required with `process.admin` when identity is enabled.
       responses:
         "200":
           description: Requeued.
@@ -711,6 +717,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/OkResponse"
+        "403":
+          $ref: "#/components/responses/Forbidden"
         "404":
           $ref: "#/components/responses/NotFound"
 
