@@ -1,6 +1,6 @@
-# Rheovela-open Status (v1.41.0)
+# Rheovela-open Status (v1.42.0)
 
-> Last updated: 2026-10-30 · current release `v1.41.0`（feature release；功能基线 `v1.4.0`）· license Apache-2.0
+> Last updated: 2026-10-30 · current release `v1.42.0`（feature release；功能基线 `v1.4.0`）· license Apache-2.0
 >
 > 本文是 open 的对外公开状态。内部发布一致性、企业能力缺口与详细 backlog
 > 由 Rheovela-ee 私有仓库 `docs/STATUS.md` 跟踪。

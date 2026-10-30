@@ -7,7 +7,7 @@ info:
     ops/integration surface — no TLS/auth shim. Multi-tenant auth lives in
     `rheovela-ee` (X-Tenant-ID middleware). The `/mcp` route is a JSON-RPC
     2.0 MCP gateway (protocol version 2024-11-05).
-  version: v1.41.0
+  version: v1.42.0
   license:
     name: Apache-2.0
 
