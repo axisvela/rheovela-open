@@ -2,7 +2,7 @@
 
 RHEOVELA open（`github.com/axisvela/rheovela-open`，Apache-2.0）发布记录：对外发布层（版本化 contracts、SDK、examples、CI、OpenAPI）。格式：最新在前；每个版本对应一个 git tag（三仓库统一语义版本 tag）。
 
-## [Unreleased]
+## [v1.40.0] - 2026-10-30
 
 ### Added
 
@@ -15,6 +15,12 @@ RHEOVELA open（`github.com/axisvela/rheovela-open`，Apache-2.0）发布记录�
   `requirements-events.txt`).
 - TypeScript SDK `sdk/typescript/events.ts`: durable WebSocket event client
   using the Node 22+ built-in WebSocket and a file-backed pending queue.
+
+### Changed
+
+- Contracts: `RunContext` gains `suspended_stages` for stage-region pause.
+- Coordinated ecosystem release with core `v1.40.0` and EE `v1.40.0`. The open
+  `/v3` module remains `v3.12.0`.
 
 ## [v1.39.0] - 2026-10-29
 
