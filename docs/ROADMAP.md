@@ -32,5 +32,5 @@
 ## Release Rules
 
 - 使用语义版本 tag（如 `v1.4.0`），不使用 `v1.x-core` 开发里程碑 tag。
-- `/v3` Go module 的模块 tag 与 release tag 对应关系由内部发布流程维护。
+- `/v3` Go module 的模块 tag 与 release tag 对应关系由内部发布流程维护；`v1.49.1` 对应根模块 `v3.14.0`、`sdk/go v3.1.0`、adapter `sdk/go/harmovela/v3.0.0`。
 - 每个 release 更新 `CHANGELOG.md`，并保持 contracts/OpenAPI 与 core 同步。
