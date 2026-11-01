@@ -1,6 +1,6 @@
-# Rheovela-open Status (v1.48.0)
+# Rheovela-open Status (v1.49.0)
 
-> Last updated: 2026-11-01 · current release `v1.48.0`（feature release；功能基线 `v1.4.0`）· license Apache-2.0
+> Last updated: 2026-11-01 · current release `v1.49.0`（feature release；功能基线 `v1.4.0`）· license Apache-2.0
 >
 > 本文是 open 的对外公开状态。内部发布一致性、企业能力缺口与详细 backlog
 > 由 Rheovela-ee 私有仓库 `docs/STATUS.md` 跟踪。
@@ -9,7 +9,7 @@
 
 | Item | State |
 |------|-------|
-| Release tag | `v1.48.0`（feature release；功能基线 `v1.4.0`） |
+| Release tag | `v1.49.0`（feature release；功能基线 `v1.4.0`） |
 | Contracts | `AssigneeSpec` candidates/SLA/budget/claim_policy/escalation；`Stage` task_kind/payload/required_evidence/approval_roles/tool_scope/credential_ref/completion_mode/required_approvals/required_completions； `schema_version=1`；事件含 `WorkItemApprovalRequested`/`WorkItemApproved`/`WorkItemRejected`/`WorkItemEscalated`/`WorkItemHandedOff`/`WorkItemTakenOver`/`WorkItemCoCompleted` |
 | OpenAPI | `api/openapi.yaml`；覆盖 instances、steps、work-items、handoff/takeover、notifications、approval-delegations、suspend/resume、approval、retry/cancel、audit、sync、events、health/status/metrics |
 | JSON Schema | `api/workflow.schema.json`、`api/event.schema.json` |
@@ -18,9 +18,9 @@
 
 `v1.44.0` added RHEO IR participant attributes, SDK claim-actor propagation on
 completion, notification retry/dead-letter metadata, and participant/assignment
-fields in `api/workflow.schema.json`. `v1.45.0`–`v1.48.0` were coordinated
+fields in `api/workflow.schema.json`. `v1.45.0`–`v1.49.0` were coordinated
 releases with no open contract or SDK changes; core added the configurable event
-bus, feed routing, durable feed routes, and tenant-aware feeds.
+bus, feed routing, durable feed routes, tenant-aware feeds, and P3 replay/retention.
 
 ## SDK Feature Matrix
 
@@ -35,9 +35,9 @@ bus, feed routing, durable feed routes, and tenant-aware feeds.
 Go SDK 的 work-item 客户端方法包括 `GetWorkItem`、`CompleteWorkItemWithResult`、
 `RequestWorkItemApproval`、`ApproveWorkItem`、`RejectWorkItem`、`CancelWorkItem`。
 
-## Verification (2026-11-01, v1.48.0 gate)
+## Verification (2026-11-01, v1.49.0 gate)
 
-The last open code changes shipped in `v1.44.0`; `v1.45.0`–`v1.48.0` are
+The last open code changes shipped in `v1.44.0`; `v1.45.0`–`v1.49.0` are
 coordinated releases without open code changes. The gate below remains the
 current baseline.
 
