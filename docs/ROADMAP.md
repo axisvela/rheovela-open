@@ -1,6 +1,6 @@
 # Rheovela-open Public Roadmap
 
-> Last updated: 2026-10-27 · current release `v1.22.0`（feature release；功能基线 `v1.4.0`）
+> Last updated: 2026-11-01 · current release `v1.48.0`（feature release；功能基线 `v1.4.0`）
 >
 > 本文是 open 的对外公开路线图。core 内核路线图见 core `docs/ROADMAP.md`；
 > 企业能力与内部发布一致性由 Rheovela-ee 私有仓库 `docs/ROADMAP.md` 跟踪。
@@ -17,12 +17,17 @@
 | SDK parity for v1.4.0 | Go / Python / TypeScript / Java / Rust SDK：result、checkpoint、effect cursor、approval、retry、cancel、claimable polling（v1.7.5） |
 | Harmovela adapter | `sdk/go/harmovela` producer/observer adapter：将 Rheovela work-item 生命周期映射为 Harmovela `task.*` 事件（v1.7.5）；仅 producer/observer，consume 方向由 core 负责，内置 transport 不包含 |
 | Community Process Designer | 静态 `designer/`：WorkflowDefinition 编辑、校验、JSON 导入导出、delegation/evidence 保留、BPMN DI 渲染、undo/redo、导入差异预览；可选直连 core API |
+| RHEO IR participant attributes | v1.44.0：`approval_roles`/`tools`/`credential`/`completion`/`approvals`/`completions` 活动属性与 conformance fixture |
+| Participant/assignment schema | v1.44.0：`api/workflow.schema.json` 覆盖 `task_kind`/`payload`/`required_evidence`/`approval_roles`/`tool_scope`/`credential_ref`/`completion_mode`/counts 与 candidates/SLA/budget/claim policy/escalation |
+| Coordinated releases | v1.45.0–v1.48.0：core 事件总线、feed 路由、durable feed routes、tenant-aware feeds；open 无 contract/SDK 变更 |
 
 ## Next
 
 1. **BPMN / RHEO IR**
    - RHEO IR v1.0 规范已发布（[RHEO-IR.md](RHEO-IR.md)）；delegation/evidence/migration policy/effect_key/timeout 已支持
    - BPMN import/export 的标准覆盖扩展（子流程、消息流等）
+2. **SDK parity**
+   - 跟随 core 的 work-item/event API 演进（notification/feed/event-bus 相关接口按需加入 SDK 与 OpenAPI）
 
 ## Release Rules
 
