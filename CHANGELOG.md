@@ -2,6 +2,13 @@
 
 RHEOVELA open（`github.com/axisvela/rheovela-open`，Apache-2.0）发布记录：对外发布层（版本化 contracts、SDK、examples、CI、OpenAPI）。格式：最新在前；每个版本对应一个 git tag（三仓库统一语义版本 tag）。
 
+## [v1.49.1] - 2026-11-01
+
+### Changed
+
+- Coordinated ecosystem release with core `v1.49.1` and EE `v1.49.1`. No open
+  changes; core ships a CI workflow fix.
+
 ## [v1.49.0] - 2026-11-01
 
 ### Changed
