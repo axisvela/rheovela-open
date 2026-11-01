@@ -200,7 +200,8 @@ class Client:
         path = f"/api/v1/work-items/{_escape(work_item_id)}"
         return WorkItem.from_dict(self._request("GET", path))
 
-    def claim(self, work_item_id, lease="30s", actor="", tools=None, credential=""):
+    def claim(self, work_item_id, lease="30s", actor="", tools=None, credential="",
+              lease_token="", session_token=""):
         body = {"lease": lease}
         if actor:
             body["actor"] = actor
@@ -208,6 +209,10 @@ class Client:
             body["tools"] = tools
         if credential:
             body["credential"] = credential
+        if lease_token:
+            body["lease_token"] = lease_token
+        if session_token:
+            body["session_token"] = session_token
         return self._request("POST", f"/api/v1/work-items/{_escape(work_item_id)}/claim",
                              body)
 
@@ -268,6 +273,31 @@ class Client:
     def fail(self, work_item_id, token, error):
         return self._request("POST", f"/api/v1/work-items/{_escape(work_item_id)}/fail",
                              {"token": token, "error": error})
+
+    def claim_stage_lease(self, instance_id, stage_id, actor, lease="1h"):
+        path = f"/api/v1/instances/{_escape(instance_id)}/stages/{_escape(stage_id)}/lease"
+        return self._request("POST", path, {"actor": actor, "lease": lease})
+
+    def heartbeat_stage_lease(self, instance_id, stage_id, actor, token, lease="1h"):
+        path = (f"/api/v1/instances/{_escape(instance_id)}/stages/"
+                f"{_escape(stage_id)}/lease/heartbeat")
+        return self._request("POST", path, {"actor": actor, "token": token, "lease": lease})
+
+    def release_stage_lease(self, instance_id, stage_id, actor, token):
+        path = f"/api/v1/instances/{_escape(instance_id)}/stages/{_escape(stage_id)}/lease"
+        return self._request("DELETE", path, {"actor": actor, "token": token})
+
+    def claim_worker_session(self, instance_id, actor, lease="1h"):
+        path = f"/api/v1/instances/{_escape(instance_id)}/session"
+        return self._request("POST", path, {"actor": actor, "lease": lease})
+
+    def heartbeat_worker_session(self, instance_id, actor, token, lease="1h"):
+        path = f"/api/v1/instances/{_escape(instance_id)}/session/heartbeat"
+        return self._request("POST", path, {"actor": actor, "token": token, "lease": lease})
+
+    def release_worker_session(self, instance_id, actor, token):
+        path = f"/api/v1/instances/{_escape(instance_id)}/session"
+        return self._request("DELETE", path, {"actor": actor, "token": token})
 
 
 class Worker:

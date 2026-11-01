@@ -24,6 +24,10 @@ releases with no open contract or SDK changes; core added the configurable event
 bus, feed routing, durable feed routes, tenant-aware feeds, P3 replay/retention,
 a CI workflow fix, and stage-level leases.
 
+**Unreleased (main):** OpenAPI now documents stage lease and worker session
+routes, and step/claim bodies accept `lease_token` / `session_token`. The Go,
+Python, TypeScript, Java, and Rust SDKs expose the lease/session methods.
+
 ## SDK Feature Matrix
 
 | SDK | Path | Work-item v1.4.0 features |

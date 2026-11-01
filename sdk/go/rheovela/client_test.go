@@ -272,6 +272,71 @@ func TestLegacyCompleteWorkItemSendsTokenOnly(t *testing.T) {
 	}
 }
 
+func TestClient_StageLease(t *testing.T) {
+	c, cap := newFake(t, func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.Write([]byte(`{"token":"lease-token","lease_until":"2026-11-01T12:00:00Z","stage_id":"stage1"}`))
+	})
+	lease, err := c.ClaimStageLease(context.Background(), "i1", "stage1", "alice", "1h")
+	if err != nil {
+		t.Fatalf("ClaimStageLease: %v", err)
+	}
+	if lease.Token != "lease-token" || lease.StageID != "stage1" {
+		t.Fatalf("lease = %+v", lease)
+	}
+	_, path, body := cap.get()
+	if path != "/api/v1/instances/i1/stages/stage1/lease" {
+		t.Fatalf("path = %q", path)
+	}
+	var got map[string]any
+	if err := json.Unmarshal([]byte(body), &got); err != nil {
+		t.Fatal(err)
+	}
+	if got["actor"] != "alice" || got["lease"] != "1h" {
+		t.Fatalf("body = %v", got)
+	}
+
+	if err := c.HeartbeatStageLease(context.Background(), "i1", "stage1", "alice", "lease-token", "1h"); err != nil {
+		t.Fatalf("HeartbeatStageLease: %v", err)
+	}
+	_, path, _ = cap.get()
+	if path != "/api/v1/instances/i1/stages/stage1/lease/heartbeat" {
+		t.Fatalf("path = %q", path)
+	}
+
+	if err := c.ReleaseStageLease(context.Background(), "i1", "stage1", "alice", "lease-token"); err != nil {
+		t.Fatalf("ReleaseStageLease: %v", err)
+	}
+	_, path, _ = cap.get()
+	if path != "/api/v1/instances/i1/stages/stage1/lease" {
+		t.Fatalf("path = %q", path)
+	}
+}
+
+func TestClient_WorkerSession(t *testing.T) {
+	c, cap := newFake(t, func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.Write([]byte(`{"token":"session-token","lease_until":"2026-11-01T12:00:00Z","run_id":"i1"}`))
+	})
+	sess, err := c.ClaimWorkerSession(context.Background(), "i1", "alice", "1h")
+	if err != nil {
+		t.Fatalf("ClaimWorkerSession: %v", err)
+	}
+	if sess.Token != "session-token" || sess.RunID != "i1" {
+		t.Fatalf("session = %+v", sess)
+	}
+	_, path, _ := cap.get()
+	if path != "/api/v1/instances/i1/session" {
+		t.Fatalf("path = %q", path)
+	}
+	if err := c.HeartbeatWorkerSession(context.Background(), "i1", "alice", "session-token", "1h"); err != nil {
+		t.Fatalf("HeartbeatWorkerSession: %v", err)
+	}
+	if err := c.ReleaseWorkerSession(context.Background(), "i1", "alice", "session-token"); err != nil {
+		t.Fatalf("ReleaseWorkerSession: %v", err)
+	}
+}
+
 func mustJSON(t *testing.T, v any) string {
 	t.Helper()
 	b, err := json.Marshal(v)

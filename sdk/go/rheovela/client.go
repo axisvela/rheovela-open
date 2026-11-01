@@ -98,9 +98,11 @@ type WorkResult struct {
 
 // ClaimOptions carries optional claim-time guards.
 type ClaimOptions struct {
-	Actor      string   `json:"actor,omitempty"`
-	Tools      []string `json:"tools,omitempty"`
-	Credential string   `json:"credential,omitempty"`
+	Actor        string   `json:"actor,omitempty"`
+	Tools        []string `json:"tools,omitempty"`
+	Credential   string   `json:"credential,omitempty"`
+	LeaseToken   string   `json:"lease_token,omitempty"`
+	SessionToken string   `json:"session_token,omitempty"`
 }
 
 // ApprovalRequest asks for human approval before a work item advances.
@@ -130,6 +132,16 @@ type StepRequest struct {
 	AssignedTo     string `json:"assigned_to,omitempty"`
 	Error          string `json:"error,omitempty"`
 	IdempotencyKey string `json:"idempotency_key,omitempty"`
+	LeaseToken     string `json:"lease_token,omitempty"`
+	SessionToken   string `json:"session_token,omitempty"`
+}
+
+// Lease is a stage lease or worker session claim result.
+type Lease struct {
+	Token      string    `json:"token"`
+	LeaseUntil time.Time `json:"lease_until"`
+	StageID    string    `json:"stage_id,omitempty"`
+	RunID      string    `json:"run_id,omitempty"`
 }
 
 // Claim is the result of claiming a work item.
@@ -305,6 +317,12 @@ func (c *Client) ClaimWorkItemWithOptions(ctx context.Context, id, lease string,
 	if opts.Credential != "" {
 		body["credential"] = opts.Credential
 	}
+	if opts.LeaseToken != "" {
+		body["lease_token"] = opts.LeaseToken
+	}
+	if opts.SessionToken != "" {
+		body["session_token"] = opts.SessionToken
+	}
 	var out Claim
 	if err := c.doJSON(ctx, http.MethodPost, "/api/v1/work-items/"+url.PathEscape(id)+"/claim", body, &out); err != nil {
 		return nil, err
@@ -393,6 +411,62 @@ func (c *Client) CancelWorkItem(ctx context.Context, id string) error {
 }
 
 // Health checks the service is reachable.
+// ClaimStageLease acquires the stage-scoped mutual-exclusion lease.
+func (c *Client) ClaimStageLease(ctx context.Context, instanceID, stageID, actor, lease string) (*Lease, error) {
+	if lease == "" {
+		lease = defaultLease
+	}
+	var out Lease
+	path := "/api/v1/instances/" + url.PathEscape(instanceID) + "/stages/" + url.PathEscape(stageID) + "/lease"
+	if err := c.doJSON(ctx, http.MethodPost, path, map[string]string{"actor": actor, "lease": lease}, &out); err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+// HeartbeatStageLease renews a stage lease.
+func (c *Client) HeartbeatStageLease(ctx context.Context, instanceID, stageID, actor, token, lease string) error {
+	if lease == "" {
+		lease = defaultLease
+	}
+	path := "/api/v1/instances/" + url.PathEscape(instanceID) + "/stages/" + url.PathEscape(stageID) + "/lease/heartbeat"
+	return c.doJSON(ctx, http.MethodPost, path, map[string]string{"actor": actor, "token": token, "lease": lease}, nil)
+}
+
+// ReleaseStageLease releases a stage lease.
+func (c *Client) ReleaseStageLease(ctx context.Context, instanceID, stageID, actor, token string) error {
+	path := "/api/v1/instances/" + url.PathEscape(instanceID) + "/stages/" + url.PathEscape(stageID) + "/lease"
+	return c.doJSON(ctx, http.MethodDelete, path, map[string]string{"actor": actor, "token": token}, nil)
+}
+
+// ClaimWorkerSession acquires the run-scoped worker session.
+func (c *Client) ClaimWorkerSession(ctx context.Context, instanceID, actor, lease string) (*Lease, error) {
+	if lease == "" {
+		lease = defaultLease
+	}
+	var out Lease
+	path := "/api/v1/instances/" + url.PathEscape(instanceID) + "/session"
+	if err := c.doJSON(ctx, http.MethodPost, path, map[string]string{"actor": actor, "lease": lease}, &out); err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+// HeartbeatWorkerSession renews the run-scoped worker session.
+func (c *Client) HeartbeatWorkerSession(ctx context.Context, instanceID, actor, token, lease string) error {
+	if lease == "" {
+		lease = defaultLease
+	}
+	path := "/api/v1/instances/" + url.PathEscape(instanceID) + "/session/heartbeat"
+	return c.doJSON(ctx, http.MethodPost, path, map[string]string{"actor": actor, "token": token, "lease": lease}, nil)
+}
+
+// ReleaseWorkerSession releases the run-scoped worker session.
+func (c *Client) ReleaseWorkerSession(ctx context.Context, instanceID, actor, token string) error {
+	path := "/api/v1/instances/" + url.PathEscape(instanceID) + "/session"
+	return c.doJSON(ctx, http.MethodDelete, path, map[string]string{"actor": actor, "token": token}, nil)
+}
+
 func (c *Client) Health(ctx context.Context) error {
 	return c.doJSON(ctx, http.MethodGet, "/api/v1/health", nil, nil)
 }

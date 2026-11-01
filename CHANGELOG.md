@@ -2,6 +2,18 @@
 
 RHEOVELA open（`github.com/axisvela/rheovela-open`，Apache-2.0）发布记录：对外发布层（版本化 contracts、SDK、examples、CI、OpenAPI）。格式：最新在前；每个版本对应一个 git tag（三仓库统一语义版本 tag）。
 
+## [Unreleased]
+
+### Added
+
+- OpenAPI paths and schemas for stage leases and worker sessions, plus optional
+  `lease_token` / `session_token` on step and work-item claim bodies.
+- Go SDK `ClaimStageLease` / `HeartbeatStageLease` / `ReleaseStageLease` and
+  worker-session equivalents, plus lease-token claim options and step fields.
+- Python, TypeScript, and Rust worker clients expose the same lease/session
+  methods and claim-token options.
+- Java SDK lease/session methods are implemented and compile with JDK 25.
+
 ## [v1.50.0] - 2026-11-01
 
 ### Changed

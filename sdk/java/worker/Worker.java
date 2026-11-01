@@ -118,6 +118,12 @@ public class Worker {
     /** POST claim with optional actor/tools/credential guards. */
     public String claim(String id, String lease, String actor, String toolsJson,
             String credential) throws Exception {
+        return claim(id, lease, actor, toolsJson, credential, null, null);
+    }
+
+    /** POST claim with optional lease/session tokens. */
+    public String claim(String id, String lease, String actor, String toolsJson,
+            String credential, String leaseToken, String sessionToken) throws Exception {
         StringBuilder body = new StringBuilder();
         body.append("{\"lease\":\"").append(jsonEscape(lease)).append('"');
         if (actor != null && !actor.isEmpty()) {
@@ -128,6 +134,12 @@ public class Worker {
         }
         if (credential != null && !credential.isEmpty()) {
             body.append(",\"credential\":\"").append(jsonEscape(credential)).append('"');
+        }
+        if (leaseToken != null && !leaseToken.isEmpty()) {
+            body.append(",\"lease_token\":\"").append(jsonEscape(leaseToken)).append('"');
+        }
+        if (sessionToken != null && !sessionToken.isEmpty()) {
+            body.append(",\"session_token\":\"").append(jsonEscape(sessionToken)).append('"');
         }
         body.append('}');
         String resp = post("/api/v1/work-items/" + id + "/claim", body.toString());
@@ -230,6 +242,52 @@ public class Worker {
                 "{\"token\":\"" + jsonEscape(token) + "\",\"error\":\"" + jsonEscape(error) + "\"}");
     }
 
+    /** POST /api/v1/instances/{id}/stages/{stage}/lease. */
+    public String claimStageLease(String instanceId, String stageId, String actor, String lease)
+            throws Exception {
+        String resp = post("/api/v1/instances/" + instanceId + "/stages/" + stageId + "/lease",
+                "{\"actor\":\"" + jsonEscape(actor) + "\",\"lease\":\"" + jsonEscape(lease) + "\"}");
+        return jsonStr(resp, "token");
+    }
+
+    /** POST /api/v1/instances/{id}/stages/{stage}/lease/heartbeat. */
+    public void heartbeatStageLease(String instanceId, String stageId, String actor,
+            String token, String lease) throws Exception {
+        post("/api/v1/instances/" + instanceId + "/stages/" + stageId + "/lease/heartbeat",
+                "{\"actor\":\"" + jsonEscape(actor) + "\",\"token\":\"" + jsonEscape(token)
+                        + "\",\"lease\":\"" + jsonEscape(lease) + "\"}");
+    }
+
+    /** DELETE /api/v1/instances/{id}/stages/{stage}/lease. */
+    public void releaseStageLease(String instanceId, String stageId, String actor, String token)
+            throws Exception {
+        delete("/api/v1/instances/" + instanceId + "/stages/" + stageId + "/lease",
+                "{\"actor\":\"" + jsonEscape(actor) + "\",\"token\":\"" + jsonEscape(token) + "\"}");
+    }
+
+    /** POST /api/v1/instances/{id}/session. */
+    public String claimWorkerSession(String instanceId, String actor, String lease)
+            throws Exception {
+        String resp = post("/api/v1/instances/" + instanceId + "/session",
+                "{\"actor\":\"" + jsonEscape(actor) + "\",\"lease\":\"" + jsonEscape(lease) + "\"}");
+        return jsonStr(resp, "token");
+    }
+
+    /** POST /api/v1/instances/{id}/session/heartbeat. */
+    public void heartbeatWorkerSession(String instanceId, String actor, String token,
+            String lease) throws Exception {
+        post("/api/v1/instances/" + instanceId + "/session/heartbeat",
+                "{\"actor\":\"" + jsonEscape(actor) + "\",\"token\":\"" + jsonEscape(token)
+                        + "\",\"lease\":\"" + jsonEscape(lease) + "\"}");
+    }
+
+    /** DELETE /api/v1/instances/{id}/session. */
+    public void releaseWorkerSession(String instanceId, String actor, String token)
+            throws Exception {
+        delete("/api/v1/instances/" + instanceId + "/session",
+                "{\"actor\":\"" + jsonEscape(actor) + "\",\"token\":\"" + jsonEscape(token) + "\"}");
+    }
+
     /**
      * Poll once, claim each item, run {@code fn}, then complete/fail/request
      * approval. Items that cannot be claimed (claimed by another worker) are
@@ -294,6 +352,14 @@ public class Worker {
         HttpRequest req = HttpRequest.newBuilder(URI.create(baseUrl + path))
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(json))
+                .build();
+        return send(req);
+    }
+
+    private String delete(String path, String json) throws Exception {
+        HttpRequest req = HttpRequest.newBuilder(URI.create(baseUrl + path))
+                .header("Content-Type", "application/json")
+                .method("DELETE", HttpRequest.BodyPublishers.ofString(json))
                 .build();
         return send(req);
     }

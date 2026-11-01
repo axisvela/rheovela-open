@@ -140,6 +140,203 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
 
+  /api/v1/instances/{id}/stages/{stage}/lease:
+    post:
+      tags: [Instances]
+      summary: Claim a stage lease
+      description: >
+        Acquires the stage-scoped mutual-exclusion lease. While valid, step
+        commands and work-item claims for the stage require the returned
+        fencing token (or a matching worker session token). Another holder
+        receives 409.
+      operationId: claimStageLease
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: stage
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LeaseClaimRequest"
+      responses:
+        "200":
+          description: Stage lease claimed.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LeaseResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "409":
+          $ref: "#/components/responses/Conflict"
+    delete:
+      tags: [Instances]
+      summary: Release a stage lease
+      operationId: releaseStageLease
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: stage
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LeaseTokenRequest"
+      responses:
+        "200":
+          description: Lease released.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OkResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /api/v1/instances/{id}/stages/{stage}/lease/heartbeat:
+    post:
+      tags: [Instances]
+      summary: Renew a stage lease
+      operationId: heartbeatStageLease
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: stage
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LeaseHeartbeatRequest"
+      responses:
+        "200":
+          description: Lease renewed.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OkResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /api/v1/instances/{id}/session:
+    post:
+      tags: [Instances]
+      summary: Claim a worker session
+      description: >
+        Acquires a run-scoped lease that authorizes sequential stages under one
+        fencing token. Only one session and no stage leases may be active.
+      operationId: claimWorkerSession
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LeaseClaimRequest"
+      responses:
+        "200":
+          description: Worker session claimed.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LeaseResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "409":
+          $ref: "#/components/responses/Conflict"
+    delete:
+      tags: [Instances]
+      summary: Release a worker session
+      operationId: releaseWorkerSession
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LeaseTokenRequest"
+      responses:
+        "200":
+          description: Session released.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OkResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /api/v1/instances/{id}/session/heartbeat:
+    post:
+      tags: [Instances]
+      summary: Renew a worker session
+      operationId: heartbeatWorkerSession
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LeaseHeartbeatRequest"
+      responses:
+        "200":
+          description: Session renewed.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OkResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
   /api/v1/instances/{id}/compensate:
     post:
       tags: [Instances]
@@ -1910,6 +2107,12 @@ components:
           description: Only used by `fail`.
         idempotency_key:
           type: string
+        lease_token:
+          type: string
+          description: Required when a stage lease is active for this stage.
+        session_token:
+          type: string
+          description: Required when a worker session is active for the run.
 
     AuditChain:
       type: object
@@ -2240,6 +2443,62 @@ components:
         credential:
           type: string
           description: Credential presented for work items with credential_ref.
+        lease_token:
+          type: string
+          description: Required when a stage lease is active for the item's stage.
+        session_token:
+          type: string
+          description: Required when a worker session is active for the run.
+
+    LeaseClaimRequest:
+      type: object
+      required: [actor]
+      properties:
+        actor:
+          type: string
+        lease:
+          type: string
+          description: Lease duration (Go duration), default `30s`.
+          example: 1h
+
+    LeaseHeartbeatRequest:
+      type: object
+      required: [actor, token]
+      properties:
+        actor:
+          type: string
+        token:
+          type: string
+          description: Fencing token returned by claim.
+        lease:
+          type: string
+          description: Lease duration (Go duration), default `30s`.
+          example: 1h
+
+    LeaseTokenRequest:
+      type: object
+      required: [actor, token]
+      properties:
+        actor:
+          type: string
+        token:
+          type: string
+          description: Fencing token returned by claim.
+
+    LeaseResponse:
+      type: object
+      required: [token, lease_until]
+      properties:
+        token:
+          type: string
+          description: Fencing token for the stage lease or worker session.
+        lease_until:
+          type: string
+          format: date-time
+        stage_id:
+          type: string
+        run_id:
+          type: string
 
     LeaseRequest:
       type: object

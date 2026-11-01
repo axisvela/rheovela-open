@@ -331,6 +331,20 @@ impl Worker {
         tools_json: Option<&str>,
         credential: Option<&str>,
     ) -> Result<String, WorkerError> {
+        self.claim_with_tokens(id, lease, actor, tools_json, credential, None, None)
+    }
+
+    /// POST claim with optional actor/tools/credential guards and lease tokens.
+    pub fn claim_with_tokens(
+        &self,
+        id: &str,
+        lease: &str,
+        actor: Option<&str>,
+        tools_json: Option<&str>,
+        credential: Option<&str>,
+        lease_token: Option<&str>,
+        session_token: Option<&str>,
+    ) -> Result<String, WorkerError> {
         let mut body = format!("{{\"lease\":\"{}\"", json_escape(lease));
         if let Some(actor) = actor.filter(|v| !v.is_empty()) {
             body.push_str(",\"actor\":\"");
@@ -346,6 +360,16 @@ impl Worker {
             body.push_str(&json_escape(credential));
             body.push('"');
         }
+        if let Some(token) = lease_token.filter(|v| !v.is_empty()) {
+            body.push_str(",\"lease_token\":\"");
+            body.push_str(&json_escape(token));
+            body.push('"');
+        }
+        if let Some(token) = session_token.filter(|v| !v.is_empty()) {
+            body.push_str(",\"session_token\":\"");
+            body.push_str(&json_escape(token));
+            body.push('"');
+        }
         body.push('}');
         let resp = self.client.request(
             "POST",
@@ -359,6 +383,139 @@ impl Worker {
     }
 
     /// POST `/api/v1/work-items/{id}/complete` — mark the item done.
+    /// POST `/api/v1/instances/{id}/stages/{stage}/lease`.
+    pub fn claim_stage_lease(
+        &self,
+        instance: &str,
+        stage: &str,
+        actor: &str,
+        lease: &str,
+    ) -> Result<String, WorkerError> {
+        let body = format!(
+            "{{\"actor\":\"{}\",\"lease\":\"{}\"}}",
+            json_escape(actor),
+            json_escape(lease)
+        );
+        let resp = self.client.request(
+            "POST",
+            &format!("/api/v1/instances/{}/stages/{}/lease", instance, stage),
+            Some(&body),
+        )?;
+        json_field(&resp, "token").ok_or_else(|| WorkerError {
+            status: 200,
+            message: "stage lease response missing token".to_string(),
+        })
+    }
+
+    /// POST `/api/v1/instances/{id}/stages/{stage}/lease/heartbeat`.
+    pub fn heartbeat_stage_lease(
+        &self,
+        instance: &str,
+        stage: &str,
+        actor: &str,
+        token: &str,
+        lease: &str,
+    ) -> Result<(), WorkerError> {
+        let body = format!(
+            "{{\"actor\":\"{}\",\"token\":\"{}\",\"lease\":\"{}\"}}",
+            json_escape(actor),
+            json_escape(token),
+            json_escape(lease)
+        );
+        self.client.request(
+            "POST",
+            &format!("/api/v1/instances/{}/stages/{}/lease/heartbeat", instance, stage),
+            Some(&body),
+        )?;
+        Ok(())
+    }
+
+    /// DELETE `/api/v1/instances/{id}/stages/{stage}/lease`.
+    pub fn release_stage_lease(
+        &self,
+        instance: &str,
+        stage: &str,
+        actor: &str,
+        token: &str,
+    ) -> Result<(), WorkerError> {
+        let body = format!(
+            "{{\"actor\":\"{}\",\"token\":\"{}\"}}",
+            json_escape(actor),
+            json_escape(token)
+        );
+        self.client.request(
+            "DELETE",
+            &format!("/api/v1/instances/{}/stages/{}/lease", instance, stage),
+            Some(&body),
+        )?;
+        Ok(())
+    }
+
+    /// POST `/api/v1/instances/{id}/session`.
+    pub fn claim_worker_session(
+        &self,
+        instance: &str,
+        actor: &str,
+        lease: &str,
+    ) -> Result<String, WorkerError> {
+        let body = format!(
+            "{{\"actor\":\"{}\",\"lease\":\"{}\"}}",
+            json_escape(actor),
+            json_escape(lease)
+        );
+        let resp = self.client.request(
+            "POST",
+            &format!("/api/v1/instances/{}/session", instance),
+            Some(&body),
+        )?;
+        json_field(&resp, "token").ok_or_else(|| WorkerError {
+            status: 200,
+            message: "worker session response missing token".to_string(),
+        })
+    }
+
+    /// POST `/api/v1/instances/{id}/session/heartbeat`.
+    pub fn heartbeat_worker_session(
+        &self,
+        instance: &str,
+        actor: &str,
+        token: &str,
+        lease: &str,
+    ) -> Result<(), WorkerError> {
+        let body = format!(
+            "{{\"actor\":\"{}\",\"token\":\"{}\",\"lease\":\"{}\"}}",
+            json_escape(actor),
+            json_escape(token),
+            json_escape(lease)
+        );
+        self.client.request(
+            "POST",
+            &format!("/api/v1/instances/{}/session/heartbeat", instance),
+            Some(&body),
+        )?;
+        Ok(())
+    }
+
+    /// DELETE `/api/v1/instances/{id}/session`.
+    pub fn release_worker_session(
+        &self,
+        instance: &str,
+        actor: &str,
+        token: &str,
+    ) -> Result<(), WorkerError> {
+        let body = format!(
+            "{{\"actor\":\"{}\",\"token\":\"{}\"}}",
+            json_escape(actor),
+            json_escape(token)
+        );
+        self.client.request(
+            "DELETE",
+            &format!("/api/v1/instances/{}/session", instance),
+            Some(&body),
+        )?;
+        Ok(())
+    }
+
     pub fn complete(&self, id: &str, token: &str) -> Result<(), WorkerError> {
         self.complete_with_result(id, token, None, None, None)
     }

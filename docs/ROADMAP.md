@@ -28,6 +28,7 @@
    - BPMN import/export 的标准覆盖扩展（子流程、消息流等）
 2. **SDK parity**
    - 跟随 core 的 work-item/event API 演进（notification/feed/event-bus 相关接口按需加入 SDK 与 OpenAPI）
+   - ✅ OpenAPI + Go/Python/TypeScript/Java/Rust：stage/session lease、`lease_token`/`session_token`
 
 ## Release Rules
 

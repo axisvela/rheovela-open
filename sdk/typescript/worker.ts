@@ -77,6 +77,15 @@ export interface ClaimOptions {
   actor?: string;
   tools?: string[];
   credential?: string;
+  lease_token?: string;
+  session_token?: string;
+}
+
+export interface Lease {
+  token: string;
+  lease_until: string;
+  stage_id?: string;
+  run_id?: string;
 }
 
 export type WorkFn = (item: WorkItem) => Promise<WorkResult>;
@@ -153,6 +162,8 @@ export class Client {
     if (options.actor) body.actor = options.actor;
     if (options.tools?.length) body.tools = options.tools;
     if (options.credential) body.credential = options.credential;
+    if (options.lease_token) body.lease_token = options.lease_token;
+    if (options.session_token) body.session_token = options.session_token;
     return this.req("POST", `${this.itemPath(id)}/claim`, body);
   }
 
@@ -211,6 +222,65 @@ export class Client {
 
   fail(id: string, token: string, error: string): Promise<{ ok: boolean }> {
     return this.req("POST", `${this.itemPath(id)}/fail`, { token, error });
+  }
+
+  claimStageLease(
+    instanceId: string,
+    stageId: string,
+    actor: string,
+    lease = "1h",
+  ): Promise<Lease> {
+    const path = `/api/v1/instances/${encodeURIComponent(instanceId)}/stages/${encodeURIComponent(stageId)}/lease`;
+    return this.req("POST", path, { actor, lease });
+  }
+
+  heartbeatStageLease(
+    instanceId: string,
+    stageId: string,
+    actor: string,
+    token: string,
+    lease = "1h",
+  ): Promise<{ ok: boolean }> {
+    const path = `/api/v1/instances/${encodeURIComponent(instanceId)}/stages/${encodeURIComponent(stageId)}/lease/heartbeat`;
+    return this.req("POST", path, { actor, token, lease });
+  }
+
+  releaseStageLease(
+    instanceId: string,
+    stageId: string,
+    actor: string,
+    token: string,
+  ): Promise<{ ok: boolean }> {
+    const path = `/api/v1/instances/${encodeURIComponent(instanceId)}/stages/${encodeURIComponent(stageId)}/lease`;
+    return this.req("DELETE", path, { actor, token });
+  }
+
+  claimWorkerSession(
+    instanceId: string,
+    actor: string,
+    lease = "1h",
+  ): Promise<Lease> {
+    const path = `/api/v1/instances/${encodeURIComponent(instanceId)}/session`;
+    return this.req("POST", path, { actor, lease });
+  }
+
+  heartbeatWorkerSession(
+    instanceId: string,
+    actor: string,
+    token: string,
+    lease = "1h",
+  ): Promise<{ ok: boolean }> {
+    const path = `/api/v1/instances/${encodeURIComponent(instanceId)}/session/heartbeat`;
+    return this.req("POST", path, { actor, token, lease });
+  }
+
+  releaseWorkerSession(
+    instanceId: string,
+    actor: string,
+    token: string,
+  ): Promise<{ ok: boolean }> {
+    const path = `/api/v1/instances/${encodeURIComponent(instanceId)}/session`;
+    return this.req("DELETE", path, { actor, token });
   }
 }
 
