@@ -23,6 +23,8 @@
 
 ## Next
 
+> 内部执行顺序与依赖见 Rheovela-ee `docs/BACKLOG-EXECUTION-PLAN.md`（open 负责 CRDT 协同编辑、federated 的契约/adapter 面；认证由 EE 的 AEGIVELA/EIDOVELA 承担）。
+
 1. **BPMN / RHEO IR**
    - RHEO IR v1.0 规范已发布（[RHEO-IR.md](RHEO-IR.md)）；delegation/evidence/migration policy/effect_key/timeout 已支持
    - BPMN import/export 的标准覆盖扩展（子流程、消息流等）
