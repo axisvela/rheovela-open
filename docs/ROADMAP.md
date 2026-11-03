@@ -1,6 +1,6 @@
 # Rheovela-open Public Roadmap
 
-> Last updated: 2026-11-01 · current release `v1.51.0`（feature release；功能基线 `v1.4.0`）
+> Last updated: 2026-11-02 · current release `v1.52.0`（M0 coordinated release；功能基线 `v1.4.0`）
 >
 > 本文是 open 的对外公开路线图。core 内核路线图见 core `docs/ROADMAP.md`；
 > 企业能力与内部发布一致性由 Rheovela-ee 私有仓库 `docs/ROADMAP.md` 跟踪。

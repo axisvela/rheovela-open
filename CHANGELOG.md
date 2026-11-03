@@ -2,6 +2,15 @@
 
 RHEOVELA open（`github.com/axisvela/rheovela-open`，Apache-2.0）发布记录：对外发布层（版本化 contracts、SDK、examples、CI、OpenAPI）。格式：最新在前；每个版本对应一个 git tag（三仓库统一语义版本 tag）。
 
+## [v1.52.0] - 2026-11-02
+
+### Changed
+
+- Coordinated M0 release: core replaces OIDC device flow/JWKS with local HTTP
+  Basic auth and EE adds EIDOVELA/AEGIVELA enterprise authentication. Open has
+  no runtime authentication changes; this release updates the roadmap reference
+  to the M0–M7 execution plan.
+
 ## [v1.51.0] - 2026-11-01
 
 ### Added
