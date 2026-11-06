@@ -14,6 +14,17 @@ func TestSchemaVersionConstant(t *testing.T) {
 	assert.Equal(t, "1", contracts.SchemaVersion)
 }
 
+func TestSubWorkflowRefJSONRoundTrip(t *testing.T) {
+	in := contracts.Stage{ID: "s1", Title: "S1", SubWorkflow: &contracts.SubWorkflowRef{
+		WorkflowID: "child", Version: 3, Inputs: map[string]string{"x": "${parentX}"},
+	}}
+	raw, err := json.Marshal(in)
+	require.NoError(t, err)
+	var out contracts.Stage
+	require.NoError(t, json.Unmarshal(raw, &out))
+	assert.Equal(t, in.SubWorkflow, out.SubWorkflow)
+}
+
 func TestStageAssignedInCatalog(t *testing.T) {
 	assert.Contains(t, contracts.KnownEventTypes, "StageAssigned")
 }

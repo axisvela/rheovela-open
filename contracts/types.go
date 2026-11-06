@@ -572,6 +572,16 @@ type Stage struct {
 	CompletionMode   string          `json:"completion_mode,omitempty"`
 	RequiredApprovals int            `json:"required_approvals,omitempty"`
 	RequiredCompletions int          `json:"required_completions,omitempty"`
+	SubWorkflow      *SubWorkflowRef `json:"sub_workflow,omitempty"`
+}
+
+// SubWorkflowRef declares that a stage is executed by a child workflow
+// instance. Inputs values are literals unless they match ${name}, which is
+// substituted from the parent instance variables at spawn time.
+type SubWorkflowRef struct {
+	WorkflowID string            `json:"workflow_id"`
+	Version    int               `json:"version,omitempty"`
+	Inputs     map[string]string `json:"inputs,omitempty"`
 }
 
 // Delegation describes an authority delegation attached to a stage.
