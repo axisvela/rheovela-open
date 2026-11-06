@@ -1,6 +1,6 @@
-# Rheovela-open Status (v1.52.0)
+# Rheovela-open Status (v1.59.0)
 
-> Last updated: 2026-11-02 · current release `v1.52.0`（M0 coordinated release；功能基线 `v1.4.0`）· license Apache-2.0
+> Last updated: 2026-11-06 · current release `v1.59.0`（coordinated release；work-item 功能参考基线 `v1.4.0`）· license Apache-2.0
 >
 > 本文是 open 的对外公开状态。内部发布一致性、企业能力缺口与详细 backlog
 > 由 Rheovela-ee 私有仓库 `docs/STATUS.md` 跟踪。
@@ -9,8 +9,8 @@
 
 | Item | State |
 |------|-------|
-| Release tag | `v1.51.0`（feature release；功能基线 `v1.4.0`） |
-| Module tags | 根模块 `v3.14.0`；`sdk/go v3.1.0`；adapter `sdk/go/harmovela/v3.0.0` |
+| Release tag | `v1.59.0`（2026-11-06，coordinated release，无 open 代码变更） |
+| Module tags | 根模块 `v3.15.0`；`sdk/go/v3.2.0`；adapter `sdk/go/harmovela/v3.0.0`（本地 tag 已核对；不代表本次验证了远端发布/模块代理） |
 | Contracts | `AssigneeSpec` candidates/SLA/budget/claim_policy/escalation；`Stage` task_kind/payload/required_evidence/approval_roles/tool_scope/credential_ref/completion_mode/required_approvals/required_completions； `schema_version=1`；事件含 `WorkItemApprovalRequested`/`WorkItemApproved`/`WorkItemRejected`/`WorkItemEscalated`/`WorkItemHandedOff`/`WorkItemTakenOver`/`WorkItemCoCompleted` |
 | OpenAPI | `api/openapi.yaml`；覆盖 instances、steps、work-items、handoff/takeover、notifications、approval-delegations、suspend/resume、approval、retry/cancel、audit、sync、events、health/status/metrics |
 | JSON Schema | `api/workflow.schema.json`、`api/event.schema.json` |
@@ -24,9 +24,13 @@ releases with no open contract or SDK changes; core added the configurable event
 bus, feed routing, durable feed routes, tenant-aware feeds, P3 replay/retention,
 a CI workflow fix, and stage-level leases.
 
-**Unreleased (main):** OpenAPI now documents stage lease and worker session
+**Released in v1.51.0:** OpenAPI documents stage lease and worker session
 routes, and step/claim bodies accept `lease_token` / `session_token`. The Go,
 Python, TypeScript, Java, and Rust SDKs expose the lease/session methods.
+
+`v1.52.0`–`v1.59.0` are coordinated releases without open code changes;
+the current release records the EE KINETOVELA live drill. The `v1.4.0`
+reference names the work-item feature set, not a freeze of later SDK/API work.
 
 ## SDK Feature Matrix
 
@@ -41,11 +45,11 @@ Python, TypeScript, Java, and Rust SDKs expose the lease/session methods.
 Go SDK 的 work-item 客户端方法包括 `GetWorkItem`、`CompleteWorkItemWithResult`、
 `RequestWorkItemApproval`、`ApproveWorkItem`、`RejectWorkItem`、`CancelWorkItem`。
 
-## Verification (2026-11-01, v1.50.0 gate)
+## Historical Verification (2026-11-01, v1.50.0 gate)
 
-The last open code changes shipped in `v1.44.0`; `v1.45.0`–`v1.50.0` are
-coordinated releases without open code changes. The gate below remains the
-current baseline.
+The commands below preserve the recorded v1.50.0 gate; they do not verify
+the later v1.51.0 lease/session SDK changes or the current checkout. No SDK
+test suite was rerun for this documentation reconciliation.
 
 ```sh
 # root module
@@ -56,8 +60,8 @@ cd sdk/go
 go test ./... -count=1        # 2 packages ok
 ```
 
-Exact top-level test counts are tracked by CI; historical 15/29 figures are not
-the current baseline.
+Exact current test counts require a fresh run; historical 15/29 figures and
+the package counts above are not a new v1.59.0 verification claim.
 
 Python / TypeScript / Java / Rust 由各自 CI job 独立验证，没有跨语言统一测试框架。
 
