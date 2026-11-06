@@ -280,8 +280,9 @@ and adapter module `sdk/go/harmovela/v3.0.0`
 To cut a release:
 
 1. Freeze changes; confirm `go test ./...` and all SDK jobs pass.
-2. Tag a semantic version and push (core repo builds binaries; open repo docs/
-   contracts ride the same tag name).
+2. Tag core and open with the same semantic version and push (core builds
+   binaries; open docs/contracts ride the same tag name). EE may use an
+   independent tag.
 3. Update `CHANGELOG.md` and the docs' version stamps.
 
 ---

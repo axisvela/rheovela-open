@@ -1,6 +1,20 @@
 # Changelog
 
-RHEOVELA open（`github.com/axisvela/rheovela-open`，Apache-2.0）发布记录：对外发布层（版本化 contracts、SDK、examples、CI、OpenAPI）。格式：最新在前；每个版本对应一个 git tag（三仓库统一语义版本 tag）。
+RHEOVELA open（`github.com/axisvela/rheovela-open`，Apache-2.0）发布记录：对外发布层（版本化 contracts、SDK、examples、CI、OpenAPI）。格式：最新在前；每个版本对应一个 git tag（core/open 共享语义版本 tag，EE 可独立）。
+
+## [v1.60.0] - 2026-11-06
+
+### Added
+
+- `Stage.SubWorkflow` / `SubWorkflowRef` contract: optional declaration that a
+  stage is executed by a child workflow, with `workflow_id`, `version`, and
+  `${parentVar}` input mapping.
+- Contract round-trip test for the new field.
+
+### Changed
+
+- Shared release tag with core `v1.60.0`; EE uses its own tag. Module tag
+  `v3.15.0` unchanged.
 
 ## [v1.59.0] - 2026-11-06
 
