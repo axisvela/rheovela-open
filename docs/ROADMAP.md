@@ -1,6 +1,6 @@
 # Rheovela-open Public Roadmap
 
-> Last updated: 2026-11-06 · current release `v1.60.0`（core/open 共享；EE 独立 tag；work-item 功能参考基线 `v1.4.0`）
+> Last updated: 2026-11-06 · current release `v1.61.0`（core/open 共享；EE 独立 tag；work-item 功能参考基线 `v1.4.0`）
 >
 > 本文是 open 的对外公开路线图。core 内核路线图见 core `docs/ROADMAP.md`；
 > 企业能力与内部发布一致性由 Rheovela-ee 私有仓库 `docs/ROADMAP.md` 跟踪。
@@ -39,7 +39,7 @@ Core 公共接口与边界见 [core Roadmap](https://github.com/axisvela/rheovel
 | RHEO IR participant attributes | v1.44.0：`approval_roles`/`tools`/`credential`/`completion`/`approvals`/`completions` 活动属性与 conformance fixture |
 | Participant/assignment schema | v1.44.0：`api/workflow.schema.json` 覆盖 `task_kind`/`payload`/`required_evidence`/`approval_roles`/`tool_scope`/`credential_ref`/`completion_mode`/counts 与 candidates/SLA/budget/claim policy/escalation |
 | Coordinated releases | v1.45.0–v1.51.0：core 事件总线、feed 路由、durable feed routes、tenant-aware feeds、P3 replay/retention、CI 修复、stage-level lease；open 在 v1.51.0 新增 stage/session lease SDK 与 OpenAPI |
-| Current release | v1.60.0（core/open 共享）：新增 `Stage.SubWorkflow` / `SubWorkflowRef` contracts。v1.52.0–v1.59.0 无 open 代码变更；实现、验证与生产验收分开记录，详见 [STATUS.md](STATUS.md) |
+| Current release | v1.61.0（core/open 共享）：新增 `Stage.SubWorkflow` / `SubWorkflowRef` contracts。v1.52.0–v1.59.0 无 open 代码变更；实现、验证与生产验收分开记录，详见 [STATUS.md](STATUS.md) |
 
 ## Next
 
@@ -58,5 +58,5 @@ Core 公共接口与边界见 [core Roadmap](https://github.com/axisvela/rheovel
 ## Release Rules
 
 - 使用语义版本 tag（如 `v1.4.0`），不使用 `v1.x-core` 开发里程碑 tag。
-- core 与 open 使用同一 release tag；EE 可独立打 tag。`/v3` Go module 的模块 tag 与 release tag 对应关系由内部发布流程维护；当前 `v1.60.0` 未切新 module tag，根模块仍为 `v3.15.0`、`sdk/go/v3.2.0`、adapter `sdk/go/harmovela/v3.0.0`。本地 tag 存在不等于远端发布或无 replace 模块解析已通过。
+- core 与 open 使用同一 release tag；EE 可独立打 tag。`/v3` Go module 的模块 tag 与 release tag 对应关系由内部发布流程维护；当前 `v1.61.0` 未切新 module tag，根模块仍为 `v3.15.0`、`sdk/go/v3.2.0`、adapter `sdk/go/harmovela/v3.0.0`。本地 tag 存在不等于远端发布或无 replace 模块解析已通过。
 - 每个 release 更新 `CHANGELOG.md`，并保持 contracts/OpenAPI 与 core 同步。
