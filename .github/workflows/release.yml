@@ -10,6 +10,7 @@ on:
 
 permissions:
   contents: write
+  packages: write
 
 jobs:
   build-core:
@@ -126,3 +127,44 @@ jobs:
           SHA256SUMS is included for checksum verification." \
             artifacts/rheo-*/rheo-* \
             artifacts/SHA256SUMS
+
+  docker:
+    name: Publish server image
+    needs: release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require core repository token
+        env:
+          CORE_REPO_TOKEN: ${{ secrets.CORE_REPO_TOKEN }}
+        run: |
+          if [ -z "${CORE_REPO_TOKEN}" ]; then
+            echo "::error::CORE_REPO_TOKEN is not configured. Add a PAT with read access to axisvela/rheovela."
+            exit 1
+          fi
+
+      - name: Checkout rheovela core at the same tag
+        uses: actions/checkout@v4
+        with:
+          repository: axisvela/rheovela
+          ref: ${{ github.ref_name }}
+          token: ${{ secrets.CORE_REPO_TOKEN }}
+          path: Rheovela
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push rheo server image
+        uses: docker/build-push-action@v6
+        with:
+          context: Rheovela
+          file: Rheovela/release/Dockerfile
+          push: true
+          build-args: |
+            RHEO_VERSION=${{ github.ref_name }}
+          tags: |
+            ghcr.io/axisvela/rheo:${{ github.ref_name }}
+            ghcr.io/axisvela/rheo:latest
