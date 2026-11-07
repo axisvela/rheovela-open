@@ -19,7 +19,16 @@ fi
 RHEO_VERSION="$VERSION" "$CORE/release/build.sh"
 
 mkdir -p "$OUT"
-cp "$CORE"/dist/rheo-* "$OUT"/
+targets=(
+  rheo-windows-amd64.exe
+  rheo-linux-amd64
+  rheo-linux-arm64
+  rheo-darwin-amd64
+  rheo-darwin-arm64
+)
+for name in "${targets[@]}"; do
+  cp "$CORE/dist/$name" "$OUT/"
+done
 cp "$CORE/dist/SHA256SUMS" "$OUT/SHA256SUMS"
 echo "==> release artifacts ready in $OUT"
 
@@ -33,5 +42,9 @@ else
 fi
 
 if [[ "${UPLOAD:-0}" == "1" ]]; then
-  gh release upload "$VERSION" "$OUT"/rheo-* "$OUT/SHA256SUMS" --clobber
+  files=()
+  for name in "${targets[@]}"; do
+    files+=("$OUT/$name")
+  done
+  gh release upload "$VERSION" "${files[@]}" "$OUT/SHA256SUMS" --clobber
 fi

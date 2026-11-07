@@ -43,6 +43,7 @@ foreach ($target in $Targets) {
 $saved = @{
     GOOS = $env:GOOS; GOARCH = $env:GOARCH; CGO_ENABLED = $env:CGO_ENABLED
 }
+$built = @()
 Push-Location $Backend
 try {
     $ldflags = "-s -w -X main.version=$Version"
@@ -56,6 +57,7 @@ try {
         Write-Host "==> building $name"
         go build -trimpath -ldflags $ldflags -o $path ./cmd/rheo
         if ($LASTEXITCODE -ne 0) { throw "build failed for $target" }
+        $built += $path
     }
 }
 finally {
@@ -67,11 +69,10 @@ finally {
 }
 
 $manifest = Join-Path $Output "SHA256SUMS"
-Get-ChildItem $Output -Filter "rheo-*" |
-    Where-Object { $_.Name -notlike "*.sha256" -and $_.Name -ne "SHA256SUMS" } |
+$built |
     ForEach-Object {
-        $hash = (Get-FileHash $_.FullName -Algorithm SHA256).Hash.ToLower()
-        "$hash  $($_.Name)"
+        $hash = (Get-FileHash $_ -Algorithm SHA256).Hash.ToLower()
+        "$hash  $(Split-Path -Leaf $_)"
     } |
     Sort-Object |
     Set-Content $manifest -Encoding ascii
@@ -93,9 +94,9 @@ if ($Upload) {
     if (-not (Get-Command gh -ErrorAction SilentlyContinue)) {
         throw "gh is required for -Upload"
     }
-    $files = Get-ChildItem $Output -Filter "rheo-*" | ForEach-Object { $_.FullName }
+    $files = @($built) + $manifest
     Write-Host "==> uploading artifacts to release $Version"
-    gh release upload $Version $files $manifest --clobber
+    gh release upload $Version $files --clobber
     if ($LASTEXITCODE -ne 0) { throw "gh release upload failed" }
 }
 
