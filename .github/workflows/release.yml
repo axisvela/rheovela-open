@@ -70,11 +70,11 @@ jobs:
 
       - uses: actions/setup-go@v5
         with:
-          go-version-file: Rheovela/go.mod
-          cache-dependency-path: Rheovela/go.sum
+          go-version-file: Rheovela/backend/go.mod
+          cache-dependency-path: Rheovela/backend/go.sum
 
       - name: Build core CLI
-        working-directory: Rheovela
+        working-directory: Rheovela/backend
         run: |
           mkdir -p "${GITHUB_WORKSPACE}/artifacts"
           ARTIFACT="rheo-${{ matrix.target.os }}-${{ matrix.target.arch }}${{ matrix.target.ext }}"

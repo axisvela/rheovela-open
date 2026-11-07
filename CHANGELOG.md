@@ -4,6 +4,17 @@ RHEOVELA open（`github.com/axisvela/rheovela-open`，Apache-2.0）发布记录�
 
 ## [Unreleased]
 
+### Added
+
+- `scripts/release-local.ps1` / `scripts/release-local.sh`: build the core
+  `rheo` release matrix from sibling checkouts without `CORE_REPO_TOKEN`,
+  with optional Docker image and `gh release upload`.
+
+### Fixed
+
+- The release workflow builds core from `Rheovela/backend` (the Go module root)
+  instead of the repository root.
+
 ## [v1.63.0] - 2026-11-07
 
 ### Added
