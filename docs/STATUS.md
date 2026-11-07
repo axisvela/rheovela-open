@@ -17,6 +17,12 @@
 | Worker SDKs | Go / Python / TypeScript / Java / Rust |
 | Examples | Go / Python / TypeScript worker examples；expense/purchase RHEO IR samples |
 
+> Release automation (2026-11-07): the `v1.63.0` tag/commit is pushed, but the
+> `release` workflow failed because `CORE_REPO_TOKEN` is not configured; core CI
+> and EE privacy jobs are also blocked by GitHub account billing. Binaries and
+> the GHCR image were not published; re-run after configuring the secret and
+> billing.
+
 `v1.44.0` added RHEO IR participant attributes, SDK claim-actor propagation on
 completion, notification retry/dead-letter metadata, and participant/assignment
 fields in `api/workflow.schema.json`. `v1.45.0`–`v1.50.0` were coordinated
