@@ -4,6 +4,8 @@ RHEOVELA open（`github.com/axisvela/rheovela-open`，Apache-2.0）发布记录�
 
 ## [Unreleased]
 
+## [v1.63.0] - 2026-11-07
+
 ### Added
 
 - The release workflow publishes the `rheo` server image to
