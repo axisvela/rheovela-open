@@ -4,13 +4,15 @@ RHEOVELA open（`github.com/axisvela/rheovela-open`，Apache-2.0）发布记录�
 
 ## [Unreleased]
 
+## [v1.69.0] - 2026-11-08
+
 ### Added
 
 - `contracts.FederationEnvelope` / `FederationHandoff` / `FederationSLA`:
   cross-org handoff wire contract (sender/receiver tenant, correlation, shared
   SLA context).
 - `designer/collab.mjs`: EE collaboration transport adapter for the Designer
-  CRDT (`sendOps`, `getDocument`, `heartbeat`, `presence`).
+  CRDT (`sendOps`, `getDocument`, `snapshot`, `heartbeat`, `presence`).
 
 ## [v1.68.0] - 2026-11-08
 
