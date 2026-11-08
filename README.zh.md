@@ -10,6 +10,10 @@ RHEOVELA 是一个 **Dynamic Process & Durable Workflow Platform（动态流程�
 
 **RHEOVELA 的答案**：负责"长期工作如何可靠流转"——而不是做开放式规划，也不是跑单个 Agent 的推理循环。
 
+### 边缘与学习边界
+
+RHEOVELA 保留持久化 Process、恢复、补偿与工作流 lease/fencing 权威。AKROVELA 的目标是本地 operation、attempt 与 receipt，不是第二个持久化流程引擎；编排训练工作流也不将 episode、dataset、label 或训练结果从 DIDACTOVELA 移入 RHEOVELA。两者均仅为未发布 `0.1.0` 引导阶段，尚无功能集成；现有 edge spool 与 KINETOVELA 证据不改称 AKROVELA 证据。参见[家族架构与边界](https://github.com/axisvela/axisvela/blob/main/EDGE-AND-LEARNING-ARCHITECTURE.md)。
+
 ### 核心特性
 
 - **事件溯源 + 确定性内核**：任何崩溃后都能从事件流恢复一致状态；相同事件流必然折叠出相同结果

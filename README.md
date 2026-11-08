@@ -19,6 +19,16 @@ agent loop has no notion of long-lived responsibility, recovery or audit.
 **The answer**: RHEOVELA owns "how long-running work reliably flows" — not
 open-ended planning, and not a single agent's inference loop.
 
+### Edge and learning boundary
+
+RHEOVELA retains durable Process state, recovery, compensation and workflow
+leases/fencing. AKROVELA targets local operations, attempts and receipts, not a
+second durable workflow engine. Training workflow orchestration does not move
+episodes, datasets, labels or training results out of DIDACTOVELA.
+Both new products are unreleased `0.1.0` bootstraps, with no functional integration;
+existing edge-spool and KINETOVELA evidence is not AKROVELA evidence.
+See the [family architecture and boundaries](https://github.com/axisvela/axisvela/blob/main/EDGE-AND-LEARNING-ARCHITECTURE.md).
+
 ### Key features
 
 - **Event sourcing + deterministic kernel**: consistent state is recovered from
