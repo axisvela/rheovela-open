@@ -4,6 +4,8 @@ RHEOVELA open（`github.com/axisvela/rheovela-open`，Apache-2.0）发布记录�
 
 ## [Unreleased]
 
+## [v1.65.0] - 2026-11-08
+
 ### Added
 
 - `scripts/release-local.ps1` / `scripts/release-local.sh`: build the core
