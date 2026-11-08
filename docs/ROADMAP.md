@@ -35,7 +35,7 @@ Core 公共接口与边界见 [core Roadmap](https://github.com/axisvela/rheovel
 | Examples | Go / Python / TypeScript runnable workers、RHEO IR samples |
 | SDK parity for v1.4.0 | Go / Python / TypeScript / Java / Rust SDK：result、checkpoint、effect cursor、approval、retry、cancel、claimable polling（v1.7.5） |
 | Harmovela adapter | `sdk/go/harmovela` producer/observer adapter：将 Rheovela work-item 生命周期映射为 Harmovela `task.*` 事件（v1.7.5）；仅 producer/observer，consume 方向由 core 负责，内置 transport 不包含 |
-| Community Process Designer | 静态 `designer/`：WorkflowDefinition 编辑、校验、JSON 导入导出、delegation/evidence 保留、BPMN DI 渲染、undo/redo、导入差异预览；可选直连 core API |
+| Community Process Designer | 静态 `designer/`：WorkflowDefinition 编辑、校验、JSON 导入导出、delegation/evidence 保留、BPMN DI 渲染、undo/redo、导入差异预览；可选直连 core API；CRDT 客户端核心（op-based LWW、快照合并、离线重放队列） |
 | RHEO IR participant attributes | v1.44.0：`approval_roles`/`tools`/`credential`/`completion`/`approvals`/`completions` 活动属性与 conformance fixture |
 | Participant/assignment schema | v1.44.0：`api/workflow.schema.json` 覆盖 `task_kind`/`payload`/`required_evidence`/`approval_roles`/`tool_scope`/`credential_ref`/`completion_mode`/counts 与 candidates/SLA/budget/claim policy/escalation |
 | Coordinated releases | v1.45.0–v1.51.0：core 事件总线、feed 路由、durable feed routes、tenant-aware feeds、P3 replay/retention、CI 修复、stage-level lease；open 在 v1.51.0 新增 stage/session lease SDK 与 OpenAPI |
@@ -52,7 +52,7 @@ Core 公共接口与边界见 [core Roadmap](https://github.com/axisvela/rheovel
    - 跟随 core 的 work-item/event API 演进（notification/feed/event-bus 相关接口按需加入 SDK 与 OpenAPI）
    - ✅ OpenAPI + Go/Python/TypeScript/Java/Rust：stage/session lease、`lease_token`/`session_token`
 3. **M6 / M7 配套**
-   - M6：Designer 文档模型与 CRDT 客户端，保持设计稿、发布版本和运行实例分离
+   - M6：Designer 文档模型与 CRDT 客户端（`designer/crdt.mjs` 已落地 op-based LWW、快照合并、离线重放；鉴权、租户隔离、共享持久化与在线状态仍属 EE），保持设计稿、发布版本和运行实例分离
    - M7：跨组织消息契约、SDK 与 adapter；不在 open 实现组织信任管理或联邦控制面
 
 ## Release Rules

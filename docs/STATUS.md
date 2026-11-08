@@ -78,7 +78,7 @@ and [Harmovela adapter](testing/2026-10-26-harmovela-adapter/README.md).
 
 | Area | Boundary |
 |------|----------|
-| Process Designer | 静态社区设计器 `designer/`：编辑/校验/导入导出、BPMN DI 渲染、undo/redo、导入差异预览；可选 load/publish/list 直连 core workflows API |
+| Process Designer | 静态社区设计器 `designer/`：编辑/校验/导入导出、BPMN DI 渲染、undo/redo、导入差异预览；可选 load/publish/list 直连 core workflows API；CRDT 客户端核心（`designer/crdt.mjs`：LWW op merge、快照合并、离线重放队列） |
 | Harmovela adapter | producer/observer adapter in `sdk/go/harmovela` (since v1.7.5)；内置 WebSocket/gRPC/NATS transports 不包含；consumer direction 由 core 负责 |
 | BPMN / RHEO IR | core 提供 BPMN import/export 子集，保留 gateway/event 语义、root definitions、activities/loops、data stores/IO、resources/roles、categories、collaboration/conversation、choreography、artifacts、data associations、extensionElements/documentation/import/relationship、auditing/monitoring、isInterrupting，以及完整 DI；RHEO IR v1.0 规范已发布（[RHEO-IR.md](RHEO-IR.md)），公开 conformance corpus 与稳定 `RHEOIRxxx` 错误码见 [`conformance/`](../conformance/README.md) |
 

@@ -60,11 +60,33 @@ can be validated with `rheo workflow validate` and imported with
 
 ```sh
 node --test designer/model.test.mjs designer/core.test.mjs \
-  designer/history.test.mjs designer/diagram.test.mjs designer/diff.test.mjs
+  designer/history.test.mjs designer/diagram.test.mjs designer/diff.test.mjs \
+  designer/crdt.test.mjs
 ```
 
 The model tests cover structural validation, DAG cycles, stage/transition
 removal cascades, JSON round-trips, and delegation/evidence preservation. The
 core client tests cover load/list/publish URLs, headers, request bodies, and
 non-2xx error handling. History, DI layout, and import diff tests cover undo/redo
-truncation, viewport normalization, and added/removed/changed metadata.
+truncation, viewport normalization, and added/removed/changed metadata. CRDT
+tests cover materialization, LWW/actor tie-break, idempotent merge, tombstones,
+snapshot merge, and the offline replay queue.
+
+## CRDT collaboration client
+
+`crdt.mjs` is a zero-dependency, op-based CRDT for design drafts. Each edit is
+an operation `{id, key, value, deleted, counter, actor}` applied to a
+last-writer-wins register: a higher `counter` wins, and equal counters are
+broken by the lexicographically larger `actor`.
+
+Registers are keyed `workflow_id`, `title`, `source`, other top-level fields,
+`stage:<id>`, `transition:<from>-><to>`, `compensation:<key>`, and the three
+`*.order` arrays. Removal is a tombstone. `snapshot()` returns every register so
+a new replica can `merge()` it; `merge()` is idempotent and commutative.
+
+`createSync(crdt, { send })` flushes unacknowledged local ops and replays them
+until the caller `ack()`s them, which covers offline edits and reconnect. The
+transport is intentionally a function: the EE collaboration service provides
+authentication, tenant isolation, shared persistence, and presence. A CRDT edit
+never publishes a definition version or migrates a running instance; publishing
+and migration remain explicit core operations.

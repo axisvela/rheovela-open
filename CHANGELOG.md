@@ -9,6 +9,11 @@ RHEOVELA open（`github.com/axisvela/rheovela-open`，Apache-2.0）发布记录�
 - `scripts/release-local.ps1` / `scripts/release-local.sh`: build the core
   `rheo` release matrix from sibling checkouts without `CORE_REPO_TOKEN`,
   with optional Docker image and `gh release upload`.
+- `designer/crdt.mjs`: dependency-free op-based CRDT document client for the
+  Community Process Designer (LWW registers with actor tie-break, stage/
+  transition/compensation registers, tombstones, snapshot merge, and a
+  transport queue with replay until ack). Design drafts stay separate from
+  published definitions; the EE collaboration service owns auth and persistence.
 
 ### Fixed
 
