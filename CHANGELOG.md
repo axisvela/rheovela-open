@@ -4,6 +4,11 @@ RHEOVELA open（`github.com/axisvela/rheovela-open`，Apache-2.0）发布记录�
 
 ## [Unreleased]
 
+## [v1.68.0] - 2026-11-08
+
+Coordinated release with core `v1.68.0`; no open contract or SDK changes.
+Core adds the position-axis `RunAuthority` command guard.
+
 ## [v1.67.0] - 2026-11-08
 
 Coordinated release with core `v1.67.0`; no open contract or SDK changes.

@@ -1,6 +1,6 @@
 # Rheovela-open Public Roadmap
 
-> Last updated: 2026-11-08 · current release `v1.67.0`（core/open 共享；EE 独立 tag；work-item 功能参考基线 `v1.4.0`）
+> Last updated: 2026-11-08 · current release `v1.68.0`（core/open 共享；EE 独立 tag；work-item 功能参考基线 `v1.4.0`）
 >
 > 本文是 open 的对外公开路线图。core 内核路线图见 core `docs/ROADMAP.md`；
 > 企业能力与内部发布一致性由 Rheovela-ee 私有仓库 `docs/ROADMAP.md` 跟踪。
@@ -39,7 +39,7 @@ Core 公共接口与边界见 [core Roadmap](https://github.com/axisvela/rheovel
 | RHEO IR participant attributes | v1.44.0：`approval_roles`/`tools`/`credential`/`completion`/`approvals`/`completions` 活动属性与 conformance fixture |
 | Participant/assignment schema | v1.44.0：`api/workflow.schema.json` 覆盖 `task_kind`/`payload`/`required_evidence`/`approval_roles`/`tool_scope`/`credential_ref`/`completion_mode`/counts 与 candidates/SLA/budget/claim policy/escalation |
 | Coordinated releases | v1.45.0–v1.51.0：core 事件总线、feed 路由、durable feed routes、tenant-aware feeds、P3 replay/retention、CI 修复、stage-level lease；open 在 v1.51.0 新增 stage/session lease SDK 与 OpenAPI |
-| Current release | v1.67.0（core/open 共享）：open 无代码变更；core 增加 SLA deadline calculator 与 SLA policy override 钩子；契约保持 v1.60.0 的 Stage.SubWorkflow / SubWorkflowRef。实现、验证与生产验收分开记录，详见 [STATUS.md](STATUS.md) |
+| Current release | v1.68.0（core/open 共享）：open 无代码变更；core 增加 position-axis `RunAuthority` 命令门；契约保持 v1.60.0 的 Stage.SubWorkflow / SubWorkflowRef。实现、验证与生产验收分开记录，详见 [STATUS.md](STATUS.md) |
 
 ## Next
 
