@@ -15,6 +15,12 @@ RHEOVELA open（`github.com/axisvela/rheovela-open`，Apache-2.0）发布记录�
 - The release workflow builds core from `Rheovela/backend` (the Go module root)
   instead of the repository root.
 
+## [v1.64.0] - 2026-11-08
+
+Coordinated release with core `v1.64.0`; no open contract or SDK changes.
+Core adds the ORCHADYN auto-replan closure and BPMN callActivity subprocess
+support (import → `Stage.SubWorkflow`, token-engine async spawn/link/回写).
+
 ## [v1.63.0] - 2026-11-07
 
 ### Added
