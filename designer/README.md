@@ -90,3 +90,20 @@ transport is intentionally a function: the EE collaboration service provides
 authentication, tenant isolation, shared persistence, and presence. A CRDT edit
 never publishes a definition version or migrates a running instance; publishing
 and migration remain explicit core operations.
+
+`collab.mjs` provides the default EE transport:
+
+```js
+import { createEECollabClient } from "./collab.mjs";
+
+const client = createEECollabClient({
+  baseUrl: "https://ee.example",
+  documentId: "expense",
+  headers: { authorization: "Bearer <token>" },
+});
+const sync = createSync(crdt, { send: (ops) => client.sendOps(ops) });
+await client.heartbeat("client-1", { field: "title" });
+```
+
+`sendOps` posts to `/api/v1/ee/collab/documents/{id}/ops`; the response carries
+`{document, accepted, rejected}` so the caller can ack accepted ops.

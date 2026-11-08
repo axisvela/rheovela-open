@@ -4,6 +4,11 @@ RHEOVELA open（`github.com/axisvela/rheovela-open`，Apache-2.0）发布记录�
 
 ## [Unreleased]
 
+### Added
+
+- `designer/collab.mjs`: EE collaboration transport adapter for the Designer
+  CRDT (`sendOps`, `getDocument`, `heartbeat`, `presence`).
+
 ## [v1.68.0] - 2026-11-08
 
 Coordinated release with core `v1.68.0`; no open contract or SDK changes.
