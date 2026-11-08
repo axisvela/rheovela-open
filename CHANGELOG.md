@@ -4,6 +4,11 @@ RHEOVELA open（`github.com/axisvela/rheovela-open`，Apache-2.0）发布记录�
 
 ## [Unreleased]
 
+## [v1.66.0] - 2026-11-08
+
+Coordinated release with core `v1.66.0`; no open contract or SDK changes.
+Core adds the generic feed tenant resolver used by EE tenant-scoped projects.
+
 ## [v1.65.0] - 2026-11-08
 
 ### Added
