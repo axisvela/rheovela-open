@@ -63,6 +63,28 @@ test("non-2xx responses throw with the status", async () => {
   await assert.rejects(() => client.getDocument(), /HTTP 403/);
 });
 
+test("snapshot converts an EE document into CRDT ops", async () => {
+  const { fetchImpl } = recordingFetch({
+    ok: true,
+    status: 200,
+    json: async () => ({
+      fields: {
+        title: { value: "x", clock: 2, replica: "a", deleted: false },
+        "stage:s1": { value: { id: "s1" }, clock: 3, replica: "a", deleted: true },
+      },
+    }),
+  });
+  const client = createEECollabClient({ baseUrl: "https://ee.example", documentId: "doc-1", fetchImpl });
+
+  const ops = await client.snapshot();
+  assert.equal(ops.length, 2);
+  const stage = ops.find((op) => op.key === "stage:s1");
+  assert.equal(stage.counter, 3);
+  assert.equal(stage.actor, "a");
+  assert.equal(stage.deleted, true);
+  assert.deepEqual(stage.value, { id: "s1" });
+});
+
 test("baseUrl and documentId are required", () => {
   assert.throws(() => createEECollabClient({ documentId: "doc-1" }), /baseUrl/);
   assert.throws(() => createEECollabClient({ baseUrl: "https://ee.example" }), /documentId/);

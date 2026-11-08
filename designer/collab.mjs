@@ -2,6 +2,22 @@
 // collaboration service. CRDT semantics stay in crdt.mjs; this module only maps
 // createSync ops to the EE HTTP contract.
 
+export function documentToOps(document) {
+  const ops = [];
+  const fields = document && document.fields ? document.fields : {};
+  for (const [key, register] of Object.entries(fields)) {
+    ops.push({
+      id: `${register.replica}:${register.clock}:${key}`,
+      key,
+      value: register.value,
+      deleted: Boolean(register.deleted),
+      counter: register.clock,
+      actor: register.replica,
+    });
+  }
+  return ops;
+}
+
 export function createEECollabClient({
   baseUrl,
   documentId,
@@ -42,6 +58,9 @@ export function createEECollabClient({
     },
     getDocument() {
       return request(documentURL, { method: "GET" });
+    },
+    async snapshot() {
+      return documentToOps(await request(documentURL, { method: "GET" }));
     },
     heartbeat(clientId, cursor) {
       const body = { client_id: clientId };
