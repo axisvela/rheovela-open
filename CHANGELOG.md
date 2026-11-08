@@ -1,15 +1,14 @@
 # Changelog
 
-RHEOVELA open锛坄github.com/axisvela/rheovela-open`锛孉pache-2.0锛夊彂甯冭褰曪細瀵瑰鍙戝竷灞傦紙鐗堟湰鍖?contracts銆丼DK銆乪xamples銆丆I銆丱penAPI锛夈€傛牸寮忥細鏈€鏂板湪鍓嶏紱姣忎釜鐗堟湰瀵瑰簲涓€涓?git tag锛坈ore/open 鍏变韩璇箟鐗堟湰 tag锛孍E 鍙嫭绔嬶級銆?
+RHEOVELA open（`github.com/axisvela/rheovela-open`，Apache-2.0）发布记录：对外发布层（版本化 contracts、SDK、examples、CI、OpenAPI）。格式：最新在前；每个版本对应一个 git tag（core/open 共享语义版本 tag，EE 可独立）。
 
 ## [Unreleased]
 
 ### Added
 
-- `contracts.FederationEnvelope` / `FederationHandoff` / `FederationSLA`: cross-org handoff wire contract (sender/receiver tenant, correlation, shared SLA context).
-
-### Added
-
+- `contracts.FederationEnvelope` / `FederationHandoff` / `FederationSLA`:
+  cross-org handoff wire contract (sender/receiver tenant, correlation, shared
+  SLA context).
 - `designer/collab.mjs`: EE collaboration transport adapter for the Designer
   CRDT (`sendOps`, `getDocument`, `heartbeat`, `presence`).
 
@@ -50,7 +49,7 @@ Core adds the generic feed tenant resolver used by EE tenant-scoped projects.
 
 Coordinated release with core `v1.64.0`; no open contract or SDK changes.
 Core adds the ORCHADYN auto-replan closure and BPMN callActivity subprocess
-support (import 鈫?`Stage.SubWorkflow`, token-engine async spawn/link/鍥炲啓).
+support (import → `Stage.SubWorkflow`, token-engine async spawn/link/回写).
 
 ## [v1.63.0] - 2026-11-07
 
@@ -153,7 +152,7 @@ support (import 鈫?`Stage.SubWorkflow`, token-engine async spawn/link/鍥炲啓
 - Coordinated M0 release: core replaces OIDC device flow/JWKS with local HTTP
   Basic auth and EE adds EIDOVELA/AEGIVELA enterprise authentication. Open has
   no runtime authentication changes; this release updates the roadmap reference
-  to the M0鈥揗7 execution plan.
+  to the M0–M7 execution plan.
 
 ## [v1.51.0] - 2026-11-01
 
@@ -816,71 +815,70 @@ support (import 鈫?`Stage.SubWorkflow`, token-engine async spawn/link/鍥炲啓
 
 ## [v1.1.0] - 2026-08-13
 
-闅?core `v1.1.0`锛圥ostgres 鏀寔锛夊悓姝ュ彂甯冿細鏂囨。琛ラ綈**杩愮淮鎵嬪唽**
-锛坄docs/OPERATIONS.md`锛屽惈 Postgres 鍚庣灏忚妭锛変笌**寮€鍙戞墜鍐?*
-锛坄docs/DEVELOPMENT.md`锛夛紱README 鏀逛负鑻辨枃涓轰富 + 涓枃閾炬帴
-锛坄README.zh.md`锛夈€?
+随 core `v1.1.0`（Postgres 支持）同步发布：文档补齐**运维手册**
+（`docs/OPERATIONS.md`，含 Postgres 后端小节）与**开发手册**
+（`docs/DEVELOPMENT.md`）；README 改为英文为主 + 中文链接
+（`README.zh.md`）。
 
 ## [v0.9.0-beta] - 2026-08-08
 
-棣栦釜 **beta** 鍙戝竷闈紙tag 涓?v1.14-core 鍚屾寚鍚戯級锛歋DK 瑕嗙洊 **5 绉嶈瑷€**
-锛圙o / Python / TypeScript / Java / Rust锛夈€傛柊澧?**Java worker SDK**
-锛坄sdk/java/`锛欽DK 21銆侀浂渚濊禆 `java.net.http.HttpClient`锛?
-`Worker.poll/claim/complete/fail/processOnce`锛変笌 **Rust worker SDK**
-锛坄sdk/rust/`锛歴td-only銆侀浂澶栭儴 crate銆乣std::net::TcpStream` 鏋佺畝 HTTP/1.1
-client锛夛紝骞舵柊澧?**java / rust CI jobs**鈥斺€擿.github/workflows/ci.yml` 鐜版湁
-4 涓?job锛坓o / python / java / rust锛夈€?
+首个 **beta** 发布面（tag 与 v1.14-core 同指向）：SDK 覆盖 **5 种语言**
+（Go / Python / TypeScript / Java / Rust）。新增 **Java worker SDK**
+（`sdk/java/`：JDK 21、零依赖 `java.net.http.HttpClient`，
+`Worker.poll/claim/complete/fail/processOnce`）与 **Rust worker SDK**
+（`sdk/rust/`：std-only、零外部 crate、`std::net::TcpStream` 极简 HTTP/1.1
+client），并新增 **java / rust CI jobs**——`.github/workflows/ci.yml` 现有
+4 个 job（go / python / java / rust）。
 
 ## [v1.14-core] - 2026-08-08
 
-**Rust worker SDK**锛圵24.5锛宍sdk/rust/`锛歚Client` / `Worker` / `process_once`锛?
-绂荤嚎鍙瀯寤猴級+ **Rust CI job**锛坄cargo build --offline` + `cargo run --offline`锛夈€?
+**Rust worker SDK**（W24.5，`sdk/rust/`：`Client` / `Worker` / `process_once`，
+离线可构建）+ **Rust CI job**（`cargo build --offline` + `cargo run --offline`）。
 
 ## [v1.13-core] - 2026-08-08
 
-**Worker SDK 鍚庡彴蹇冭烦**锛圵23.2锛夛細`sdk/worker.Worker` 鍦ㄩ暱浠诲姟鎵ц鏈熼棿浜庡悗鍙?
-缁锛坄worker_test.go` 澧炲姞 heartbeat 鐢ㄤ緥锛夛紝閬垮厤闀夸换鍔＄绾﹁繃鏈熻閲嶆柊棰嗗彇銆?
+**Worker SDK 后台心跳**（W23.2）：`sdk/worker.Worker` 在长任务执行期间于后台
+续租（`worker_test.go` 增加 heartbeat 用例），避免长任务租约过期被重新领取。
 
 ## [v1.12-core] - 2026-08-08
 
-**Event JSON Schema**锛圵21.1锛宍api/event.schema.json`锛宒raft-07锛岃鐩?**13 绉嶄簨浠?
-绫诲瀷**锛? `api/schema_test.go` 涓€鑷存€ф祴璇曪紙`TestEventSchema`锛夈€?
+**Event JSON Schema**（W21.1，`api/event.schema.json`，draft-07，覆盖 **13 种事件
+类型**）+ `api/schema_test.go` 一致性测试（`TestEventSchema`）。
 
 ## [v1.11-core] - 2026-08-08
 
-**WorkflowDefinition JSON Schema**锛圵20.1锛宍api/workflow.schema.json`锛宒raft-07锛?
-conformance 娴嬭瘯锛坄TestWorkflowSchemaValidatesSample` 绛夛級锛沗examples/README.md`
-澹版槑绀轰緥 JSON 鍧囩鍚堣 schema銆?
+**WorkflowDefinition JSON Schema**（W20.1，`api/workflow.schema.json`，draft-07）+
+conformance 测试（`TestWorkflowSchemaValidatesSample` 等）；`examples/README.md`
+声明示例 JSON 均符合该 schema。
 
 ## [v1.10-core] - 2026-08-08
 
-Runnable examples 琛ラ綈锛氭柊澧?**Python worker example**锛坄examples/python-worker/main.py`锛変笌 **TypeScript worker example**锛坄examples/typescript-worker/worker-example.mjs`锛夛紝涓?Go example锛坴1.9-core锛夋瀯鎴愪笁璇█鍙繍琛屾牱渚嬶紙`examples/README.md`锛夈€?
+Runnable examples 补齐：新增 **Python worker example**（`examples/python-worker/main.py`）与 **TypeScript worker example**（`examples/typescript-worker/worker-example.mjs`），与 Go example（v1.9-core）构成三语言可运行样例（`examples/README.md`）。
 
 ## [v1.9-core] - 2026-08-08
 
-Runnable **Go worker example**锛坄examples/go-worker/main.go` + `main_test.go`锛宨n-memory store锛夛紝绀轰緥娴佺▼鍙洿鎺ヨ繍琛屽苟绾冲叆 `go test`锛? 鍖?ok锛歝ontracts / sdk/worker / examples/go-worker锛夈€?
+Runnable **Go worker example**（`examples/go-worker/main.go` + `main_test.go`，in-memory store），示例流程可直接运行并纳入 `go test`（3 包 ok：contracts / sdk/worker / examples/go-worker）。
 
 ## [v1.8-core] - 2026-08-07
 
-OpenAI 鍙戝竷闈㈡墿灞曪細**TypeScript worker SDK**锛坄sdk/typescript/worker.ts` + `worker.test.ts`锛岄浂渚濊禆銆丯ode 18+ `fetch`锛夈€?*OpenAPI 3.0 瑙勮寖**锛坄api/openapi.yaml`锛?00 琛岋級銆?*鍙岃 README**锛堜腑鏂?+ English 蹇€熷紑濮嬶級銆?
+OpenAI 发布面扩展：**TypeScript worker SDK**（`sdk/typescript/worker.ts` + `worker.test.ts`，零依赖、Node 18+ `fetch`）、**OpenAPI 3.0 规范**（`api/openapi.yaml`，700 行）、**双语 README**（中文 + English 快速开始）。
 
 ## [v1.7-core] - 2026-08-07
 
-**Python worker SDK**锛坄sdk/python/worker.py`锛歴tdlib-only `Client`/`Worker`锛? **Python CI job**锛坄.github/workflows/ci.yml`锛宍unittest` 璺?`sdk/python` 娴嬭瘯锛夈€?
+**Python worker SDK**（`sdk/python/worker.py`：stdlib-only `Client`/`Worker`）+ **Python CI job**（`.github/workflows/ci.yml`，`unittest` 跑 `sdk/python` 测试）。
 
 ## [v1.6-core] - 2026-08-07
 
-Contracts catalog 琛ラ綈 + 鍙戝竷璧勪骇锛?*SubprocessStarted 浜嬩欢娉ㄥ唽**锛圵7.1锛孠nownEventTypes 杈?**11 绉?*锛? open release assets锛坄examples/` 涓や釜 RHEO IR DSL 鏍蜂緥銆乣api/README.md` HTTP API reference銆乣docs/product.md` 浜у搧浠嬬粛銆乣sdk/worker/README.md` worker SDK 鎸囧崡锛學7.4锛夈€?
+Contracts catalog 补齐 + 发布资产：**SubprocessStarted 事件注册**（W7.1，KnownEventTypes 达 **11 种**）+ open release assets（`examples/` 两个 RHEO IR DSL 样例、`api/README.md` HTTP API reference、`docs/product.md` 产品介绍、`sdk/worker/README.md` worker SDK 指南，W7.4）。
 
 ## [v1.5-core] - 2026-08-07
 
-Contracts catalog 澧為暱锛?*CompensationExecuted 浜嬩欢娉ㄥ唽**锛圔8 / Wave 6锛孠nownEventTypes 10 绉嶏級銆?
+Contracts catalog 增长：**CompensationExecuted 事件注册**（B8 / Wave 6，KnownEventTypes 10 种）。
 
 ## [v1.4-core] - 2026-08-07
 
-Contracts catalog 澧為暱锛?*StageAssigned 浜嬩欢娉ㄥ唽**锛圵2.2锛屽紩鍏?`KnownEventTypes` 鐩綍锛屽垵濮?8 绉嶏級+ **Migrated 浜嬩欢娉ㄥ唽**锛圵5.1锛孠nownEventTypes 9 绉嶏級锛沗contracts/types_test.go` 澧炲姞瀵瑰簲 catalog round-trip 鏂█銆?
+Contracts catalog 增长：**StageAssigned 事件注册**（W2.2，引入 `KnownEventTypes` 目录，初始 8 种）+ **Migrated 事件注册**（W5.1，KnownEventTypes 9 种）；`contracts/types_test.go` 增加对应 catalog round-trip 断言。
 
 ## [v1.0-core] - 2026-08-07
 
-棣栦釜 open release锛?*鐗堟湰鍖?contracts**锛坄contracts/`锛宍schema_version=1`锛欵vent/WorkflowDefinition/Stage/Transition/RunContext/Actor 绛?+ schema round-trip 娴嬭瘯锛? **Go worker SDK alpha**锛坄sdk/worker/`锛歚WorkStore` 绔彛 + heartbeat/lease renewal/fencing token/structured failure锛學1.6锛夈€?
-
+首个 open release：**版本化 contracts**（`contracts/`，`schema_version=1`：Event/WorkflowDefinition/Stage/Transition/RunContext/Actor 等 + schema round-trip 测试）+ **Go worker SDK alpha**（`sdk/worker/`：`WorkStore` 端口 + heartbeat/lease renewal/fencing token/structured failure，W1.6）。
