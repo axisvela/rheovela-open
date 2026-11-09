@@ -4,6 +4,10 @@ RHEOVELA open（`github.com/axisvela/rheovela-open`，Apache-2.0）发布记录�
 
 ## [Unreleased]
 
+## [v1.72.0] - 2026-11-08
+
+Coordinated release with core `v1.72.0` and EE `v1.79.0`; no open changes.
+
 ## [v1.71.0] - 2026-11-08
 
 Coordinated release with core `v1.71.0` and EE `v1.78.0`; no open changes.
