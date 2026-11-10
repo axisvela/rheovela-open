@@ -25,6 +25,12 @@ RHEOVELA open（`github.com/axisvela/rheovela-open`，Apache-2.0）发布记录�
 - RHEO IR activities accept `gate "<csv>"`, compiled by core to
   `Stage.gate.requires`.
 
+## [v1.73.0] - 2026-11-10
+
+Coordinated release with core `v1.73.0`; no open changes. Core moved its Go
+module path to `github.com/axisvela/rheovela/backend/v3` (breaking for core
+consumers; open module paths are unchanged).
+
 ## [v1.72.0] - 2026-11-08
 
 Coordinated release with core `v1.72.0` and EE `v1.79.0`; no open changes.
