@@ -13,6 +13,8 @@ RHEOVELA open（`github.com/axisvela/rheovela-open`，Apache-2.0）发布记录�
   `Stage.payload`.
 - RHEO IR activities accept `actor "<id>"`, compiled by core to an actor
   assignee spec.
+- RHEO IR activities accept `title "<text>"`; quoted values may contain spaces
+  and backslash escapes.
 
 ## [v1.72.0] - 2026-11-08
 

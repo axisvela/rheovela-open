@@ -56,7 +56,8 @@ version       = "v" 1*DIGIT
 declaration   = activity / transition / compensate / delegate / evidence / migration
 activity      = "activity" WS ident WS ":" WS kind *( WS attribute )
 kind          = ident
-attribute     = "capability" WS value
+attribute     = "title" WS value
+              / "capability" WS value
               / "role" WS value
               / "actor" WS value
               / "effect_key" WS value
@@ -123,6 +124,8 @@ process PurchaseApproval v1 {
 - `<kind>` is a free-form token. The canonical kinds are `AgentTask`,
   `HumanTask` and `ServiceTask`; other kinds are preserved in the IR AST but
   compile to an open assignee.
+- Quoted values may contain spaces; backslash escapes are decoded.
+- `title "<text>"` sets `Stage.title`; it defaults to the activity id.
 - `capability "<cap>"` sets `AssigneeSpec.kind = "capability"` and
   `AssigneeSpec.required = ["<cap>"]`.
 - `role "<role>"` sets `AssigneeSpec.kind = "role"` and `AssigneeSpec.role`.
@@ -141,8 +144,8 @@ process PurchaseApproval v1 {
   `Stage.required_evidence`; completion must carry each named evidence key.
 - `inputs "<csv>"` and `outputs "<csv>"` compile to comma-split
   `Stage.inputs` and `Stage.outputs`.
-- `payload <json>` accepts compact JSON (no whitespace) and compiles to
-  `Stage.payload`.
+- `payload <json>` accepts compact JSON (no whitespace) or a quoted JSON
+  string (escaped quotes, spaces allowed) and compiles to `Stage.payload`.
 
 ### 5.3 Transition
 
@@ -199,7 +202,8 @@ may be removed by a live migration.
 | IR element | WorkflowDefinition field |
 |------------|--------------------------|
 | `process <name>` | `workflow_id`, `title` |
-| `activity <id> : <kind>` | `stages[].id`, `stages[].title` (title = id) |
+| `activity <id> : <kind>` | `stages[].id`, `stages[].title` (title = id unless `title` sets it) |
+| `title "<text>"` | `stages[].title` |
 | `capability "<cap>"` | `stages[].assignee_spec = {kind:"capability", required:["<cap>"]}` |
 | `role "<role>"` | `stages[].assignee_spec = {kind:"role", role:"<role>"}` |
 | `actor "<id>"` | `stages[].assignee_spec = {kind:"actor", actor_id:"<id>"}` |
