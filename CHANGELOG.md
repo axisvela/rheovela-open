@@ -4,6 +4,11 @@ RHEOVELA open（`github.com/axisvela/rheovela-open`，Apache-2.0）发布记录�
 
 ## [Unreleased]
 
+## [v1.74.0] - 2026-11-10
+
+Coordinated release with core `v1.74.0`; documents the RHEO IR activity
+attributes below.
+
 ### Added
 
 - RHEO IR activities accept `required_evidence "<csv>"`, compiled by core to

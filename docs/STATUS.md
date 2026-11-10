@@ -1,6 +1,6 @@
-# Rheovela-open Status (v1.73.0)
+# Rheovela-open Status (v1.74.0)
 
-> Last updated: 2026-11-10 · current release `v1.73.0`（core/open 共享；EE 独立 tag；work-item 功能参考基线 `v1.4.0`）· license Apache-2.0
+> Last updated: 2026-11-10 · current release `v1.74.0`（core/open 共享；EE 独立 tag；work-item 功能参考基线 `v1.4.0`）· license Apache-2.0
 >
 > 本文是 open 的对外公开状态。内部发布一致性、企业能力缺口与详细 backlog
 > 由 Rheovela-ee 私有仓库 `docs/STATUS.md` 跟踪。
@@ -9,7 +9,7 @@
 
 | Item | State |
 |------|-------|
-| Release tag | `v1.73.0`（2026-11-10，core/open 共享；EE 独立 tag；本版 open 无变更，core 迁移模块路径到 `backend/v3`） |
+| Release tag | `v1.74.0`（2026-11-10，core/open 共享；EE 独立 tag；本版记录 RHEO IR activity 属性扩展，core 侧编译到 `Stage`/`AssigneeSpec`） |
 | Module tags | 根模块保持 `v3.16.0`；`sdk/go/v3.2.0`；adapter `sdk/go/harmovela/v3.0.0`（本地 tag 已核对；不代表本次验证了远端发布/模块代理） |
 | Contracts | `AssigneeSpec` candidates/SLA/budget/claim_policy/escalation；`Stage` task_kind/payload/required_evidence/approval_roles/tool_scope/credential_ref/completion_mode/required_approvals/required_completions/**sub_workflow**； `schema_version=1`；事件含 `WorkItemApprovalRequested`/`WorkItemApproved`/`WorkItemRejected`/`WorkItemEscalated`/`WorkItemHandedOff`/`WorkItemTakenOver`/`WorkItemCoCompleted` |
 | OpenAPI | `api/openapi.yaml`；覆盖 instances、steps、work-items、handoff/takeover、notifications、approval-delegations、suspend/resume、approval、retry/cancel、audit、sync、events、health/status/metrics |
