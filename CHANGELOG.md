@@ -22,6 +22,8 @@ RHEOVELA open（`github.com/axisvela/rheovela-open`，Apache-2.0）发布记录�
   `Stage.sub_workflow`.
 - RHEO IR activities accept `sub_workflow_inputs "<k=v,csv>"`, compiled by core
   to `Stage.sub_workflow.inputs`.
+- RHEO IR activities accept `gate "<csv>"`, compiled by core to
+  `Stage.gate.requires`.
 
 ## [v1.72.0] - 2026-11-08
 

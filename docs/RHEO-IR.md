@@ -69,6 +69,7 @@ attribute     = "title" WS value
               / "sub_workflow" WS value
               / "sub_workflow_version" WS integer
               / "sub_workflow_inputs" WS value
+              / "gate" WS value
               / "effect_key" WS value
               / "timeout" WS duration
               / "approval_roles" WS value
@@ -148,6 +149,7 @@ process PurchaseApproval v1 {
   `sub_workflow_version <n>` sets its pinned version and
   `sub_workflow_inputs "<k=v,csv>"` sets its inputs. Both require
   `sub_workflow`.
+- `gate "<csv>"` compiles to `Stage.gate = {requires: [...]}`.
 - `effect_key "<template>"` and `timeout <duration>` compile to
   `Stage.effect_key` and `Stage.timeout`.
 - `approval_roles "<csv>"` and `tools "<csv>"` compile to comma-split
@@ -227,6 +229,7 @@ may be removed by a live migration.
 | `claim_policy` / `escalation` | `stages[].assignee_spec.claim_policy/escalation` |
 | `owner_skill` | `stages[].owner_skill` |
 | `sub_workflow` / `sub_workflow_version` / `sub_workflow_inputs` | `stages[].sub_workflow = {workflow_id, version, inputs}` |
+| `gate` | `stages[].gate = {requires: [...]}` |
 | no actor/role/capability | `stages[].assignee_spec = {kind:"open"}` |
 | `transition a -> b` | `transitions[] = {from:"a", to:"b"}` |
 | `when <condition>` | `transitions[].condition` |
