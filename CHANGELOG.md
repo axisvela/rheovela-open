@@ -20,6 +20,8 @@ RHEOVELA open（`github.com/axisvela/rheovela-open`，Apache-2.0）发布记录�
 - RHEO IR activities accept `owner_skill` and `sub_workflow` /
   `sub_workflow_version`, compiled by core to `Stage.owner_skill` and
   `Stage.sub_workflow`.
+- RHEO IR activities accept `sub_workflow_inputs "<k=v,csv>"`, compiled by core
+  to `Stage.sub_workflow.inputs`.
 
 ## [v1.72.0] - 2026-11-08
 

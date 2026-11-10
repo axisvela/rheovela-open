@@ -68,6 +68,7 @@ attribute     = "title" WS value
               / "owner_skill" WS value
               / "sub_workflow" WS value
               / "sub_workflow_version" WS integer
+              / "sub_workflow_inputs" WS value
               / "effect_key" WS value
               / "timeout" WS duration
               / "approval_roles" WS value
@@ -144,7 +145,8 @@ process PurchaseApproval v1 {
   and `escalation "<value>"` compile to the matching `AssigneeSpec` fields.
 - `owner_skill "<skill>"` compiles to `Stage.owner_skill`.
 - `sub_workflow "<workflow-id>"` compiles to `Stage.sub_workflow`; an optional
-  `sub_workflow_version <n>` sets its pinned version and requires
+  `sub_workflow_version <n>` sets its pinned version and
+  `sub_workflow_inputs "<k=v,csv>"` sets its inputs. Both require
   `sub_workflow`.
 - `effect_key "<template>"` and `timeout <duration>` compile to
   `Stage.effect_key` and `Stage.timeout`.
@@ -224,7 +226,7 @@ may be removed by a live migration.
 | `candidates` / `sla` / `budget` | `stages[].assignee_spec.candidates/sla/budget` |
 | `claim_policy` / `escalation` | `stages[].assignee_spec.claim_policy/escalation` |
 | `owner_skill` | `stages[].owner_skill` |
-| `sub_workflow` / `sub_workflow_version` | `stages[].sub_workflow = {workflow_id, version}` |
+| `sub_workflow` / `sub_workflow_version` / `sub_workflow_inputs` | `stages[].sub_workflow = {workflow_id, version, inputs}` |
 | no actor/role/capability | `stages[].assignee_spec = {kind:"open"}` |
 | `transition a -> b` | `transitions[] = {from:"a", to:"b"}` |
 | `when <condition>` | `transitions[].condition` |
