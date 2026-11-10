@@ -58,6 +58,7 @@ activity      = "activity" WS ident WS ":" WS kind *( WS attribute )
 kind          = ident
 attribute     = "capability" WS value
               / "role" WS value
+              / "actor" WS value
               / "effect_key" WS value
               / "timeout" WS duration
               / "approval_roles" WS value
@@ -125,8 +126,9 @@ process PurchaseApproval v1 {
 - `capability "<cap>"` sets `AssigneeSpec.kind = "capability"` and
   `AssigneeSpec.required = ["<cap>"]`.
 - `role "<role>"` sets `AssigneeSpec.kind = "role"` and `AssigneeSpec.role`.
-- When both `capability` and `role` are present, `role` takes precedence.
-- When neither is present, `AssigneeSpec.kind = "open"`.
+- `actor "<id>"` sets `AssigneeSpec.kind = "actor"` and `AssigneeSpec.actor_id`.
+- Assignee precedence is `actor` over `role` over `capability`.
+- When none is present, `AssigneeSpec.kind = "open"`.
 - `effect_key "<template>"` and `timeout <duration>` compile to
   `Stage.effect_key` and `Stage.timeout`.
 - `approval_roles "<csv>"` and `tools "<csv>"` compile to comma-split
@@ -200,7 +202,8 @@ may be removed by a live migration.
 | `activity <id> : <kind>` | `stages[].id`, `stages[].title` (title = id) |
 | `capability "<cap>"` | `stages[].assignee_spec = {kind:"capability", required:["<cap>"]}` |
 | `role "<role>"` | `stages[].assignee_spec = {kind:"role", role:"<role>"}` |
-| no capability/role | `stages[].assignee_spec = {kind:"open"}` |
+| `actor "<id>"` | `stages[].assignee_spec = {kind:"actor", actor_id:"<id>"}` |
+| no actor/role/capability | `stages[].assignee_spec = {kind:"open"}` |
 | `transition a -> b` | `transitions[] = {from:"a", to:"b"}` |
 | `when <condition>` | `transitions[].condition` |
 | `effect_key` / `timeout` | `stages[].effect_key`, `stages[].timeout` |

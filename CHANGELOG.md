@@ -11,6 +11,8 @@ RHEOVELA open（`github.com/axisvela/rheovela-open`，Apache-2.0）发布记录�
 - RHEO IR activities accept `inputs`/`outputs` lists and compact JSON
   `payload`, compiled by core to `Stage.inputs`, `Stage.outputs`, and
   `Stage.payload`.
+- RHEO IR activities accept `actor "<id>"`, compiled by core to an actor
+  assignee spec.
 
 ## [v1.72.0] - 2026-11-08
 
