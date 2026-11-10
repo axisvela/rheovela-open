@@ -66,6 +66,7 @@ attribute     = "capability" WS value
               / "completion" WS value
               / "approvals" WS integer
               / "completions" WS integer
+              / "required_evidence" WS value
 transition    = "transition" WS ident WS "->" WS ident [ WS "when" WS condition ]
 compensate    = "compensate" WS ident WS "with" WS ( "capability" WS value / ident )
 delegate      = "delegate" WS ident WS "to" WS ("actor"/"role"/"capability") WS value
@@ -131,6 +132,8 @@ process PurchaseApproval v1 {
 - `completion "<mode>"` (`single`/`quorum`/`all_actors`) compiles to
   `Stage.completion_mode`; `approvals <n>` and `completions <n>` compile to
   `Stage.required_approvals` and `Stage.required_completions`.
+- `required_evidence "<csv>"` compiles to comma-split
+  `Stage.required_evidence`; completion must carry each named evidence key.
 - `inputs` and `outputs` are emitted as empty arrays by the compiler.
 
 ### 5.3 Transition
@@ -198,6 +201,7 @@ may be removed by a live migration.
 | `approval_roles` / `tools` | `stages[].approval_roles`, `stages[].tool_scope` |
 | `credential` / `completion` | `stages[].credential_ref`, `stages[].completion_mode` |
 | `approvals` / `completions` | `stages[].required_approvals`, `stages[].required_completions` |
+| `required_evidence` | `stages[].required_evidence` |
 | `compensate ...` | `compensations[] = {for_activity, compensate_with/capability}` |
 | `delegate ...` | `stages[].delegation = {kind, delegatee, scopes, budget, evidence}` |
 | `evidence ... require` | `stages[].evidence[]` |
