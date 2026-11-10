@@ -8,6 +8,9 @@ RHEOVELA open（`github.com/axisvela/rheovela-open`，Apache-2.0）发布记录�
 
 - RHEO IR activities accept `required_evidence "<csv>"`, compiled by core to
   `Stage.required_evidence`.
+- RHEO IR activities accept `inputs`/`outputs` lists and compact JSON
+  `payload`, compiled by core to `Stage.inputs`, `Stage.outputs`, and
+  `Stage.payload`.
 
 ## [v1.72.0] - 2026-11-08
 
