@@ -15,6 +15,8 @@ RHEOVELA open（`github.com/axisvela/rheovela-open`，Apache-2.0）发布记录�
   assignee spec.
 - RHEO IR activities accept `title "<text>"`; quoted values may contain spaces
   and backslash escapes.
+- RHEO IR activities accept `candidates`, `sla`, `budget`, `claim_policy`, and
+  `escalation`, compiled by core to the matching `AssigneeSpec` fields.
 
 ## [v1.72.0] - 2026-11-08
 
