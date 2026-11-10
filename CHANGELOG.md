@@ -17,6 +17,9 @@ RHEOVELA open（`github.com/axisvela/rheovela-open`，Apache-2.0）发布记录�
   and backslash escapes.
 - RHEO IR activities accept `candidates`, `sla`, `budget`, `claim_policy`, and
   `escalation`, compiled by core to the matching `AssigneeSpec` fields.
+- RHEO IR activities accept `owner_skill` and `sub_workflow` /
+  `sub_workflow_version`, compiled by core to `Stage.owner_skill` and
+  `Stage.sub_workflow`.
 
 ## [v1.72.0] - 2026-11-08
 
